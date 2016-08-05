@@ -7,6 +7,11 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    //TODO
+    //Implement simple UDP Communications today
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
