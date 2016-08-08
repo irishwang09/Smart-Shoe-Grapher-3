@@ -8,10 +8,6 @@ import android.view.MenuItem;
 public class MainActivity extends AppCompatActivity {
 
 
-    //TODO
-    //Implement simple UDP Communications today
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

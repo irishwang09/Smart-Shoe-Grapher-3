@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
@@ -14,23 +16,29 @@ public class udpClient {
     private int remoteServerPort;
     private InetAddress serverAddress;
 
-    public udpClient(String ipAddress, int remoteServerPort){
+    public udpClient(String ipAddress, int remoteServerPort, int localPort) throws IOException{
         this.remoteServerPort = remoteServerPort;
-        //this.serverAddress = InetAddress.getByName(ipAddress);
+        this.socket = new DatagramSocket(localPort);
     }
-
-    //TODO: Add permissions to manifest folder
+    
 
     /**
      *  Send a quick message to the server to
      *  allow the server to obtain the Android device
      *  IP address
      */
-    public void acknowledgeServer(){
+    public void acknowledgeServer()throws IOException{ //Need to implement a try catch
+        byte[] buf = "It is I Android. Grab my IP Address".getBytes();
+        InetAddress address = InetAddress.getByName("footsensor1.dynamic-dns.net");
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 2391);
+        socket.send(packet);
 
+        //Wait a reply in the button pushing code
 
+    }
 
-
+    public void listenToServer(){
+        //Implement method to get data from user about hostname port, etc.
     }
 
 

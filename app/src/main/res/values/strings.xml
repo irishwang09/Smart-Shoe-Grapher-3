@@ -4,5 +4,12 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="acknowledge_server">Ping Server</string>
+    <string name="remote_hostname">Remote Hostname</string>
+    <string name="example_host">footsensor1.dynamic-dns.net</string>
+    <string name="remote_port">Remote Port</string>
+    <string name="remote_port_example">2391</string>
+    <string name="local_port">Local Port</string>
+    <string name="local_port_example">5006</string>
+    <string name="connected">Not Connected.</string>
 
 </resources>
