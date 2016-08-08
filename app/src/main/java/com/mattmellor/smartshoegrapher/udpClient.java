@@ -11,7 +11,7 @@ import java.net.InetAddress;
  * That will accept incoming datagrams(packets)
  */
 
-public class udpClient implements Runnable {
+public class UdpClient implements Runnable {
 
     private DatagramSocket socket;
     private InetAddress serverAddress;
@@ -21,7 +21,7 @@ public class udpClient implements Runnable {
     public DatagramPacket rcvdPacket;
 
 
-    public udpClient(String ipAddress, int remoteServerPort, int localPort, int dataSetsPerPacket) throws IOException{
+    public UdpClient(String ipAddress, int remoteServerPort, int localPort, int dataSetsPerPacket) throws IOException{
         this.remoteServerPort = remoteServerPort;
         this.serverAddress = InetAddress.getByName(ipAddress);
         this.dataSetsPerPacket = dataSetsPerPacket;

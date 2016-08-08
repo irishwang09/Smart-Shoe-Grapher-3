@@ -1,17 +1,32 @@
 package com.mattmellor.smartshoegrapher;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    //Todo: Add structure to udpClient
+    UdpClient client = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        try {
+            client = new UdpClient("footsensor1.dynamic-dns.net", 2391, 5006, 45);
+            client.acknowledgeServer();
+        }catch (IOException e){
+            //Didn't work
+        }
+
     }
 
     @Override
@@ -34,4 +49,15 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public void onClickPing(View view){
+        Button pingButton = (Button) view;
+        try {
+            client.acknowledgeServer();
+        }catch (IOException e){
+            //DO Nothing for now
+        }
+
+    }
+
 }
