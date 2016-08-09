@@ -6,14 +6,30 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 /**
- * Created by Matthew on 8/5/2016.
+ * Created by Matt Mellor on 8/5/2016.
  * Class that represents a udp wifi client
  * That will accept incoming datagrams(packets)
+ * Outer class contains the information about the Udp connection
+ *
+ * Inner classes are responsible for
+ *      1. Pinging the server
+ *      2. Reading data from the server
+ *
+ * Reasoning for this formatting is to avoid having the UI Main thread
+ * touch the UDP threads (Avoids errors)
+ *
+ * Benefits of this approach
+ *      1. Scalability
+ *          Since each instance of UdpClient will have a seperate instance of
+ *          threads that ping the server and read the data, code should be scalable to
+ *          allow for multiple udp connections at once.
  */
 
-public class UdpClient implements Runnable {
+public class UdpClient {
 
     private DatagramSocket socket;
     private InetAddress serverAddress;
@@ -21,7 +37,7 @@ public class UdpClient implements Runnable {
     private int localPort;
     private int dataSetsPerPacket;
     public DatagramPacket rcvdPacket;
-
+    private final boolean streamData = true;
 
     public UdpClient(String ipAddress, int remoteServerPort, int localPort, int dataSetsPerPacket){
         try {
@@ -30,51 +46,66 @@ public class UdpClient implements Runnable {
             this.serverAddress = InetAddress.getByName(ipAddress);
             this.dataSetsPerPacket = dataSetsPerPacket;
             this.localPort = localPort;
-            this.socket = new DatagramSocket(localPort);
             Log.d("MATT!", "Object Initialized");
         }catch(Exception e){
             Log.e("MATT!", "Object Initialization Failed");
         }
-
     }
 
-    public void acknowledgeServer(){ //Need to implement a try catch
-        try {
-            byte[] buf = "Android Phone Connection ".getBytes();
-            InetAddress address = InetAddress.getByName("18.111.41.17");
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 2391);
-            //DatagramSocket socket2 = new DatagramSocket(5005);
-            socket.send(packet);
-            socket.close();
-        }catch (Exception e){
-            Log.d("MATT!", "Caught Acknowledge Server Exception");
-            socket.close();
+    public class UdpServerAcknowledger extends Thread{
+        //TODO: Update this to be a threaded class
+        //Look up inner classes to refresh on how to instantiate this
+
+        public void run(){
+            acknowledgeServer();
+        }
+
+        public void acknowledgeServer(){
+            String mess = "Android connection";
+            DatagramPacket packet;
+            try{
+                socket = new DatagramSocket(localPort);
+                packet = new DatagramPacket(mess.getBytes(), mess.length(), serverAddress, remoteServerPort);
+                socket.send(packet);
+                Log.d("MATT!", "end of packet sending");
+            }catch (SocketException e){
+                //e.printStackTrace();
+                Log.e("MATT!", "socket exception");
+            }catch(UnknownHostException e){
+                //e.printStackTrace();
+                Log.e("MATT!", "unknown host exception");
+            }catch(IOException e){
+                //e.printStackTrace();
+                Log.e("MATT!", "IOException");
+            }catch(Exception e){
+                Log.e("MATT!", "General exception");
+                e.printStackTrace();
+            }finally {
+                if(socket != null){
+                    socket.close();
+                    Log.d("MATT!", "Made it to finally");
+                }
+            }
         }
     }
 
 
-    public void listenToServer() throws IOException{
-        //Implement method to get data from user about hostname port, etc.
-        byte[] buf = new byte[1352];
-        int i = 0;
-        String received = "";
-        while(i < 50){
-            rcvdPacket = new DatagramPacket(buf, buf.length);
-            socket.receive(rcvdPacket);
-            received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
-            String[] val = received.substring(0, received.length() -2).split(",");
-            //Put the data somewhere another thread can use
-            i++;
-        }
-    }
-
-    @Override
-    public void run(){
-        //listen to server for data
-        try {
-            listenToServer();
-        } catch (IOException e) {
-            e.printStackTrace();
+    private class UdpDataListener extends Thread {
+        //Implements thread
+        //TODO implement this class
+        public void listenToServer() throws IOException{
+            //Implement method to get data from user about hostname port, etc.
+            byte[] buf = new byte[1352];
+            int i = 0;
+            String received = "";
+            while(i < 50){
+                rcvdPacket = new DatagramPacket(buf, buf.length);
+                socket.receive(rcvdPacket);
+                received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
+                String[] val = received.substring(0, received.length() -2).split(",");
+                //Put the data somewhere another thread can use
+                i++;
+            }
         }
     }
 
