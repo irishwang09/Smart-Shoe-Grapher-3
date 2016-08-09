@@ -1,5 +1,7 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -21,21 +23,36 @@ public class UdpClient implements Runnable {
     public DatagramPacket rcvdPacket;
 
 
-    public UdpClient(String ipAddress, int remoteServerPort, int localPort, int dataSetsPerPacket) throws IOException{
-        this.remoteServerPort = remoteServerPort;
-        this.serverAddress = InetAddress.getByName(ipAddress);
-        this.dataSetsPerPacket = dataSetsPerPacket;
-        this.localPort = localPort;
-        this.socket = new DatagramSocket(localPort);
+    public UdpClient(String ipAddress, int remoteServerPort, int localPort, int dataSetsPerPacket){
+        try {
+            Log.d("MATT!", "Attempting to Initialize Object");
+            this.remoteServerPort = remoteServerPort;
+            this.serverAddress = InetAddress.getByName(ipAddress);
+            this.dataSetsPerPacket = dataSetsPerPacket;
+            this.localPort = localPort;
+            this.socket = new DatagramSocket(localPort);
+            Log.d("MATT!", "Object Initialized");
+        }catch(Exception e){
+            Log.e("MATT!", "Object Initialization Failed");
+        }
+
     }
 
-    public void acknowledgeServer()throws IOException{ //Need to implement a try catch
-        byte[] buf = "Android Phone Connection ".getBytes();
-        DatagramPacket packet = new DatagramPacket(buf, buf.length, serverAddress, remoteServerPort);
-        socket.send(packet);
+    public void acknowledgeServer(){ //Need to implement a try catch
+        try {
+            byte[] buf = "Android Phone Connection ".getBytes();
+            InetAddress address = InetAddress.getByName("18.111.41.17");
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 2391);
+            //DatagramSocket socket2 = new DatagramSocket(5005);
+            socket.send(packet);
+            socket.close();
+        }catch (Exception e){
+            Log.d("MATT!", "Caught Acknowledge Server Exception");
+            socket.close();
+        }
     }
 
-    //TODO Needs work
+
     public void listenToServer() throws IOException{
         //Implement method to get data from user about hostname port, etc.
         byte[] buf = new byte[1352];
@@ -53,8 +70,12 @@ public class UdpClient implements Runnable {
 
     @Override
     public void run(){
-        //TODO
-        //Implementing runnable as opposed to extending thread seems like the right choice here
+        //listen to server for data
+        try {
+            listenToServer();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
