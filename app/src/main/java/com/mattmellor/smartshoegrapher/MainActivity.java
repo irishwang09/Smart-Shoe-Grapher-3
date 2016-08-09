@@ -6,11 +6,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    final UdpClient client = new UdpClient("18.111.41.17",2391,5006,45);
+    final UdpClient client = new UdpClient("18.111.41.17",2391,5007,45);
     UdpClient.UdpServerAcknowledger udpPinger = null;
 
     @Override
@@ -18,14 +17,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d("MATT!", "onCreateMethod");
-
     }
 
     public void onClickPingButton(View view){
         udpPinger = client.new UdpServerAcknowledger();
         udpPinger.start();
-        TextView connection = (TextView) findViewById(R.id.connection_status);
-        connection.setText(" Connected ");
+        //TextView connection = (TextView) findViewById(R.id.connection_status);
+        //connection.setText(" Connected ");
+        //Log.d("MATT!", "Successful Ping");
     }
 
 

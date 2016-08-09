@@ -48,13 +48,11 @@ public class UdpClient {
             this.localPort = localPort;
             Log.d("MATT!", "Object Initialized");
         }catch(Exception e){
-            Log.e("MATT!", "Object Initialization Failed");
+            //Log.e("MATT!", "Object Initialization Failed");
         }
     }
 
     public class UdpServerAcknowledger extends Thread{
-        //TODO: Update this to be a threaded class
-        //Look up inner classes to refresh on how to instantiate this
 
         public void run(){
             acknowledgeServer();
@@ -67,7 +65,7 @@ public class UdpClient {
                 socket = new DatagramSocket(localPort);
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), serverAddress, remoteServerPort);
                 socket.send(packet);
-                Log.d("MATT!", "end of packet sending");
+                //Log.d("MATT!", "end of packet sending");
             }catch (SocketException e){
                 //e.printStackTrace();
                 Log.e("MATT!", "socket exception");
@@ -83,7 +81,7 @@ public class UdpClient {
             }finally {
                 if(socket != null){
                     socket.close();
-                    Log.d("MATT!", "Made it to finally");
+                    //Log.d("MATT!", "Made it to finally");
                 }
             }
         }
