@@ -6,11 +6,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
     final UdpClient client = new UdpClient("18.111.41.17",2391,5007,45);
     UdpClient.UdpServerAcknowledger udpPinger = null;
+    private final boolean changedConnectionStatus = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,10 +24,22 @@ public class MainActivity extends AppCompatActivity {
     public void onClickPingButton(View view){
         udpPinger = client.new UdpServerAcknowledger();
         udpPinger.start();
-        //TextView connection = (TextView) findViewById(R.id.connection_status);
-        //connection.setText(" Connected ");
-        //Log.d("MATT!", "Successful Ping");
+        if(!changedConnectionStatus){
+            TextView connection = (TextView) findViewById(R.id.connection_status);
+            connection.setText(" Connected ");
+        }
     }
+
+    //TODO change udp data streamer class to make its own socket
+    public void onClickStartStreaming(View view){
+        //TODO implement this
+    }
+
+    public void onClickStopStreaming(View view){
+        //TODO implement this
+        //Just change the boolean value
+    }
+
 
 
     @Override

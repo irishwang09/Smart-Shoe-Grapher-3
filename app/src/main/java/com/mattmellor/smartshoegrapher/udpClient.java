@@ -48,7 +48,7 @@ public class UdpClient {
             this.localPort = localPort;
             Log.d("MATT!", "Object Initialized");
         }catch(Exception e){
-            //Log.e("MATT!", "Object Initialization Failed");
+            Log.e("MATT!", "Object Initialization Failed");
         }
     }
 
@@ -65,15 +65,14 @@ public class UdpClient {
                 socket = new DatagramSocket(localPort);
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), serverAddress, remoteServerPort);
                 socket.send(packet);
-                //Log.d("MATT!", "end of packet sending");
             }catch (SocketException e){
-                //e.printStackTrace();
+                e.printStackTrace();
                 Log.e("MATT!", "socket exception");
             }catch(UnknownHostException e){
-                //e.printStackTrace();
+                e.printStackTrace();
                 Log.e("MATT!", "unknown host exception");
             }catch(IOException e){
-                //e.printStackTrace();
+                e.printStackTrace();
                 Log.e("MATT!", "IOException");
             }catch(Exception e){
                 Log.e("MATT!", "General exception");
@@ -81,7 +80,6 @@ public class UdpClient {
             }finally {
                 if(socket != null){
                     socket.close();
-                    //Log.d("MATT!", "Made it to finally");
                 }
             }
         }
@@ -91,18 +89,25 @@ public class UdpClient {
     private class UdpDataListener extends Thread {
         //Implements thread
         //TODO implement this class
+
+        public void run(){
+            try {
+                listenToServer();
+            }catch (IOException e){
+                Log.e("MATT!","IO Exception thrown in dataListener");
+            }
+        }
+
         public void listenToServer() throws IOException{
-            //Implement method to get data from user about hostname port, etc.
             byte[] buf = new byte[1352];
-            int i = 0;
             String received = "";
-            while(i < 50){
+            while(streamData){
                 rcvdPacket = new DatagramPacket(buf, buf.length);
                 socket.receive(rcvdPacket);
                 received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
-                String[] val = received.substring(0, received.length() -2).split(",");
-                //Put the data somewhere another thread can use
-                i++;
+                //String[] val = received.substring(0, received.length() -2).split(",");
+                //TODO: Make the data available for streaming to the graph
+                Log.d("MATT!", received.substring(0, received.length() -2));
             }
         }
     }
