@@ -24,47 +24,61 @@ import java.net.UnknownHostException;
  *
  * Benefits of this approach
  *      1. Scalability
- *          Since each instance of UdpClient will have a seperate instance of
+ *          Since each instance of UdpClient will have a separate instance of
  *          threads that ping the server and read the data, code should be scalable to
  *          allow for multiple udp connections at once.
  */
 
 public class UdpClient {
 
-    private DatagramSocket socket;
+    private DatagramSocket pingSocket;
+    private DatagramSocket receiveSocket;
     private InetAddress serverAddress;
     private int remoteServerPort;
     private int localPort;
     private int dataSetsPerPacket;
     public DatagramPacket rcvdPacket;
-    private final boolean streamData = true;
+    private boolean streamData = true;
 
+    /**
+     * @param ipAddress : String representing the ip Address/hostname of the remote server
+     * @param remoteServerPort : int representing the value of the remote port of the server
+     * @param localPort: int representing the value of the local port of the server
+     * @param dataSetsPerPacket: int representing the number of data sets per packet
+     */
     public UdpClient(String ipAddress, int remoteServerPort, int localPort, int dataSetsPerPacket){
         try {
-            Log.d("MATT!", "Attempting to Initialize Object");
             this.remoteServerPort = remoteServerPort;
             this.serverAddress = InetAddress.getByName(ipAddress);
             this.dataSetsPerPacket = dataSetsPerPacket;
             this.localPort = localPort;
-            Log.d("MATT!", "Object Initialized");
         }catch(Exception e){
             Log.e("MATT!", "Object Initialization Failed");
         }
     }
 
+    /**
+     * Inner class for sending a message to the remote server
+     * This is a separate class because all networking actions can't occur
+     * on the main UI thread
+     */
     public class UdpServerAcknowledger extends Thread{
 
+        /**
+         * value to be called by the thread
+         */
         public void run(){
-            acknowledgeServer();
+            acknowledgeServerNoReceive();
         }
 
-        public void acknowledgeServer(){
-            String mess = "Android connection";
+        private void acknowledgeServerNoReceive(){
+            String mess = "Ping";
             DatagramPacket packet;
+            int pingLocalPort = localPort + 1; //Ensures that send a recieve sockets are different
             try{
-                socket = new DatagramSocket(localPort);
+                pingSocket = new DatagramSocket(pingLocalPort);
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), serverAddress, remoteServerPort);
-                socket.send(packet);
+                pingSocket.send(packet);
             }catch (SocketException e){
                 e.printStackTrace();
                 Log.e("MATT!", "socket exception");
@@ -78,79 +92,133 @@ public class UdpClient {
                 Log.e("MATT!", "General exception");
                 e.printStackTrace();
             }finally {
-                if(socket != null){
-                    socket.close();
+                if(pingSocket != null){
+                    pingSocket.close();
                 }
             }
         }
     }
 
-
-    private class UdpDataListener extends Thread {
-        //Implements thread
-        //TODO implement this class
+    /**
+     * Class for listening to Udp remote server for a long time
+     * as a separate thread
+     */
+    public class UdpDataListener extends Thread {
+        //TODO figure out a why to stop the thread if needed
+        //TODO figure out how to store the data for the graph to pick up
 
         public void run(){
-            try {
-                listenToServer();
-            }catch (IOException e){
-                Log.e("MATT!","IO Exception thrown in dataListener");
-            }
+            pingThenListenToServer();
         }
 
-        public void listenToServer() throws IOException{
-            byte[] buf = new byte[1352];
+        private void pingThenListenToServer(){
+            byte[] buf = new byte[1352]; //TODO calculate this number with a formula
             String received = "";
-            while(streamData){
-                rcvdPacket = new DatagramPacket(buf, buf.length);
-                socket.receive(rcvdPacket);
-                received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
-                //String[] val = received.substring(0, received.length() -2).split(",");
-                //TODO: Make the data available for streaming to the graph
-                Log.d("MATT!", received.substring(0, received.length() -2));
+            //First try to connect to udp with a ping
+            //Then start listening for data
+            String mess = "Android Data Receiver";
+            DatagramPacket packet;
+            try{
+                //Ping the server to tell server IP Address of Android phone
+                receiveSocket = new DatagramSocket(localPort);
+                packet = new DatagramPacket(mess.getBytes(), mess.length(), serverAddress, remoteServerPort);
+                receiveSocket.send(packet);
+
+                while (streamData) {
+                        rcvdPacket = new DatagramPacket(buf, buf.length);
+                        receiveSocket.receive(rcvdPacket);
+                        received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
+                        //String[] val = received.substring(0, received.length() -2).split(",");
+                        Log.d("MATT!", received.substring(0, received.length() - 2));
+                }
+            }catch (SocketException e){
+                e.printStackTrace();
+                Log.e("MATT!", "socket exception");
+            }catch(UnknownHostException e){
+                e.printStackTrace();
+                Log.e("MATT!", "unknown host exception");
+            }catch(IOException e){
+                e.printStackTrace();
+                Log.e("MATT!", "IOException");
+            }catch(Exception e){
+                Log.e("MATT!", "General exception");
+                e.printStackTrace();
+            }finally {
+                if(receiveSocket != null){
+                    receiveSocket.close();
+                }
             }
+
         }
     }
 
 
     //---------------Getter and Setter Methods()------------------
+
+    /**
+     * @return InetAddress representing the address of the remote server
+     */
     public InetAddress getServerAddress() {
         return serverAddress;
     }
 
+    /**
+     * @param serverAddress set the value of the remote server address
+     *                      must be a InetAddress object
+     */
     public void setServerAddress(InetAddress serverAddress) {
         this.serverAddress = serverAddress;
     }
 
+    /**
+     * @return int remote port of the server
+     */
     public int getRemoteServerPort() {
         return remoteServerPort;
     }
 
+    /**
+     * @param remoteServerPort set the remote server port
+     *                         must be greater than 0
+     */
     public void setRemoteServerPort(int remoteServerPort) {
         this.remoteServerPort = remoteServerPort;
     }
 
+    /**
+     * @return local port used
+     */
     public int getLocalPort() {
         return localPort;
     }
 
+    /**
+     * @param localPort to set to use for udp
+     *                  must be greater than 0
+     */
     public void setLocalPort(int localPort) {
         this.localPort = localPort;
     }
 
+    /**
+     * @return int representing the number of data sets per udp packet
+     */
     public int getDataSetsPerPacket() {
         return dataSetsPerPacket;
     }
 
+    /**
+      * @param dataSetsPerPacket must be greater than 0
+     */
     public void setDataSetsPerPacket(int dataSetsPerPacket) {
         this.dataSetsPerPacket = dataSetsPerPacket;
     }
 
-    public DatagramSocket getSocket() {
-        return socket;
-    }
-
-    public void setSocket(DatagramSocket socket) {
-        this.socket = socket;
+    /**
+     *
+     * @param streamData
+     */
+    public void setStreamData(boolean streamData) {
+        this.streamData = streamData;
     }
 }

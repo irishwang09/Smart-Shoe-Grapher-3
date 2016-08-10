@@ -11,8 +11,9 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
 
     final UdpClient client = new UdpClient("18.111.41.17",2391,5007,45);
-    UdpClient.UdpServerAcknowledger udpPinger = null;
-    private final boolean changedConnectionStatus = false;
+    private boolean changedConnectionStatus = false;
+    private boolean listenerExists = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,24 +23,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickPingButton(View view){
-        udpPinger = client.new UdpServerAcknowledger();
+        UdpClient.UdpServerAcknowledger udpPinger = client.new UdpServerAcknowledger();
         udpPinger.start();
         if(!changedConnectionStatus){
             TextView connection = (TextView) findViewById(R.id.connection_status);
             connection.setText(" Connected ");
+            changedConnectionStatus = true;
         }
     }
 
-    //TODO change udp data streamer class to make its own socket
     public void onClickStartStreaming(View view){
-        //TODO implement this
+        if(!listenerExists) {
+            listenerExists = true;
+            client.setStreamData(true);
+            UdpClient.UdpDataListener listener = client.new UdpDataListener();
+            listener.start();
+        }
     }
 
     public void onClickStopStreaming(View view){
-        //TODO implement this
-        //Just change the boolean value
+        if(listenerExists){
+            client.setStreamData(false); //Effectively kills the listener thread
+            listenerExists = false;
+        }
     }
-
 
 
     @Override
