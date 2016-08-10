@@ -104,8 +104,8 @@ public class UdpClient {
      * as a separate thread
      */
     public class UdpDataListener extends Thread {
-        //TODO figure out a why to stop the thread if needed
         //TODO figure out how to store the data for the graph to pick up
+        //TODO Something that I've forgotten...darn
 
         public void run(){
             pingThenListenToServer();
