@@ -24,7 +24,7 @@
     <fragment
         android:name="com.mattmellor.smartshoegrapher.UdpStreamControlFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/stream_control_fragment_landscape"
         tools:layout="@layout/udp_stream_control_fragment" />
 

@@ -25,7 +25,6 @@ public class UdpStreamControlFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View frag = inflater.inflate(R.layout.udp_stream_control_fragment, container, false);
 
-
         //Start Button Listener
         start = (Button) frag.findViewById(R.id.start_streaming);
         start.setOnClickListener(new View.OnClickListener() {

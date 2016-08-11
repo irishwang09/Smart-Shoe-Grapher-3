@@ -20,7 +20,7 @@ public class UdpClientFragment extends Fragment {
 
 
     private UdpClient client = new UdpClient("18.111.41.17",2391,5007,45);
-    //This needs to be passed in ^
+    //TODO: This needs to be passed in ^
     private boolean changedConnectionStatus = false;
 
     //Is it bad that the wiring is contained here????
@@ -28,7 +28,6 @@ public class UdpClientFragment extends Fragment {
     //^then there will be no data...
     //That is why start and stop shouldn't be here
     //TODO: Initialize the UDP client outside of this thread
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
@@ -44,7 +43,6 @@ public class UdpClientFragment extends Fragment {
                 onClickPing(frag);
             }
         });
-
         return frag;
     }
 
