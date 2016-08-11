@@ -29,7 +29,7 @@ import java.net.UnknownHostException;
  *          allow for multiple udp connections at once.
  */
 
-public class UdpClient {
+public class UdpClient  {
 
     private DatagramSocket pingSocket;
     private DatagramSocket receiveSocket;
@@ -74,9 +74,8 @@ public class UdpClient {
         private void acknowledgeServerNoReceive(){
             String mess = "Ping";
             DatagramPacket packet;
-            int pingLocalPort = localPort + 1; //Ensures that send a recieve sockets are different
             try{
-                pingSocket = new DatagramSocket(pingLocalPort);
+                pingSocket = new DatagramSocket();
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), serverAddress, remoteServerPort);
                 pingSocket.send(packet);
             }catch (SocketException e){

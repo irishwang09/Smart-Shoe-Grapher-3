@@ -1,51 +1,46 @@
 package com.mattmellor.smartshoegrapher;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
-    final UdpClient client = new UdpClient("18.111.41.17",2391,5007,45);
-    private boolean changedConnectionStatus = false;
-    private boolean listenerExists = false;
+public class MainActivity extends FragmentActivity {
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main); //Connects up the fragments views
         Log.d("MATT!", "onCreateMethod");
-    }
 
-    public void onClickPingButton(View view){
-        UdpClient.UdpServerAcknowledger udpPinger = client.new UdpServerAcknowledger();
-        udpPinger.start();
-        if(!changedConnectionStatus){
-            TextView connection = (TextView) findViewById(R.id.connection_status);
-            connection.setText(" Connected ");
-            changedConnectionStatus = true;
-        }
-    }
+        GraphView graph = (GraphView) findViewById(R.id.graph);
+        graph.setTitle("Volt Vs Count");
 
-    public void onClickStartStreaming(View view){
-        if(!listenerExists) {
-            listenerExists = true;
-            client.setStreamData(true);
-            UdpClient.UdpDataListener listener = client.new UdpDataListener();
-            listener.start();
-        }
-    }
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                new DataPoint(0, 1),
+                new DataPoint(1, 5),
+                new DataPoint(2, 3),
+                new DataPoint(3, 2),
+                new DataPoint(4, 6)
+        });
+        graph.addSeries(series);
 
-    public void onClickStopStreaming(View view){
-        if(listenerExists){
-            client.setStreamData(false); //Effectively kills the listener thread
-            listenerExists = false;
-        }
+        LineGraphSeries<DataPoint> series2 = new LineGraphSeries<DataPoint>(new DataPoint[] {
+                new DataPoint(0, 3),
+                new DataPoint(1, 3),
+                new DataPoint(2, 6),
+                new DataPoint(3, 2),
+                new DataPoint(4, 5)
+        });
+        graph.addSeries(series2);
+
     }
 
 

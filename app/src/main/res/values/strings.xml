@@ -10,7 +10,7 @@
     <string name="remote_port_example">2391</string>
     <string name="local_port">Local Port</string>
     <string name="local_port_example">5006</string>
-    <string name="connected">Not Connected.</string>
+    <string name="connected">Not Connected</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
 

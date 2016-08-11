@@ -9,123 +9,20 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:layout_weight="50">
 
-        <TextView
+        <fragment
+            android:name="com.mattmellor.smartshoegrapher.UdpClientFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/remote_hostname"/>
+            android:id="@+id/client_fragment_view_portrait"
+            tools:layout="@layout/udp_client_fragment_layout" />
 
-        <EditText
-            android:id="@+id/remote_hostname"
+
+        <com.jjoe64.graphview.GraphView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/example_host" />
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="@string/remote_port"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="@string/local_port"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/remote_port"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="@string/remote_port_example"/>
-
-            <EditText
-                android:id="@+id/local_port"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="@string/local_port_example"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/ping"
-                android:onClick="onClickPingButton"
-                android:text="@string/acknowledge_server"
-                android:layout_weight="70"/>
-
-            <TextView
-                android:id="@+id/connection_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/connected"
-                android:layout_weight="10"
-                android:layout_marginLeft="10dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="50"
-                android:id="@+id/start_streaming"
-                android:onClick="onClickStartStreaming"
-                android:text="@string/start"/>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="50"
-                android:id="@+id/stop_streaming"
-                android:onClick="onClickStopStreaming"
-                android:text="@string/stop"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-
-    <com.androidplot.xy.XYPlot
-        android:id="@+id/plot"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="50"
-        android:padding="2dp"
-        title="Plot" />
-
-
-
+            android:layout_height="match_parent"
+            android:id="@+id/graph"
+            android:padding="2dp"/>
 
 
 </LinearLayout>
