@@ -13,6 +13,14 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 public class MainActivity extends FragmentActivity {
 
 
+    //Fragments communicate down to the activity
+
+    //UDP Connection settings
+    private String hostname;
+    private String remotePort;
+    private String localPort;
+    private UdpClient client;
+    //Create the UDP client thread here as a result of the values given by the fragment
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +48,9 @@ public class MainActivity extends FragmentActivity {
                 new DataPoint(4, 5)
         });
         graph.addSeries(series2);
+
+        //Figure out how to pass an object to the fragments
+        //Communicate between fragments
 
     }
 

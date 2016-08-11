@@ -13,5 +13,7 @@
     <string name="connected">Not Connected</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="apply_button">Apply</string>
+    <string name="reset_button">Reset</string>
 
 </resources>

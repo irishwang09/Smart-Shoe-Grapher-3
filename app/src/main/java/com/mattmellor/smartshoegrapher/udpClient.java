@@ -98,6 +98,10 @@ public class UdpClient  {
         }
     }
 
+    //TODO Add methods to parse the input strings
+    // for the parameters
+
+
     /**
      * Class for listening to Udp remote server for a long time
      * as a separate thread
