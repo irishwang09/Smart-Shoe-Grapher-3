@@ -15,5 +15,6 @@
     <string name="stop">Stop</string>
     <string name="apply_button">Apply</string>
     <string name="reset_button">Reset</string>
+    <string name="connectedComplete">Connected</string>
 
 </resources>

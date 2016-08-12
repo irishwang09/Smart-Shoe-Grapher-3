@@ -15,7 +15,7 @@
         android:orientation="vertical">
 
     <fragment
-        android:name="com.mattmellor.smartshoegrapher.UdpClientFragment"
+        android:name="com.mattmellor.smartshoegrapher.UdpSettingsFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:layout="@layout/udp_client_fragment_layout"

@@ -10,7 +10,7 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass{
 
 
     //Fragments communicate down to the activity
@@ -54,7 +54,6 @@ public class MainActivity extends FragmentActivity {
 
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -74,6 +73,26 @@ public class MainActivity extends FragmentActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override //Passes Data from the UdpClient Fragment
+    public void onDataPassUdpSettings(String unverifiedHostname, String unverifiedLocalPort, String unverifiedRemotePort) {
+        this.hostname = unverifiedHostname;
+        this.localPort = unverifiedLocalPort;
+        this.remotePort = unverifiedRemotePort;
+        Log.d("MATT!", "Unverified Host: " + unverifiedHostname);
+        Log.d("MATT!", "Unverified Local Port : " + unverifiedLocalPort);
+        Log.d("MATT!", "Unverified Remote Port : " + unverifiedRemotePort);
+    }
+
+    @Override
+    public void onDataPassUdpReset(String defaultHostname, String defaultLocalPort, String defaultRemotePort) {
+        this.hostname = defaultHostname;
+        this.localPort = defaultLocalPort;
+        this.remotePort = defaultRemotePort;
+        Log.d("MATT!", "default hostname: " + defaultHostname);
+        Log.d("MATT!", "default remotePort: " + defaultRemotePort);
+        Log.d("MATT!", "default localPort: " + defaultLocalPort);
     }
 
 
