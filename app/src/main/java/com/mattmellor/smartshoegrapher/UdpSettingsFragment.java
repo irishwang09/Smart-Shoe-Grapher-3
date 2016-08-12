@@ -130,11 +130,10 @@ public class UdpSettingsFragment extends Fragment {
                     validParameters = false;
                 }
 
-                if(true){ //TODO implement a test for hostname
+                if(hostnameValid(unverifiedHostname)){
                     hostname = unverifiedHostname;
                 }
                 else{
-                    //TODO: Shake the host edit field
                     hostnameEditText.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.vibrate));
                 }
 
@@ -186,8 +185,8 @@ public class UdpSettingsFragment extends Fragment {
     }
 
     public boolean hostnameValid(String hostname){
-        return !hostname.matches("hostnametregex");
-        //^I think this will be a hard regex to make
+        return hostname.contains(".");
+        //TODO: This is a naive way of testing..
     }
 
     //------------Helper functions for the onClick Listeners--------
