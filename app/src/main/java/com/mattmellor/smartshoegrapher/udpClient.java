@@ -33,7 +33,7 @@ public class UdpClient  {
 
     private DatagramSocket pingSocket;
     private DatagramSocket receiveSocket;
-    private InetAddress serverAddress;
+    private String serverAddress;
     private int remoteServerPort;
     private int localPort;
     private int dataSetsPerPacket;
@@ -47,14 +47,10 @@ public class UdpClient  {
      * @param dataSetsPerPacket: int representing the number of data sets per packet
      */
     public UdpClient(String ipAddress, int remoteServerPort, int localPort, int dataSetsPerPacket){
-        try {
-            this.remoteServerPort = remoteServerPort;
-            this.serverAddress = InetAddress.getByName(ipAddress);
-            this.dataSetsPerPacket = dataSetsPerPacket;
-            this.localPort = localPort;
-        }catch(Exception e){
-            Log.e("MATT!", "Object Initialization Failed");
-        }
+        this.remoteServerPort = remoteServerPort;
+        this.serverAddress = ipAddress;
+        this.dataSetsPerPacket = dataSetsPerPacket;
+        this.localPort = localPort;
     }
 
     /**
@@ -73,10 +69,12 @@ public class UdpClient  {
 
         private void acknowledgeServerNoReceive(){
             String mess = "Ping";
+            InetAddress address;
             DatagramPacket packet;
             try{
                 pingSocket = new DatagramSocket();
-                packet = new DatagramPacket(mess.getBytes(), mess.length(), serverAddress, remoteServerPort);
+                address = InetAddress.getByName(serverAddress);
+                packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
                 pingSocket.send(packet);
             }catch (SocketException e){
                 e.printStackTrace();
@@ -99,7 +97,17 @@ public class UdpClient  {
     }
 
     //TODO Add methods to parse the input strings
-    // for the parameters
+    //How to test the input strings??
+
+    /**
+     *
+     * @param port representing the local or remote port
+     * @return true or false representing whether the string/port
+     * is valid
+     */
+    public boolean portValid(String port){
+        return !port.matches("\\D"); //returns true if there is a non digit character in the port
+    }
 
 
     /**
@@ -108,7 +116,6 @@ public class UdpClient  {
      */
     public class UdpDataListener extends Thread {
         //TODO figure out how to store the data for the graph to pick up
-        //TODO Something that I've forgotten...darn
 
         public void run(){
             pingThenListenToServer();
@@ -117,14 +124,14 @@ public class UdpClient  {
         private void pingThenListenToServer(){
             byte[] buf = new byte[1352]; //TODO calculate this number with a formula
             String received = "";
-            //First try to connect to udp with a ping
-            //Then start listening for data
+            InetAddress address;
             String mess = "Android Data Receiver";
             DatagramPacket packet;
             try{
                 //Ping the server to tell server IP Address of Android phone
                 receiveSocket = new DatagramSocket(localPort);
-                packet = new DatagramPacket(mess.getBytes(), mess.length(), serverAddress, remoteServerPort);
+                address = InetAddress.getByName(serverAddress);
+                packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
                 receiveSocket.send(packet);
 
                 while (streamData) {
@@ -161,7 +168,7 @@ public class UdpClient  {
     /**
      * @return InetAddress representing the address of the remote server
      */
-    public InetAddress getServerAddress() {
+    public String getServerAddress() {
         return serverAddress;
     }
 
@@ -169,7 +176,7 @@ public class UdpClient  {
      * @param serverAddress set the value of the remote server address
      *                      must be a InetAddress object
      */
-    public void setServerAddress(InetAddress serverAddress) {
+    public void setServerAddress(String serverAddress) {
         this.serverAddress = serverAddress;
     }
 

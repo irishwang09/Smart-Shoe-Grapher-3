@@ -17,8 +17,8 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
 
     //UDP Connection settings
     private String hostname;
-    private String remotePort;
-    private String localPort;
+    private int remotePort;
+    private int localPort;
     private UdpClient client;
     //Create the UDP client thread here as a result of the values given by the fragment
 
@@ -48,10 +48,6 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
                 new DataPoint(4, 5)
         });
         graph.addSeries(series2);
-
-        //Figure out how to pass an object to the fragments
-        //Communicate between fragments
-
     }
 
     @Override
@@ -76,17 +72,17 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
     }
 
     @Override //Passes Data from the UdpClient Fragment
-    public void onDataPassUdpSettings(String unverifiedHostname, String unverifiedLocalPort, String unverifiedRemotePort) {
-        this.hostname = unverifiedHostname;
-        this.localPort = unverifiedLocalPort;
-        this.remotePort = unverifiedRemotePort;
-        Log.d("MATT!", "Unverified Host: " + unverifiedHostname);
-        Log.d("MATT!", "Unverified Local Port : " + unverifiedLocalPort);
-        Log.d("MATT!", "Unverified Remote Port : " + unverifiedRemotePort);
+    public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
+        this.hostname = verifiedHostname;
+        this.localPort = verifiedLocalPort;
+        this.remotePort = verifiedRemotePort;
+        Log.d("MATT!", "Verified Host: " + verifiedHostname);
+        Log.d("MATT!", "Verified Local Port : " + verifiedLocalPort);
+        Log.d("MATT!", "Verified Remote Port : " + verifiedRemotePort);
     }
 
     @Override
-    public void onDataPassUdpReset(String defaultHostname, String defaultLocalPort, String defaultRemotePort) {
+    public void onDataPassUdpReset(String defaultHostname, int defaultLocalPort, int defaultRemotePort) {
         this.hostname = defaultHostname;
         this.localPort = defaultLocalPort;
         this.remotePort = defaultRemotePort;
@@ -94,6 +90,5 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         Log.d("MATT!", "default remotePort: " + defaultRemotePort);
         Log.d("MATT!", "default localPort: " + defaultLocalPort);
     }
-
 
 }
