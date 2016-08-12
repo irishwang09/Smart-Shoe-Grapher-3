@@ -7,6 +7,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 /**
@@ -64,25 +65,44 @@ public class UdpClient  {
          * value to be called by the thread
          */
         public void run(){
-            acknowledgeServerNoReceive();
+            acknowledgeServer();
         }
 
-        private void acknowledgeServerNoReceive(){
+        private boolean acknowledgeServer() {
             String mess = "Ping";
             InetAddress address;
             DatagramPacket packet;
-            try{
-                pingSocket = new DatagramSocket();
+            DatagramPacket rPacket;
+            boolean succesfulAcknowledgement = false;
+            //TODO How to communicate from a thread?
+            //^Because run doesn't return anything...
+            byte[] buf = new byte[8];
+            try {
+                pingSocket = new DatagramSocket(localPort + 1);
                 address = InetAddress.getByName(serverAddress);
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
                 pingSocket.send(packet);
+                Log.d("MATT!", "About to wait to receive packet");
+                pingSocket.setSoTimeout(1000); //1 second wait tile
+                rPacket = new DatagramPacket(buf, buf.length);
+                pingSocket.receive(rPacket);
+                String received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
+
+                if (received.length() > 0){
+                    Log.d("MATT!", "Made it here after no reply");
+                    succesfulAcknowledgement = true;
+                }
+
+            }catch(SocketTimeoutException e){
+                //Send a message to the fragment
+                Log.d("MATT!", "TimeoutException");
             }catch (SocketException e){
                 e.printStackTrace();
                 Log.e("MATT!", "socket exception");
             }catch(UnknownHostException e){
                 e.printStackTrace();
                 Log.e("MATT!", "unknown host exception");
-            }catch(IOException e){
+            }catch(IOException e) {
                 e.printStackTrace();
                 Log.e("MATT!", "IOException");
             }catch(Exception e){
@@ -93,20 +113,8 @@ public class UdpClient  {
                     pingSocket.close();
                 }
             }
+            return succesfulAcknowledgement;
         }
-    }
-
-    //TODO Add methods to parse the input strings
-    //How to test the input strings??
-
-    /**
-     *
-     * @param port representing the local or remote port
-     * @return true or false representing whether the string/port
-     * is valid
-     */
-    public boolean portValid(String port){
-        return !port.matches("\\D"); //returns true if there is a non digit character in the port
     }
 
 
