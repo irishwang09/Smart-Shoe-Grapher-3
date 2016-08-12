@@ -19,6 +19,8 @@ import android.widget.Toast;
  *
  */
 
+//TODO: Communicate between UDP Acknowledger thread and this fragment for connection checks
+//TODO: Make sure that when bad input is given that the user can't start the graph currently runs with defaults...
 public class UdpSettingsFragment extends Fragment {
 
     private Button ping;
