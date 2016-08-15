@@ -11,15 +11,15 @@ import android.widget.Button;
 
 /**
  * Created by Matthew on 8/11/2016.
+ * Fragment that sends start or stop button presses to the main activity
+ * and then eventually to graph fragment
  */
 
 public class UdpStartStopFragment extends Fragment {
 
-
     private Button start;
     private Button stop;
     private PassStartStopData dataPassHandle;
-
 
     //House the start and stop buttons here
     @Override

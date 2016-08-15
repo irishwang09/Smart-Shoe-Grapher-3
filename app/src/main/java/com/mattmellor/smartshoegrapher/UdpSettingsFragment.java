@@ -175,14 +175,14 @@ public class UdpSettingsFragment extends Fragment {
         udpPinger.start();
         if(udpPinger.getConnectionSuccess()){ //TODO: Implement the Thread to UI Messaging
             Context context = getActivity();
-            CharSequence text = "Reply Received";
+            CharSequence text = "Server Active";
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
         else{
             Context context = getActivity();
-            CharSequence text = "No Reply from Server";
+            CharSequence text = "No Reply from Server: Check Settings";
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
@@ -200,7 +200,6 @@ public class UdpSettingsFragment extends Fragment {
     }
 
     public void applyClickedPassData(){
-        //Pass only valid data...
         dataPassHandle.onDataPassUdpSettings(hostname,localPort,remotePort);
     }
 
@@ -213,7 +212,6 @@ public class UdpSettingsFragment extends Fragment {
 
     //-------------Helper Functions-------------
     /**
-     *
      * @param value string
      * @return true if string is a valid remote port or local port number
      */
@@ -243,7 +241,5 @@ public class UdpSettingsFragment extends Fragment {
         String validHostnameRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$";
         return (hostname.matches(validIpAddressRegex) || hostname.matches(validHostnameRegex));
     }
-
-
 
 }
