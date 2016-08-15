@@ -76,6 +76,16 @@ public class GraphFragment extends Fragment {
         this.hostname = hostname;
     }
 
+    public void startGraphing(){
+        if(!listenerExists) {
+            listenerExists = true;
+            client = new UdpClient(hostname, remotePort, localPort, 45);
+            client.setStreamData(true);
+            UdpClient.UdpDataListener listener = client.new UdpDataListener();
+            listener.start();
+        }
+    }
+
     public void stopGraphing(){
         if (listenerExists) {
             client.setStreamData(false);
@@ -83,13 +93,4 @@ public class GraphFragment extends Fragment {
         }
     }
 
-    public void startGraphing(){
-        if(!listenerExists) {
-            listenerExists = true;
-            client.setStreamData(true);
-            UdpClient.UdpDataListener listener = client.new UdpDataListener();
-            listener.start();
-        }
-
-    }
 }
