@@ -4,7 +4,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="acknowledge_server">Ping Server</string>
-    <string name="remote_hostname">Remote Hostname</string>
+    <string name="remote_hostname">Remote Hostname/IP Address</string>
     <string name="example_host">footsensor1.dynamic-dns.net</string>
     <string name="remote_port">Remote Port</string>
     <string name="remote_port_example">2391</string>

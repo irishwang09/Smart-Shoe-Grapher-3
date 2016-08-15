@@ -61,6 +61,8 @@ public class UdpClient  {
      */
     public class UdpServerAcknowledger extends Thread{
 
+        private boolean connectionSuccess = false;
+
         /**
          * value to be called by the thread
          */
@@ -68,34 +70,33 @@ public class UdpClient  {
             acknowledgeServer();
         }
 
-        private boolean acknowledgeServer() {
+        private void acknowledgeServer() {
             String mess = "Ping";
             InetAddress address;
             DatagramPacket packet;
             DatagramPacket rPacket;
-            boolean succesfulAcknowledgement = false;
-            //TODO How to communicate from a thread?
-            //^Because run doesn't return anything...
             byte[] buf = new byte[8];
+
             try {
                 pingSocket = new DatagramSocket(localPort + 1);
                 address = InetAddress.getByName(serverAddress);
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
                 pingSocket.send(packet);
                 Log.d("MATT!", "About to wait to receive packet");
-                pingSocket.setSoTimeout(1000); //1 second wait tile
+                pingSocket.setSoTimeout(2000); //2 second wait tile
                 rPacket = new DatagramPacket(buf, buf.length);
                 pingSocket.receive(rPacket);
-                String received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
+                String received = new String(rPacket.getData(), 0, rPacket.getLength());
 
                 if (received.length() > 0){
-                    Log.d("MATT!", "Made it here after no reply");
-                    succesfulAcknowledgement = true;
+                    Log.d("MATT!", "Successful Response from server");
+                    connectionSuccess = true;
                 }
 
             }catch(SocketTimeoutException e){
                 //Send a message to the fragment
                 Log.d("MATT!", "TimeoutException");
+                //connectionSuccess = false;
             }catch (SocketException e){
                 e.printStackTrace();
                 Log.e("MATT!", "socket exception");
@@ -108,13 +109,18 @@ public class UdpClient  {
             }catch(Exception e){
                 Log.e("MATT!", "General exception");
                 e.printStackTrace();
+                //connectionSuccess = false;
             }finally {
                 if(pingSocket != null){
                     pingSocket.close();
                 }
             }
-            return succesfulAcknowledgement;
         }
+        public boolean getConnectionSuccess(){
+            Log.d("MATT!", "" + connectionSuccess);
+            return this.connectionSuccess;
+        }
+
     }
 
 

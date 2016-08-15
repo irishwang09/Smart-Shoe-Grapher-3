@@ -11,7 +11,10 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import static com.mattmellor.smartshoegrapher.R.string.connectedComplete;
 
 /**
  * Created by Matthew on 8/11/2016.
@@ -19,8 +22,6 @@ import android.widget.Toast;
  *
  */
 
-//TODO: Communicate between UDP Acknowledger thread and this fragment for connection checks
-//TODO: Make sure that when bad input is given that the user can't start the graph currently runs with defaults...
 public class UdpSettingsFragment extends Fragment {
 
     private Button ping;
@@ -40,6 +41,7 @@ public class UdpSettingsFragment extends Fragment {
     private final int defaultRemotePort = 2391;
     private final int defaultLocalPort = 5006;
     private boolean applyPressed = false;
+    private boolean successfulServerConnect = false;
 
     private boolean changedConnectionStatus = false;
 
@@ -187,8 +189,9 @@ public class UdpSettingsFragment extends Fragment {
     }
 
     public boolean hostnameValid(String hostname){
-        return hostname.contains(".");
-        //TODO: This is a naive way of testing..
+        String validIpAddressRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
+        String validHostnameRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$";
+        return (hostname.matches(validIpAddressRegex) || hostname.matches(validHostnameRegex));
     }
 
     //------------Helper functions for the onClick Listeners--------
@@ -200,15 +203,18 @@ public class UdpSettingsFragment extends Fragment {
         UdpClient client = new UdpClient(hostname,remotePort,localPort,45); //Still want to pass this?
         UdpClient.UdpServerAcknowledger udpPinger = client.new UdpServerAcknowledger();
         udpPinger.start();
-        //Figure out a way to communicate with the thread...
-//        if(!changedConnectionStatus){
-//            TextView connection = (TextView) frag.findViewById(R.id.connection_status);//What to do here?
-//            connection.setText(connectedComplete);
-//            changedConnectionStatus = true;
-//        }
-        //TODO: Should wait for a message in response so we can show the user accurately if the connection works?
-        //TODO: Get message from thread about whether socket was successfully created?
-
+        if(udpPinger.getConnectionSuccess()){
+            TextView connection = (TextView) frag.findViewById(R.id.connection_status);//What to do here?
+            connection.setText(connectedComplete);
+            changedConnectionStatus = true;
+        }
+        else{
+            Context context = getActivity();
+            CharSequence text = "No Reply from Server";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
     }
 
     /**
