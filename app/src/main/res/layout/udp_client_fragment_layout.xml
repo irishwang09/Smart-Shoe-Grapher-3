@@ -58,27 +58,19 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
         <Button
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ping"
-            android:text="@string/acknowledge_server"
-            android:layout_weight="50"/>
+            android:layout_centerHorizontal="true"
+            android:text="@string/acknowledge_server" />
 
-        <TextView
-            android:id="@+id/connection_status"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/connected"
-            android:layout_weight="50"
-            android:layout_marginLeft="10dp"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

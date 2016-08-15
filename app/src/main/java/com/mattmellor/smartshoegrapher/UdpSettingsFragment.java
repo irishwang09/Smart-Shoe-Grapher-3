@@ -180,14 +180,18 @@ public class UdpSettingsFragment extends Fragment {
      * @param port
      *          representing the local or remote port
      * @return boolean
-     *         true if a valid port number
+     *         true if a valid port number 0 - 65535
      *         false if not a valid port number
      */
     public boolean portValid(String port){
-        return port.matches("\\d*"); //returns true if there is a non digit character in the port
-        //TODO: Make this more robust
+        return port.matches("^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$");
     }
 
+    /**
+     *
+     * @param hostname
+     * @return true if hostname is a valid hostname or IP Address according to RFC 1123
+     */
     public boolean hostnameValid(String hostname){
         String validIpAddressRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
         String validHostnameRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$";
@@ -204,9 +208,11 @@ public class UdpSettingsFragment extends Fragment {
         UdpClient.UdpServerAcknowledger udpPinger = client.new UdpServerAcknowledger();
         udpPinger.start();
         if(udpPinger.getConnectionSuccess()){
-            TextView connection = (TextView) frag.findViewById(R.id.connection_status);//What to do here?
-            connection.setText(connectedComplete);
-            changedConnectionStatus = true;
+            Context context = getActivity();
+            CharSequence text = "Reply Received";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
         }
         else{
             Context context = getActivity();
