@@ -12,43 +12,42 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass{
 
-
-    //Fragments communicate down to the activity
-
     //UDP Connection settings
     private String hostname;
     private int remotePort;
     private int localPort;
     private UdpClient client;
-    //Create the UDP client thread here as a result of the values given by the fragment
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); //Connects up the fragments views
         Log.d("MATT!", "onCreateMethod");
-
-        GraphView graph = (GraphView) findViewById(R.id.graph);
-        graph.setTitle("Volt Vs Count");
-
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
-                new DataPoint(0, 1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
-        graph.addSeries(series);
-
-        LineGraphSeries<DataPoint> series2 = new LineGraphSeries<DataPoint>(new DataPoint[] {
-                new DataPoint(0, 3),
-                new DataPoint(1, 3),
-                new DataPoint(2, 6),
-                new DataPoint(3, 2),
-                new DataPoint(4, 5)
-        });
-        graph.addSeries(series2);
     }
+
+
+    @Override //Passes Data from the UdpClient Fragment
+    public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
+        this.hostname = verifiedHostname;
+        this.localPort = verifiedLocalPort;
+        this.remotePort = verifiedRemotePort;
+        Log.d("MATT!", "Verified Host: " + verifiedHostname);
+        Log.d("MATT!", "Verified Local Port : " + verifiedLocalPort);
+        Log.d("MATT!", "Verified Remote Port : " + verifiedRemotePort);
+        //TODO: Notify the start and stop fragment & and the graph fragment of the changes
+    }
+
+    @Override
+    public void onDataPassUdpReset(String defaultHostname, int defaultLocalPort, int defaultRemotePort) {
+        this.hostname = defaultHostname;
+        this.localPort = defaultLocalPort;
+        this.remotePort = defaultRemotePort;
+        Log.d("MATT!", "default hostname: " + defaultHostname);
+        Log.d("MATT!", "default remotePort: " + defaultRemotePort);
+        Log.d("MATT!", "default localPort: " + defaultLocalPort);
+        //TODO: Notify the start and stop fragment & the graph fragment of the changes
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -71,24 +70,5 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         return super.onOptionsItemSelected(item);
     }
 
-    @Override //Passes Data from the UdpClient Fragment
-    public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
-        this.hostname = verifiedHostname;
-        this.localPort = verifiedLocalPort;
-        this.remotePort = verifiedRemotePort;
-        Log.d("MATT!", "Verified Host: " + verifiedHostname);
-        Log.d("MATT!", "Verified Local Port : " + verifiedLocalPort);
-        Log.d("MATT!", "Verified Remote Port : " + verifiedRemotePort);
-    }
-
-    @Override
-    public void onDataPassUdpReset(String defaultHostname, int defaultLocalPort, int defaultRemotePort) {
-        this.hostname = defaultHostname;
-        this.localPort = defaultLocalPort;
-        this.remotePort = defaultRemotePort;
-        Log.d("MATT!", "default hostname: " + defaultHostname);
-        Log.d("MATT!", "default remotePort: " + defaultRemotePort);
-        Log.d("MATT!", "default localPort: " + defaultLocalPort);
-    }
 
 }

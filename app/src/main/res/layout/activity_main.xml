@@ -18,17 +18,18 @@
             tools:layout="@layout/udp_client_fragment_layout" />
 
         <fragment
-            android:name="com.mattmellor.smartshoegrapher.UdpStreamControlFragment"
+            android:name="com.mattmellor.smartshoegrapher.UdpStartStopFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/stream_control_fragment"
             tools:layout="@layout/udp_stream_control_fragment" />
 
-        <com.jjoe64.graphview.GraphView
+        <fragment
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/graph"
-            android:padding="2dp"/>
+            android:name="com.mattmellor.smartshoegrapher.GraphFragment"
+            android:id="@+id/graph_fragment_layout_landscape"
+            tools:layout="@layout/graph_fragment" />
 
 
 </LinearLayout>

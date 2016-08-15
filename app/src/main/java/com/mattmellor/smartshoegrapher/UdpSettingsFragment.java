@@ -42,10 +42,9 @@ public class UdpSettingsFragment extends Fragment {
     private final int defaultLocalPort = 5006;
     private boolean applyPressed = false;
     private boolean successfulServerConnect = false;
-
     private boolean changedConnectionStatus = false;
 
-    OnDataPass dataPassHandle;
+    private OnDataPass dataPassHandle;
 
     @Override
     public void onAttach(Context context){
@@ -164,8 +163,55 @@ public class UdpSettingsFragment extends Fragment {
         return frag;
     }
 
-    ///-------------Helper Functions-------------
 
+    //------------Helper functions for the onClick Listeners--------
+
+    /**
+     * Starts a thread to ping the server
+     */
+    public void onClickPing(View frag){
+        UdpClient client = new UdpClient(hostname,remotePort,localPort,45); //Still want to pass this?
+        UdpClient.UdpServerAcknowledger udpPinger = client.new UdpServerAcknowledger();
+        udpPinger.start();
+        if(udpPinger.getConnectionSuccess()){ //TODO: Implement the Thread to UI Messaging
+            Context context = getActivity();
+            CharSequence text = "Reply Received";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
+        else{
+            Context context = getActivity();
+            CharSequence text = "No Reply from Server";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
+    }
+
+    /**
+     * Interface methods implemented by main activity to allow for communication between the activity
+     * and the fragment
+     * We only pass verified input
+     */
+    public interface OnDataPass{
+         public void onDataPassUdpSettings(String hostname,int localPort, int remotePort);
+         public void onDataPassUdpReset(String defaultHostname, int defaultLocalPort, int defaultRemotePort);
+    }
+
+    public void applyClickedPassData(){
+        //Pass only valid data...
+        dataPassHandle.onDataPassUdpSettings(hostname,localPort,remotePort);
+    }
+
+    public void resetClickedPassDefaults(){
+        //Passes only valid data since defaults are valid...
+        //TODO: maybe we should make defaults just the last set of valid values instead of these?
+        dataPassHandle.onDataPassUdpReset(defaultHostname, defaultLocalPort, defaultRemotePort);
+    }
+
+
+    //-------------Helper Functions-------------
     /**
      *
      * @param value string
@@ -198,51 +244,6 @@ public class UdpSettingsFragment extends Fragment {
         return (hostname.matches(validIpAddressRegex) || hostname.matches(validHostnameRegex));
     }
 
-    //------------Helper functions for the onClick Listeners--------
 
-    /**
-     * Starts a thread to ping the server
-     */
-    public void onClickPing(View frag){
-        UdpClient client = new UdpClient(hostname,remotePort,localPort,45); //Still want to pass this?
-        UdpClient.UdpServerAcknowledger udpPinger = client.new UdpServerAcknowledger();
-        udpPinger.start();
-        if(udpPinger.getConnectionSuccess()){
-            Context context = getActivity();
-            CharSequence text = "Reply Received";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
-        else{
-            Context context = getActivity();
-            CharSequence text = "No Reply from Server";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
-    }
-
-    /**
-     * Interface methods implemented by main activity to allow for communication between the activity
-     * and the fragment
-     * We only pass verified input
-     */
-    public interface OnDataPass{
-         public void onDataPassUdpSettings(String hostname,int localPort, int remotePort);
-         public void onDataPassUdpReset(String defaultHostname, int defaultLocalPort, int defaultRemotePort);
-    }
-
-
-    public void applyClickedPassData(){
-        //Pass only valid data...
-        dataPassHandle.onDataPassUdpSettings(hostname,localPort,remotePort);
-    }
-
-    public void resetClickedPassDefaults(){
-        //Passes only valid data since defaults are valid...
-        //TODO: maybe we should make defaults just the last set of valid values instead of these?
-        dataPassHandle.onDataPassUdpReset(defaultHostname, defaultLocalPort, defaultRemotePort);
-    }
 
 }

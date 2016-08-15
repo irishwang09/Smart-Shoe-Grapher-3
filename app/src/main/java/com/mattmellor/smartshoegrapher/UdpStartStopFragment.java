@@ -11,7 +11,7 @@ import android.widget.Button;
  * Created by Matthew on 8/11/2016.
  */
 
-public class UdpStreamControlFragment extends Fragment {
+public class UdpStartStopFragment extends Fragment {
 
 
     //TODO: Clean up this class

@@ -22,7 +22,7 @@
         android:id="@+id/client_fragment_view_landscape"/>
 
     <fragment
-        android:name="com.mattmellor.smartshoegrapher.UdpStreamControlFragment"
+        android:name="com.mattmellor.smartshoegrapher.UdpStartStopFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/stream_control_fragment_landscape"
@@ -31,11 +31,12 @@
     </LinearLayout>
 
 
-    <com.jjoe64.graphview.GraphView
+    <fragment
+        android:name="com.mattmellor.smartshoegrapher.GraphFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/graph"
-        android:padding="2dp"/>
+        android:id="@+id/graph_fragment_layout"
+        tools:layout="@layout/graph_fragment" />
 
 
 </LinearLayout>
