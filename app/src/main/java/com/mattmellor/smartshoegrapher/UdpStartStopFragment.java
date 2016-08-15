@@ -1,5 +1,7 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,11 +16,10 @@ import android.widget.Button;
 public class UdpStartStopFragment extends Fragment {
 
 
-    //TODO: Clean up this class
-    private UdpClient client = new UdpClient("18.111.41.17",2391,5007,45);
     private Button start;
     private Button stop;
-    private boolean listenerExists = false;
+    private PassStartStopData dataPassHandle;
+
 
     //House the start and stop buttons here
     @Override
@@ -30,7 +31,7 @@ public class UdpStartStopFragment extends Fragment {
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onClickStart();
+                dataPassHandle.startGraphing(); //send the start stop signal to main activity
             }
         });
 
@@ -39,7 +40,7 @@ public class UdpStartStopFragment extends Fragment {
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onClickStop();
+                dataPassHandle.stopGraphing(); //Send the start/stop signal to main activity
             }
         });
 
@@ -47,27 +48,20 @@ public class UdpStartStopFragment extends Fragment {
     }
 
 
-    /**
-     * Starts a thread to ping and then receive data from
-     * the server
-     */
-    public void onClickStart(){
-        if(!listenerExists) {
-            listenerExists = true;
-            client.setStreamData(true);
-            UdpClient.UdpDataListener listener = client.new UdpDataListener();
-            listener.start();
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+        Activity a;
+        if(context instanceof Activity){
+            a = (Activity) context;
+            dataPassHandle = (UdpStartStopFragment.PassStartStopData) a;
         }
     }
 
-    /**
-     * Stops the thread the receives data from the server
-     */
-    public void onClickStop() {
-        if (listenerExists) {
-            client.setStreamData(false); //Effectively kills the listener thread
-            listenerExists = false;
-        }
 
+    public interface PassStartStopData{
+        public void startGraphing();
+        public void stopGraphing();
     }
+
 }

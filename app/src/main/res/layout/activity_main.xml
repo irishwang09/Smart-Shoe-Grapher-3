@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:name="com.mattmellor.smartshoegrapher.GraphFragment"
-            android:id="@+id/graph_fragment_layout_landscape"
+            android:id="@+id/graph_fragment"
             tools:layout="@layout/graph_fragment" />
 
 

@@ -18,6 +18,11 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 public class GraphFragment extends Fragment {
 
+    private UdpClient client;
+    private String hostname;
+    private int remotePort;
+    private int localPort;
+    private boolean listenerExists = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,5 +50,46 @@ public class GraphFragment extends Fragment {
         graph.addSeries(series2);
 
         return frag;
+    }
+
+    /**
+     * Update the remote port
+     * @param remotePort of udp server
+     */
+    public void updateRemotePort(int remotePort){
+        this.remotePort = remotePort;
+    }
+
+    /**
+     * Update the local port
+     * @param localPort of udp server
+     */
+    public void updateLocalPort(int localPort){
+        this.localPort = localPort;
+    }
+
+    /**
+     * Update the hostname
+     * @param hostname of udp server
+     */
+    public void updateHostname(String hostname){
+        this.hostname = hostname;
+    }
+
+    public void stopGraphing(){
+        if (listenerExists) {
+            client.setStreamData(false);
+            listenerExists = false;
+        }
+    }
+
+    public void startGraphing(){
+        if(!listenerExists) {
+            listenerExists = true;
+            client.setStreamData(true);
+            UdpClient.UdpDataListener listener = client.new UdpDataListener();
+            listener.start();
+        }
+
     }
 }

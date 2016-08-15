@@ -10,31 +10,35 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass{
+public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass, UdpStartStopFragment.PassStartStopData{
 
     //UDP Connection settings
     private String hostname;
     private int remotePort;
     private int localPort;
     private UdpClient client;
+    private GraphFragment graphFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main); //Connects up the fragments views
-        Log.d("MATT!", "onCreateMethod");
+        setContentView(R.layout.activity_main);
+        graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
+
     }
 
 
-    @Override //Passes Data from the UdpClient Fragment
+    @Override //Passes Data from the UdpClient Fragment to main activity
     public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         this.hostname = verifiedHostname;
         this.localPort = verifiedLocalPort;
         this.remotePort = verifiedRemotePort;
+        graphFragment.updateHostname(hostname);
+        graphFragment.updateLocalPort(localPort);
+        graphFragment.updateRemotePort(remotePort);
         Log.d("MATT!", "Verified Host: " + verifiedHostname);
         Log.d("MATT!", "Verified Local Port : " + verifiedLocalPort);
         Log.d("MATT!", "Verified Remote Port : " + verifiedRemotePort);
-        //TODO: Notify the start and stop fragment & and the graph fragment of the changes
     }
 
     @Override
@@ -42,10 +46,22 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         this.hostname = defaultHostname;
         this.localPort = defaultLocalPort;
         this.remotePort = defaultRemotePort;
+        graphFragment.updateHostname(hostname);
+        graphFragment.updateLocalPort(localPort);
+        graphFragment.updateRemotePort(remotePort);
         Log.d("MATT!", "default hostname: " + defaultHostname);
         Log.d("MATT!", "default remotePort: " + defaultRemotePort);
         Log.d("MATT!", "default localPort: " + defaultLocalPort);
-        //TODO: Notify the start and stop fragment & the graph fragment of the changes
+    }
+
+    @Override
+    public void startGraphing() {
+        graphFragment.startGraphing();
+    }
+
+    @Override
+    public void stopGraphing() {
+        graphFragment.stopGraphing();
     }
 
 
@@ -69,6 +85,7 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         }
         return super.onOptionsItemSelected(item);
     }
+
 
 
 }
