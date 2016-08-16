@@ -93,7 +93,7 @@ public class UdpClient  {
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
                 pingSocket.send(packet);
                 Log.d("MATT!", "About to wait to receive packet");
-                pingSocket.setSoTimeout(500); //2 second wait tile
+                pingSocket.setSoTimeout(1000); //2 second wait tile
                 rPacket = new DatagramPacket(buf, buf.length);
                 pingSocket.receive(rPacket);
                 String received = new String(rPacket.getData(), 0, rPacket.getLength());
@@ -150,9 +150,8 @@ public class UdpClient  {
      * as a separate thread
      */
     public class UdpDataListener extends Thread {
-        //TODO figure out how to store the data for the graph to pick up
 
-        private Handler handler; //TODO Implement this so it is the handler of the fragment
+        private Handler handler;
 
         public UdpDataListener(Handler handler){
             this.handler = handler; //This will be used to pass data to the Graph Fragment
@@ -174,13 +173,15 @@ public class UdpClient  {
                 address = InetAddress.getByName(serverAddress);
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
                 receiveSocket.send(packet);
+                String dataToSend = "";
 
                 while (streamData) {
                         rcvdPacket = new DatagramPacket(buf, buf.length);
                         receiveSocket.receive(rcvdPacket);
                         received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
-                        //String[] val = received.substring(0, received.length() -2).split(",");
-                        Log.d("MATT!", received.substring(0, received.length() - 2));
+                        dataToSend = received.substring(0, received.length() - 2);
+                        threadMsg(dataToSend);
+                        Log.d("MATT!", dataToSend);
                 }
             }catch (SocketException e){
                 e.printStackTrace();
@@ -201,69 +202,22 @@ public class UdpClient  {
             }
 
         }
+
+        private void threadMsg(String msg) { //Send the data to the Graph Fragment
+            if (!msg.equals(null) && !msg.equals("")) {
+                Message msgObj = handler.obtainMessage();
+                Bundle b = new Bundle();    //Is this the best way to do this??
+                b.putString("data", msg);
+                msgObj.setData(b);
+                handler.sendMessage(msgObj);
+            }
+        }
+
     }
 
 
     //---------------Getter and Setter Methods()------------------
 
-    /**
-     * @return InetAddress representing the address of the remote server
-     */
-    public String getServerAddress() {
-        return serverAddress;
-    }
-
-    /**
-     * @param serverAddress set the value of the remote server address
-     *                      must be a InetAddress object
-     */
-    public void setServerAddress(String serverAddress) {
-        this.serverAddress = serverAddress;
-    }
-
-    /**
-     * @return int remote port of the server
-     */
-    public int getRemoteServerPort() {
-        return remoteServerPort;
-    }
-
-    /**
-     * @param remoteServerPort set the remote server port
-     *                         must be greater than 0
-     */
-    public void setRemoteServerPort(int remoteServerPort) {
-        this.remoteServerPort = remoteServerPort;
-    }
-
-    /**
-     * @return local port used
-     */
-    public int getLocalPort() {
-        return localPort;
-    }
-
-    /**
-     * @param localPort to set to use for udp
-     *                  must be greater than 0
-     */
-    public void setLocalPort(int localPort) {
-        this.localPort = localPort;
-    }
-
-    /**
-     * @return int representing the number of data sets per udp packet
-     */
-    public int getDataSetsPerPacket() {
-        return dataSetsPerPacket;
-    }
-
-    /**
-      * @param dataSetsPerPacket must be greater than 0
-     */
-    public void setDataSetsPerPacket(int dataSetsPerPacket) {
-        this.dataSetsPerPacket = dataSetsPerPacket;
-    }
 
     /**
      *

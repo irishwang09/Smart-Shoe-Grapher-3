@@ -15,6 +15,8 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.util.ArrayList;
+
 /**
  * Created by Matthew on 8/15/2016.
  * Fragment to hold a single graph and its underlying UDP Data Collection
@@ -32,6 +34,7 @@ public class GraphFragment extends Fragment {
     private GraphView graphHandle;
     private LineGraphSeries<DataPoint> series;
     private Handler handler;
+    private int xCount = 0;
     //private Handler defined below
 
     @Override
@@ -43,7 +46,7 @@ public class GraphFragment extends Fragment {
         graphHandle = new GraphView(getContext());
         graphHandle.setTitle("Value vs Count");
         graphHandle.getViewport().setXAxisBoundsManual(true);
-        graphHandle.getViewport().setMaxX(6000);
+        graphHandle.getViewport().setMaxX(6000); //Want these to be dynamically programmed
         graphHandle.getViewport().setMinX(0);
         graphHandle.getViewport().setYAxisBoundsManual(true);
         graphHandle.getViewport().setMaxY(4500);
@@ -102,6 +105,7 @@ public class GraphFragment extends Fragment {
 
     //Nested Class for Graphing Values
     //TODO determine if this is necessary...
+    //TODO: Look at the two examples to see how they handle the graphing...
     public class GraphLooper extends Thread{
 
         //TODO: What is this thread doing???
@@ -110,8 +114,10 @@ public class GraphFragment extends Fragment {
             //Do something
             handler = new Handler(){
                 public void handleMessage(Message msg){
-                    //TODO do something with the message
-                    //Graph the value that is received
+                    String aResponse = msg.getData().getString("data"); //Data received
+                    //TODO: How to handle the data
+                    //resetData
+                    //appendData
                 }
             };
             Looper.loop(); //Waits for messages?
@@ -122,6 +128,10 @@ public class GraphFragment extends Fragment {
 
         }
 
+        //TODO:
+        public ArrayList<ArrayList<DataPoint>> spliceData(String data){
+            throw new RuntimeException("Unimplemented");
+        }
 
     }
 }
