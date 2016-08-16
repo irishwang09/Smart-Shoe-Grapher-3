@@ -170,7 +170,7 @@ public class UdpSettingsFragment extends Fragment {
     public void onClickPing(View frag){
         //set the activity handler
         UdpClient client = new UdpClient(hostname,remotePort,localPort,45); //Still want to pass this?
-        UdpClient.UdpServerAcknowledger udpPinger = client.new UdpServerAcknowledger(this.activityHandler);
+        UdpClient.UdpServerAcknowledge udpPinger = client.new UdpServerAcknowledge(this.activityHandler);
         udpPinger.start();
     }
 

@@ -1,10 +1,15 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -23,31 +28,30 @@ public class GraphFragment extends Fragment {
     private int remotePort;
     private int localPort;
     private boolean listenerExists = false;
+    private LinearLayout graphContainer;
+    private GraphView graphHandle;
+    private LineGraphSeries<DataPoint> series;
+    private Handler handler;
+    //private Handler defined below
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View frag = inflater.inflate(R.layout.graph_fragment, container, false);
 
-        GraphView graph = (GraphView) frag.findViewById(R.id.graph);
-        graph.setTitle("Volt Vs Count");
+        graphContainer = (LinearLayout) frag.findViewById(R.id.graph);
 
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(new DataPoint[] {
-                new DataPoint(0, 1),
-                new DataPoint(1, 5),
-                new DataPoint(2, 3),
-                new DataPoint(3, 2),
-                new DataPoint(4, 6)
-        });
-        graph.addSeries(series);
+        graphHandle = new GraphView(getContext());
+        graphHandle.setTitle("Value vs Count");
+        graphHandle.getViewport().setXAxisBoundsManual(true);
+        graphHandle.getViewport().setMaxX(6000);
+        graphHandle.getViewport().setMinX(0);
+        graphHandle.getViewport().setYAxisBoundsManual(true);
+        graphHandle.getViewport().setMaxY(4500);
+        graphHandle.getViewport().setMinY(0);
 
-        LineGraphSeries<DataPoint> series2 = new LineGraphSeries<DataPoint>(new DataPoint[] {
-                new DataPoint(0, 3),
-                new DataPoint(1, 3),
-                new DataPoint(2, 6),
-                new DataPoint(3, 2),
-                new DataPoint(4, 5)
-        });
-        graph.addSeries(series2);
+        series = new LineGraphSeries<DataPoint>();
+        graphHandle.addSeries(series);
+        graphContainer.addView(graphHandle);
 
         return frag;
     }
@@ -81,7 +85,9 @@ public class GraphFragment extends Fragment {
             listenerExists = true;
             client = new UdpClient(hostname, remotePort, localPort, 45);
             client.setStreamData(true);
-            UdpClient.UdpDataListener listener = client.new UdpDataListener();
+            GraphLooper graphLooper = new GraphLooper();
+            graphLooper.start(); //initializes the handler in the next line (below)
+            UdpClient.UdpDataListener listener = client.new UdpDataListener(handler);
             listener.start();
         }
     }
@@ -93,4 +99,29 @@ public class GraphFragment extends Fragment {
         }
     }
 
+
+    //Nested Class for Graphing Values
+    //TODO determine if this is necessary...
+    public class GraphLooper extends Thread{
+
+        //TODO: What is this thread doing???
+        // Is this thread necessary or can the main thread do the graphing????
+        public void run(){
+            //Do something
+            handler = new Handler(){
+                public void handleMessage(Message msg){
+                    //TODO do something with the message
+                    //Graph the value that is received
+                }
+            };
+            Looper.loop(); //Waits for messages?
+            //^Run the message queue in this thread
+        }
+
+        public void startGraphing(){
+
+        }
+
+
+    }
 }

@@ -1,5 +1,6 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -8,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -22,6 +24,22 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
     private UdpClient client;
     private GraphFragment graphFragment;
     private UdpSettingsFragment settingsFragment;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        //TODO: Change the background
+        // LinearLayout background = (LinearLayout)findViewById(R.id.bg);
+        // background.setBackgroundColor(Color.BLACK);
+
+        graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
+        settingsFragment = (UdpSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.client_fragment_layout); //This is null???
+        settingsFragment.setActivityHandler(this.mHandler);
+    }
+
+
     /**
      * Handler to receive messages from different threads
      */
@@ -39,16 +57,6 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
             }
         }
     };
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
-        settingsFragment = (UdpSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.client_fragment_layout); //This is null???
-        settingsFragment.setActivityHandler(this.mHandler);
-    }
 
 
     @Override //Passes Data from the UdpClient Fragment to main activity
@@ -86,9 +94,6 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
     public void stopGraphing() {
         graphFragment.stopGraphing();
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

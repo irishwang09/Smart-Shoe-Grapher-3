@@ -69,7 +69,6 @@ public class UdpClient  {
         public UdpServerAcknowledge(Handler handler){
             this.handler = handler;
         }
-        
 
         /**
          * value to be called by the thread
@@ -152,6 +151,12 @@ public class UdpClient  {
      */
     public class UdpDataListener extends Thread {
         //TODO figure out how to store the data for the graph to pick up
+
+        private Handler handler; //TODO Implement this so it is the handler of the fragment
+
+        public UdpDataListener(Handler handler){
+            this.handler = handler; //This will be used to pass data to the Graph Fragment
+        }
 
         public void run(){
             pingThenListenToServer();
