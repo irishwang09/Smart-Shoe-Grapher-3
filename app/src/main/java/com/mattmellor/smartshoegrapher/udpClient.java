@@ -1,5 +1,8 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
@@ -59,9 +62,14 @@ public class UdpClient  {
      * This is a separate class because all networking actions can't occur
      * on the main UI thread
      */
-    public class UdpServerAcknowledger extends Thread{
+    public class UdpServerAcknowledge extends Thread{
 
-        private boolean connectionSuccess = false;
+        private Handler handler;
+
+        public UdpServerAcknowledge(Handler handler){
+            this.handler = handler;
+        }
+        
 
         /**
          * value to be called by the thread
@@ -76,51 +84,65 @@ public class UdpClient  {
             DatagramPacket packet;
             DatagramPacket rPacket;
             byte[] buf = new byte[8];
+            boolean fail = false;
+            int port = localPort + 1;
+            if (localPort == 65535) port = localPort -1;
 
             try {
-                pingSocket = new DatagramSocket(localPort + 1);
+                pingSocket = new DatagramSocket(port);
                 address = InetAddress.getByName(serverAddress);
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
                 pingSocket.send(packet);
                 Log.d("MATT!", "About to wait to receive packet");
-                pingSocket.setSoTimeout(2000); //2 second wait tile
+                pingSocket.setSoTimeout(500); //2 second wait tile
                 rPacket = new DatagramPacket(buf, buf.length);
                 pingSocket.receive(rPacket);
                 String received = new String(rPacket.getData(), 0, rPacket.getLength());
 
                 if (received.length() > 0){
                     Log.d("MATT!", "Successful Response from server");
-                    connectionSuccess = true;
+                    threadMsg("success");
                 }
 
             }catch(SocketTimeoutException e){
                 //Send a message to the fragment
                 Log.d("MATT!", "TimeoutException");
-                //connectionSuccess = false;
+                fail = true;
             }catch (SocketException e){
                 e.printStackTrace();
                 Log.e("MATT!", "socket exception");
+                fail = true;
             }catch(UnknownHostException e){
                 e.printStackTrace();
                 Log.e("MATT!", "unknown host exception");
+                fail = true;
             }catch(IOException e) {
                 e.printStackTrace();
                 Log.e("MATT!", "IOException");
+                fail = true;
             }catch(Exception e){
                 Log.e("MATT!", "General exception");
                 e.printStackTrace();
-                //connectionSuccess = false;
+                fail = true;
             }finally {
+                if(fail){
+                    threadMsg("fail");
+                }
                 if(pingSocket != null){
                     pingSocket.close();
                 }
             }
         }
-        public boolean getConnectionSuccess(){
-            Log.d("MATT!", "" + connectionSuccess);
-            return this.connectionSuccess;
-        }
 
+        private void threadMsg(String msg) {
+            if (!msg.equals(null) && !msg.equals("")) {
+                Message msgObj = handler.obtainMessage();
+                Bundle b = new Bundle();
+                b.putString("message", msg);
+                msgObj.setData(b);
+                handler.sendMessage(msgObj);
+            }
+        }
     }
 
 

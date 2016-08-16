@@ -1,6 +1,9 @@
 package com.mattmellor.smartshoegrapher;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -18,13 +21,33 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
     private int localPort;
     private UdpClient client;
     private GraphFragment graphFragment;
+    private UdpSettingsFragment settingsFragment;
+    /**
+     * Handler to receive messages from different threads
+     */
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            //Gets the task from the incoming Message object
+            String aResponse = msg.getData().getString("message");
+            if (aResponse.equals("success")) {
+                settingsFragment.reportPingResult(true);
+                Log.d("MATT!", "Succesful Ping");
+            } else {
+                settingsFragment.reportPingResult(false);
+                Log.d("MATT!", "Unsucessful Ping");
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
-
+        settingsFragment = (UdpSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.client_fragment_layout); //This is null???
+        settingsFragment.setActivityHandler(this.mHandler);
     }
 
 
@@ -63,6 +86,8 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
     public void stopGraphing() {
         graphFragment.stopGraphing();
     }
+
+
 
 
     @Override

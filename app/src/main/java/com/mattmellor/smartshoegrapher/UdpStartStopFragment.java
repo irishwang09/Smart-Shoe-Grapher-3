@@ -47,7 +47,6 @@ public class UdpStartStopFragment extends Fragment {
         return frag;
     }
 
-
     @Override
     public void onAttach(Context context){
         super.onAttach(context);

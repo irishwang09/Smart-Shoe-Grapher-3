@@ -3,6 +3,7 @@ package com.mattmellor.smartshoegrapher;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,10 +42,9 @@ public class UdpSettingsFragment extends Fragment {
     private final int defaultRemotePort = 2391;
     private final int defaultLocalPort = 5006;
     private boolean applyPressed = false;
-    private boolean successfulServerConnect = false;
-    private boolean changedConnectionStatus = false;
 
     private OnDataPass dataPassHandle;
+    private Handler activityHandler;
 
     @Override
     public void onAttach(Context context){
@@ -164,29 +164,14 @@ public class UdpSettingsFragment extends Fragment {
     }
 
 
-    //------------Helper functions for the onClick Listeners--------
-
     /**
      * Starts a thread to ping the server
      */
     public void onClickPing(View frag){
+        //set the activity handler
         UdpClient client = new UdpClient(hostname,remotePort,localPort,45); //Still want to pass this?
-        UdpClient.UdpServerAcknowledger udpPinger = client.new UdpServerAcknowledger();
+        UdpClient.UdpServerAcknowledger udpPinger = client.new UdpServerAcknowledger(this.activityHandler);
         udpPinger.start();
-        if(udpPinger.getConnectionSuccess()){ //TODO: Implement the Thread to UI Messaging
-            Context context = getActivity();
-            CharSequence text = "Server Active";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
-        else{
-            Context context = getActivity();
-            CharSequence text = "No Reply from Server: Check Settings";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
     }
 
     /**
@@ -204,9 +189,28 @@ public class UdpSettingsFragment extends Fragment {
     }
 
     public void resetClickedPassDefaults(){
-        //Passes only valid data since defaults are valid...
-        //TODO: maybe we should make defaults just the last set of valid values instead of these?
         dataPassHandle.onDataPassUdpReset(defaultHostname, defaultLocalPort, defaultRemotePort);
+    }
+
+    public void reportPingResult(boolean result){
+        if(result){
+            Context context = getActivity();
+            CharSequence text = "Server Active: Reply Received";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
+        else{
+            Context context = getActivity();
+            CharSequence text = "No Reply: Verify Settings";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
+    }
+
+    public void setActivityHandler(Handler handler){
+        this.activityHandler = handler;
     }
 
 
