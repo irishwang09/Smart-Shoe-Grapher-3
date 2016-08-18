@@ -34,7 +34,7 @@ public class GraphFragment extends Fragment {
     private GraphView graphHandle;
     private LineGraphSeries<DataPoint> series;
     private Handler handler;
-    private int xCount = 0;
+    private int xcounter = 0;
     //private Handler defined below
 
     @Override
@@ -134,4 +134,68 @@ public class GraphFragment extends Fragment {
         }
 
     }
+
+    private boolean dataValid(String data){
+        return ((data.length() == 1350) );
+    }
+
+    /**
+     *
+     * @param data String of the entire data
+     * @return ArrayList of ArrayLists.. Inner arrayLists are the
+     * values of the individual sensors
+     */
+    private ArrayList<ArrayList<DataPoint>> spliceData(String data){
+        ArrayList<ArrayList<DataPoint>> DataPoints = new ArrayList<>();
+        String[] dataSplit = data.split(",");
+        DataPoints.add(spliceToSensors(dataSplit, 1));
+        DataPoints.add(spliceToSensors(dataSplit, 2));
+        DataPoints.add(spliceToSensors(dataSplit, 3));
+        DataPoints.add(spliceToSensors(dataSplit, 4));
+        DataPoints.add(spliceToSensors(dataSplit, 5));
+        DataPoints.add(spliceToSensors(dataSplit, 6));
+        xcounter = xcounter + 45;
+        return DataPoints;
+    }
+
+    /**
+     *
+     * @param dataSplit data to split into individual sensor array
+     *                  must contain only string representations of numbers
+     * @param sensorNumber which sensors to collect the data points of
+     * @return ArrayList<DataPoint> List of DataPoint values for an individual
+     * sensor
+     */
+    private ArrayList<DataPoint> spliceToSensors(String[] dataSplit, int sensorNumber){
+
+        sensorNumber -= 1;
+        int xcount = xcounter;
+        ArrayList<DataPoint> sensor = new ArrayList<>();
+        int i = sensorNumber;
+        int dataSize = dataSplit.length - 1;
+
+        while(true){
+            DataPoint xy;
+            String num = "1";
+            if(i < 6){ //This is the base case...add the first set of data
+                num = dataSplit[i];
+                xy = new DataPoint(xcount, Integer.parseInt(num));
+                //Log.d("MATT!",xy.toString());//This could throw an error there
+                sensor.add(xy);
+            }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
+                num = dataSplit[i];
+                xy = new DataPoint(xcount, Integer.parseInt(num));
+                //Log.d("MATT!",xy.toString());
+                sensor.add(xy);
+            }else{
+                xcount++;
+                break;
+            }
+            i += 6;
+            xcount++;
+        }
+        return sensor;
+    }
+
+
 }

@@ -30,10 +30,6 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //TODO: Change the background
-        // LinearLayout background = (LinearLayout)findViewById(R.id.bg);
-        // background.setBackgroundColor(Color.BLACK);
-
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
         settingsFragment = (UdpSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.client_fragment_layout); //This is null???
         settingsFragment.setActivityHandler(this.mHandler);
