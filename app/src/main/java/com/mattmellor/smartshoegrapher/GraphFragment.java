@@ -41,11 +41,12 @@ public class GraphFragment extends Fragment {
     private XYPlot plot;
     //private Handler defined below
 
-    @Override
+    @Override //inflate the fragment view in the mainActivity view
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View frag = inflater.inflate(R.layout.graph_fragment, container, false);
         graphContainer = (LinearLayout) frag.findViewById(R.id.graph);
 
+        //Code until the end of this method is a place holder
         plot = (XYPlot) frag.findViewById(R.id.plot);
 
         // create a couple arrays of y-values to plot:
@@ -126,6 +127,12 @@ public class GraphFragment extends Fragment {
         this.hostname = hostname;
     }
 
+    /**
+     * If there isn't already a data listener create one
+     * and start listening to data. Data listener notifies the UI thread
+     * each time it has a new data packet full of valid data
+     * UI thread then graphes it (not implemented)
+     */
     public void startGraphing(){
         if(!listenerExists) {
             listenerExists = true;
@@ -138,6 +145,9 @@ public class GraphFragment extends Fragment {
         }
     }
 
+    /**
+     * Tell the data listener to stop listening to data
+     */
     public void stopGraphing(){
         if (listenerExists) {
             client.setStreamData(false);
@@ -174,6 +184,12 @@ public class GraphFragment extends Fragment {
 
     }
 
+    /**
+     *
+     * @param data string of the udp data
+     * @return true if the data isn't corrupted..aka the correct length
+     * TODO: add a regex test (again...)
+     */
     private boolean dataValid(String data){
         return ((data.length() == 1350) );
     }

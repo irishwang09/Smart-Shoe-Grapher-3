@@ -34,7 +34,9 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         setContentView(R.layout.activity_main);
 
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
+//        graphFragment.setActivity
 
+        //Pass a handle to
         settingsFragment = (UdpSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.client_fragment_layout); //This is null???
         settingsFragment.setActivityHandler(this.mHandler);
 
