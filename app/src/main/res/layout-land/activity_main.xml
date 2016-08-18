@@ -32,17 +32,13 @@
     </LinearLayout>
 
 
-    <!--<fragment-->
-        <!--android:name="com.mattmellor.smartshoegrapher.GraphFragment"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:id="@+id/graph_fragment"-->
-        <!--tools:layout="@layout/graph_fragment" />-->
-
-    <com.jjoe64.graphview.GraphView
+    <fragment
+        android:name="com.mattmellor.smartshoegrapher.GraphFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/graph_test"/>
+        android:id="@+id/graph_fragment"
+        tools:layout="@layout/graph_fragment" />
+
   
 
 </LinearLayout>

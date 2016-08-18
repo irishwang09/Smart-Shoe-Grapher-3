@@ -11,10 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
-
 import java.util.ArrayList;
 
 /**
@@ -31,8 +27,6 @@ public class GraphFragment extends Fragment {
     private int localPort;
     private boolean listenerExists = false;
     private LinearLayout graphContainer;
-    private GraphView graphHandle;
-    private LineGraphSeries<DataPoint> series;
     private Handler handler;
     private int xcounter = 0;
     //private Handler defined below
@@ -40,22 +34,7 @@ public class GraphFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View frag = inflater.inflate(R.layout.graph_fragment, container, false);
-
         graphContainer = (LinearLayout) frag.findViewById(R.id.graph);
-
-        graphHandle = new GraphView(getContext());
-        graphHandle.setTitle("Value vs Count");
-        graphHandle.getViewport().setXAxisBoundsManual(true);
-        graphHandle.getViewport().setMaxX(6000); //Want these to be dynamically programmed
-        graphHandle.getViewport().setMinX(0);
-        graphHandle.getViewport().setYAxisBoundsManual(true);
-        graphHandle.getViewport().setMaxY(4500);
-        graphHandle.getViewport().setMinY(0);
-
-        series = new LineGraphSeries<DataPoint>();
-        graphHandle.addSeries(series);
-        graphContainer.addView(graphHandle);
-
         return frag;
     }
 
@@ -128,10 +107,6 @@ public class GraphFragment extends Fragment {
 
         }
 
-        //TODO:
-        public ArrayList<ArrayList<DataPoint>> spliceData(String data){
-            throw new RuntimeException("Unimplemented");
-        }
 
     }
 
@@ -145,17 +120,18 @@ public class GraphFragment extends Fragment {
      * @return ArrayList of ArrayLists.. Inner arrayLists are the
      * values of the individual sensors
      */
-    private ArrayList<ArrayList<DataPoint>> spliceData(String data){
-        ArrayList<ArrayList<DataPoint>> DataPoints = new ArrayList<>();
+    //private ArrayList<ArrayList<DataPoint>> spliceData(String data){
+    private void spliceData(String data){
+        //ArrayList<ArrayList<DataPoint>> DataPoints = new ArrayList<>();
         String[] dataSplit = data.split(",");
-        DataPoints.add(spliceToSensors(dataSplit, 1));
-        DataPoints.add(spliceToSensors(dataSplit, 2));
-        DataPoints.add(spliceToSensors(dataSplit, 3));
-        DataPoints.add(spliceToSensors(dataSplit, 4));
-        DataPoints.add(spliceToSensors(dataSplit, 5));
-        DataPoints.add(spliceToSensors(dataSplit, 6));
+//        DataPoints.add(spliceToSensors(dataSplit, 1));
+//        DataPoints.add(spliceToSensors(dataSplit, 2));
+//        DataPoints.add(spliceToSensors(dataSplit, 3));
+//        DataPoints.add(spliceToSensors(dataSplit, 4));
+//        DataPoints.add(spliceToSensors(dataSplit, 5));
+//        DataPoints.add(spliceToSensors(dataSplit, 6));
         xcounter = xcounter + 45;
-        return DataPoints;
+        //return DataPoints;
     }
 
     /**
@@ -166,27 +142,27 @@ public class GraphFragment extends Fragment {
      * @return ArrayList<DataPoint> List of DataPoint values for an individual
      * sensor
      */
-    private ArrayList<DataPoint> spliceToSensors(String[] dataSplit, int sensorNumber){
-
+    //private ArrayList<DataPoint> spliceToSensors(String[] dataSplit, int sensorNumber){
+    private void spliceToSensors(String[] dataSplit, int sensorNumber){
         sensorNumber -= 1;
         int xcount = xcounter;
-        ArrayList<DataPoint> sensor = new ArrayList<>();
+        //ArrayList<DataPoint> sensor = new ArrayList<>();
         int i = sensorNumber;
         int dataSize = dataSplit.length - 1;
 
         while(true){
-            DataPoint xy;
+            //DataPoint xy;
             String num = "1";
             if(i < 6){ //This is the base case...add the first set of data
                 num = dataSplit[i];
-                xy = new DataPoint(xcount, Integer.parseInt(num));
+                //xy = new DataPoint(xcount, Integer.parseInt(num));
                 //Log.d("MATT!",xy.toString());//This could throw an error there
-                sensor.add(xy);
+               // sensor.add(xy);
             }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
                 num = dataSplit[i];
-                xy = new DataPoint(xcount, Integer.parseInt(num));
+                //xy = new DataPoint(xcount, Integer.parseInt(num));
                 //Log.d("MATT!",xy.toString());
-                sensor.add(xy);
+                //sensor.add(xy);
             }else{
                 xcount++;
                 break;
@@ -194,7 +170,7 @@ public class GraphFragment extends Fragment {
             i += 6;
             xcount++;
         }
-        return sensor;
+        //return sensor;
     }
 
 
