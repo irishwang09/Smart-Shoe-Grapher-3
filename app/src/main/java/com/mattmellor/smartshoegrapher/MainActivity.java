@@ -12,12 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass, UdpStartStopFragment.PassStartStopData{
 
