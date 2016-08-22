@@ -12,15 +12,7 @@
         android:id="@+id/plot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        androidplot.renderMode="use_background_thread"
-        ap:Label= "Sensor Data"
-        ap:domainLabel ="Domain"
-        ap:rangeLabel = "Range"
-        ap:legendTextSize = "15sp"
-        ap:legendIconHeight="15dp"
-        ap:legendIconWidth="15dp"
-        ap:legendHeight="25dp"
-        ap:legendAnchorPosition="right_bottom" />
+        androidplot.renderMode="use_background_thread" />
 
 </LinearLayout>
 

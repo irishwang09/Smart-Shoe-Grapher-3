@@ -69,18 +69,18 @@ public class GraphFragment extends Fragment {
         //TODO: Make plot redraw be on a background thread
         //Change the setting^
         plotUpdater = new MyPlotUpdater(plot);
-        dataSource = new GraphDataSource();
+
 
         //Display only whole numbers in domain labels
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM);
 
 
-        DynamicSeries sensor1 = new DynamicSeries(dataSource, 0 , "Sensor 1", 10000);
-        DynamicSeries sensor2 = new DynamicSeries(dataSource, 1 , "Sensor 2", 10000);
-        DynamicSeries sensor3 = new DynamicSeries(dataSource, 2 , "Sensor 3", 10000);
-        DynamicSeries sensor4 = new DynamicSeries(dataSource, 3 , "Sensor 4", 10000);
-        DynamicSeries sensor5 = new DynamicSeries(dataSource, 4 , "Sensor 5", 10000);
-        DynamicSeries sensor6 = new DynamicSeries(dataSource, 5 , "Sensor 6", 10000);
+        DynamicSeries sensor1 = new DynamicSeries(0 , "Sensor 1", 10000);
+        DynamicSeries sensor2 = new DynamicSeries(1 , "Sensor 2", 10000);
+        DynamicSeries sensor3 = new DynamicSeries(2 , "Sensor 3", 10000);
+        DynamicSeries sensor4 = new DynamicSeries(3 , "Sensor 4", 10000);
+        DynamicSeries sensor5 = new DynamicSeries(4 , "Sensor 5", 10000);
+        DynamicSeries sensor6 = new DynamicSeries(5 , "Sensor 6", 10000);
 
         seriesList = new ArrayList<>(Arrays.asList(sensor1,sensor2, sensor3, sensor4, sensor5, sensor6));
 
@@ -258,14 +258,12 @@ public class GraphFragment extends Fragment {
 
     //TODO: figure out how to implement XYSeries in a reasonable manner
     class DynamicSeries implements XYSeries{
-        private GraphDataSource datasource;
         private int seriesIndex;
         private String title;
         private int bounds;
         public ArrayList<Integer> data = new ArrayList<>();
 
-        public DynamicSeries(GraphDataSource datasource, int seriesIndex, String title, int size) {
-            this.datasource = datasource;
+        public DynamicSeries(int seriesIndex, String title, int size) {
             this.seriesIndex = seriesIndex;
             this.bounds = size;
             this.title = title;
@@ -283,12 +281,14 @@ public class GraphFragment extends Fragment {
 
         @Override
         public Number getX(int index) {
-            return datasource.getX(seriesIndex, index);
+            //return data.getX(seriesIndex, index);
+            throw new RuntimeException("Unimplemened");
         }
 
         @Override
         public Number getY(int index) {
-            return datasource.getY(seriesIndex, index);
+            //return datasource.getY(seriesIndex, index);
+            throw new RuntimeException("Unimplemented");
         }
 
         public void resetData(){
@@ -313,6 +313,7 @@ public class GraphFragment extends Fragment {
             listenerExists = true;
             client = new UdpClient(hostname, remotePort, localPort, 45);
             client.setStreamData(true);
+            dataSource = new GraphDataSource();
             dataSource.start(); //TODO: This might be a problem
             UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //When we press start graphing.. We pass handler object.
             listener.start();
