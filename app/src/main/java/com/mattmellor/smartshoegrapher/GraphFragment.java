@@ -25,6 +25,7 @@ import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
 
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,15 +53,11 @@ public class GraphFragment extends Fragment {
     private GraphDataSource dataSource;
 
     private ArrayList<DynamicSeries> seriesList;
-    private DynamicSeries sensor1;
-    private DynamicSeries sensor2;
-    private DynamicSeries sensor3;
-    private DynamicSeries sensor4;
-    private DynamicSeries sensor5;
-    private DynamicSeries sensor6;
+
 
     private boolean listenerExists = false;
     private int xcounter = 0;
+    private int xBound = 1000;
 
     @Override //inflate the fragment view in the mainActivity view
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,12 +75,12 @@ public class GraphFragment extends Fragment {
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM);
 
 
-        sensor1 = new DynamicSeries(dataSource, 0 , "Sensor 1", 10000);
-        sensor2 = new DynamicSeries(dataSource, 1 , "Sensor 2", 10000);
-        sensor3 = new DynamicSeries(dataSource, 2 , "Sensor 3", 10000);
-        sensor4 = new DynamicSeries(dataSource, 3 , "Sensor 4", 10000);
-        sensor5 = new DynamicSeries(dataSource, 4 , "Sensor 5", 10000);
-        sensor6 = new DynamicSeries(dataSource, 5 , "Sensor 6", 10000);
+        DynamicSeries sensor1 = new DynamicSeries(dataSource, 0 , "Sensor 1", 10000);
+        DynamicSeries sensor2 = new DynamicSeries(dataSource, 1 , "Sensor 2", 10000);
+        DynamicSeries sensor3 = new DynamicSeries(dataSource, 2 , "Sensor 3", 10000);
+        DynamicSeries sensor4 = new DynamicSeries(dataSource, 3 , "Sensor 4", 10000);
+        DynamicSeries sensor5 = new DynamicSeries(dataSource, 4 , "Sensor 5", 10000);
+        DynamicSeries sensor6 = new DynamicSeries(dataSource, 5 , "Sensor 6", 10000);
 
         seriesList = new ArrayList<>(Arrays.asList(sensor1,sensor2, sensor3, sensor4, sensor5, sensor6));
 
@@ -154,8 +151,7 @@ public class GraphFragment extends Fragment {
                     String aResponse = msg.getData().getString("data"); //Data received
                     Log.d("Goyle!", aResponse);
                     if(dataValid(aResponse)){
-                        ArrayList<ArrayList<Integer>> sensors = spliceData(aResponse);
-                        addDataToSensors(sensors);
+                        spliceDataAndAddData(aResponse);
                         notifier.notifyObservers(); //tells the graph to redraw
                     }
                 }
@@ -178,17 +174,14 @@ public class GraphFragment extends Fragment {
          * @return ArrayList of ArrayLists.. Inner arrayLists are the
          * values of the individual sensors
          */
-        private ArrayList<ArrayList<Integer>> spliceData(String data){
-            ArrayList<ArrayList<Integer>> DataPoints = new ArrayList<>();
+        private void spliceDataAndAddData(String data){
             String[] dataSplit = data.split(",");
-            DataPoints.add(spliceToSensors(dataSplit, 1));
-            DataPoints.add(spliceToSensors(dataSplit, 2));
-            DataPoints.add(spliceToSensors(dataSplit, 3));
-            DataPoints.add(spliceToSensors(dataSplit, 4));
-            DataPoints.add(spliceToSensors(dataSplit, 5));
-            DataPoints.add(spliceToSensors(dataSplit, 6));
-            xcounter = xcounter + 45;
-            return DataPoints;
+            addDataToSensors(spliceToSensors(dataSplit, 1),1);
+            addDataToSensors(spliceToSensors(dataSplit, 2),2);
+            addDataToSensors(spliceToSensors(dataSplit, 3),3);
+            addDataToSensors(spliceToSensors(dataSplit, 4),4);
+            addDataToSensors(spliceToSensors(dataSplit, 5),5);
+            addDataToSensors(spliceToSensors(dataSplit, 6),6);
         }
 
         /**
@@ -225,20 +218,21 @@ public class GraphFragment extends Fragment {
             return sensor;
         }
 
-        private void addDataToSensors(ArrayList<ArrayList<Integer>> sensors){
-            throw new RuntimeException("Unimplemented");
+        private void addDataToSensors(ArrayList<Integer> sensor, Integer sensorNumber){
+            int dataSize = seriesList.get(sensorNumber).data.size();
+            if(dataSize + sensor.size() > xBound){  //TODO Double check this...
+                seriesList.get(sensorNumber).resetData();
+            }
+            seriesList.get(sensorNumber).data.addAll(sensor);
         }
 
-        public int getItemCount(int series){
-            return seriesList.get(series).size();
-        }
 
         public Number getX(int series, int index){
             return index;
         }
 
         public Number getY(int series, int index){
-            return seriesList.get(series).getX(index);
+            return seriesList.get(series).data.get(index); //TODO: Double check this so no null pointer ref
         }
 
     }
@@ -268,6 +262,7 @@ public class GraphFragment extends Fragment {
         private int seriesIndex;
         private String title;
         private int bounds;
+        public ArrayList<Integer> data = new ArrayList<>();
 
         public DynamicSeries(GraphDataSource datasource, int seriesIndex, String title, int size) {
             this.datasource = datasource;
@@ -283,7 +278,7 @@ public class GraphFragment extends Fragment {
 
         @Override
         public int size() {
-            return datasource.getItemCount(seriesIndex);
+            return data.size();
         }
 
         @Override
@@ -295,6 +290,13 @@ public class GraphFragment extends Fragment {
         public Number getY(int index) {
             return datasource.getY(seriesIndex, index);
         }
+
+        public void resetData(){
+            data.clear();
+        }
+
+
+
     }
 
 
