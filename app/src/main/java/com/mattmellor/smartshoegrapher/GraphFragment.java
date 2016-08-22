@@ -51,6 +51,7 @@ public class GraphFragment extends Fragment {
     private MyPlotUpdater plotUpdater;
     private GraphDataSource dataSource;
 
+    private ArrayList<DynamicSeries> seriesList;
     private DynamicSeries sensor1;
     private DynamicSeries sensor2;
     private DynamicSeries sensor3;
@@ -68,7 +69,8 @@ public class GraphFragment extends Fragment {
 
         //Code until the end of this method is a place holder
         plot = (XYPlot) frag.findViewById(R.id.plot);
-
+        //TODO: Make plot redraw be on a background thread
+        //Change the setting^
         plotUpdater = new MyPlotUpdater(plot);
         dataSource = new GraphDataSource();
 
@@ -76,12 +78,14 @@ public class GraphFragment extends Fragment {
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM);
 
 
-        sensor1 = new DynamicSeries(dataSource, 0 , "Sensor 1");
-        sensor2 = new DynamicSeries(dataSource, 1 , "Sensor 2");
-        sensor3 = new DynamicSeries(dataSource, 2 , "Sensor 3");
-        sensor4 = new DynamicSeries(dataSource, 3 , "Sensor 4");
-        sensor5 = new DynamicSeries(dataSource, 4 , "Sensor 5");
-        sensor6 = new DynamicSeries(dataSource, 5 , "Sensor 6");
+        sensor1 = new DynamicSeries(dataSource, 0 , "Sensor 1", 10000);
+        sensor2 = new DynamicSeries(dataSource, 1 , "Sensor 2", 10000);
+        sensor3 = new DynamicSeries(dataSource, 2 , "Sensor 3", 10000);
+        sensor4 = new DynamicSeries(dataSource, 3 , "Sensor 4", 10000);
+        sensor5 = new DynamicSeries(dataSource, 4 , "Sensor 5", 10000);
+        sensor6 = new DynamicSeries(dataSource, 5 , "Sensor 6", 10000);
+
+        seriesList = new ArrayList<>(Arrays.asList(sensor1,sensor2, sensor3, sensor4, sensor5, sensor6));
 
 
         // create formatters to use for drawing a series using LineAndPointRenderer
@@ -106,15 +110,13 @@ public class GraphFragment extends Fragment {
         plot.setRangeStepMode(StepMode.INCREMENT_BY_VAL);
         plot.setRangeStepValue(10);
 
-        plot.getGraph().getLineLabelStyle(
-                XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("###.#"));
+        plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("###.#"));
 
         // uncomment this line to freeze the range boundaries:
         plot.setRangeBoundaries(0, 10000, BoundaryMode.FIXED);
 
         // create a dash effect for domain and range grid lines:
-        DashPathEffect dashFx = new DashPathEffect(
-                new float[] {PixelUtils.dpToPix(3), PixelUtils.dpToPix(3)}, 0);
+        DashPathEffect dashFx = new DashPathEffect(new float[] {PixelUtils.dpToPix(3), PixelUtils.dpToPix(3)}, 0);
         plot.getGraph().getDomainGridLinePaint().setPathEffect(dashFx);
         plot.getGraph().getRangeGridLinePaint().setPathEffect(dashFx);
 
@@ -153,11 +155,9 @@ public class GraphFragment extends Fragment {
                     Log.d("Goyle!", aResponse);
                     if(dataValid(aResponse)){
                         ArrayList<ArrayList<Integer>> sensors = spliceData(aResponse);
-                        //TODO: Add data to the plot
-                        //TODO: Notify the observers
+                        addDataToSensors(sensors);
                         notifier.notifyObservers(); //tells the graph to redraw
                     }
-
                 }
             };
             Looper.loop(); //Waits for messages?
@@ -225,38 +225,21 @@ public class GraphFragment extends Fragment {
             return sensor;
         }
 
+        private void addDataToSensors(ArrayList<ArrayList<Integer>> sensors){
+            throw new RuntimeException("Unimplemented");
+        }
 
         public int getItemCount(int series){
-            //return SAMPLE_SIZE;
-            throw new RuntimeException("Unimplemented");
+            return seriesList.get(series).size();
         }
 
-        public int getX(int series, int index){
-//            if (index >= SAMPLE_SIZE) {
-//                throw new IllegalArgumentException();
-//            }
-//            return index;
-            throw new RuntimeException("Unimplemented");
+        public Number getX(int series, int index){
+            return index;
         }
 
-        public int getY(int series, int index){
-//            if (index >= SAMPLE_SIZE) {
-//                throw new IllegalArgumentException();
-//            }
-//            double angle = (index + (phase))/FREQUENcY;
-//            double amp = sinAmp * Math.sin(angle);
-//            switch (series) {
-//                case SINE1:
-//                    return amp;
-//                case SINE2:
-//                    return -amp;
-//                default:
-//                    throw new IllegalArgumentException();
-//            }
-            throw new RuntimeException("Unimplemented");
+        public Number getY(int series, int index){
+            return seriesList.get(series).getX(index);
         }
-
-
 
     }
 
@@ -279,14 +262,17 @@ public class GraphFragment extends Fragment {
 
     //---------------Data Representation------------------
 
+    //TODO: figure out how to implement XYSeries in a reasonable manner
     class DynamicSeries implements XYSeries{
         private GraphDataSource datasource;
         private int seriesIndex;
         private String title;
+        private int bounds;
 
-        public DynamicSeries(GraphDataSource datasource, int seriesIndex, String title) {
+        public DynamicSeries(GraphDataSource datasource, int seriesIndex, String title, int size) {
             this.datasource = datasource;
             this.seriesIndex = seriesIndex;
+            this.bounds = size;
             this.title = title;
         }
 
