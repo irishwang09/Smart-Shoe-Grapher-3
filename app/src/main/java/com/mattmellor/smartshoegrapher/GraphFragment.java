@@ -1,26 +1,35 @@
 package com.mattmellor.smartshoegrapher;
 
-import android.content.Context;
+import android.graphics.Color;
 import android.graphics.DashPathEffect;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.androidplot.Plot;
 import com.androidplot.util.PixelUtils;
-import com.androidplot.xy.CatmullRomInterpolator;
+import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.PointLabelFormatter;
 import com.androidplot.xy.SimpleXYSeries;
+import com.androidplot.xy.StepMode;
+import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Observable;
+import java.util.Observer;
 
 /**
  * Created by Matthew on 8/15/2016.
@@ -34,12 +43,23 @@ public class GraphFragment extends Fragment {
     private String hostname;
     private int remotePort;
     private int localPort;
-    private boolean listenerExists = false;
+
     private LinearLayout graphContainer;
     private Handler handler;
-    private int xcounter = 0;
+
     private XYPlot plot;
-    //private Handler defined below
+    private MyPlotUpdater plotUpdater;
+    private GraphDataSource dataSource;
+
+    private DynamicSeries sensor1;
+    private DynamicSeries sensor2;
+    private DynamicSeries sensor3;
+    private DynamicSeries sensor4;
+    private DynamicSeries sensor5;
+    private DynamicSeries sensor6;
+
+    private boolean listenerExists = false;
+    private int xcounter = 0;
 
     @Override //inflate the fragment view in the mainActivity view
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,58 +69,276 @@ public class GraphFragment extends Fragment {
         //Code until the end of this method is a place holder
         plot = (XYPlot) frag.findViewById(R.id.plot);
 
-        // create a couple arrays of y-values to plot:
-        Number[] series1Numbers = {1, 4, 2, 8, 4, 16, 8, 32, 16, 64};
-        Number[] series2Numbers = {5, 2, 10, 5, 20, 10, 40, 20, 80, 40};
+        plotUpdater = new MyPlotUpdater(plot);
+        dataSource = new GraphDataSource();
 
-        // turn the above arrays into XYSeries':
-        // (Y_VALS_ONLY means use the element index as the x value)
-        XYSeries series1 = new SimpleXYSeries(Arrays.asList(series1Numbers),
-                SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Series1");
+        //Display only whole numbers in domain labels
+        plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM);
 
-        XYSeries series2 = new SimpleXYSeries(Arrays.asList(series2Numbers),
-                SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Series2");
+
+        sensor1 = new DynamicSeries(dataSource, 0 , "Sensor 1");
+        sensor2 = new DynamicSeries(dataSource, 1 , "Sensor 2");
+        sensor3 = new DynamicSeries(dataSource, 2 , "Sensor 3");
+        sensor4 = new DynamicSeries(dataSource, 3 , "Sensor 4");
+        sensor5 = new DynamicSeries(dataSource, 4 , "Sensor 5");
+        sensor6 = new DynamicSeries(dataSource, 5 , "Sensor 6");
+
 
         // create formatters to use for drawing a series using LineAndPointRenderer
         // and configure them from xml:
-        LineAndPointFormatter series1Format = new LineAndPointFormatter();
+        LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.rgb(0, 200, 0), null, null, null);
         series1Format.setPointLabelFormatter(new PointLabelFormatter());
-        series1Format.configure(getContext(),
-                R.xml.line_point_formatter_with_labels);
+        series1Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
+        series1Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
 
-        LineAndPointFormatter series2Format = new LineAndPointFormatter();
-        series2Format.setPointLabelFormatter(new PointLabelFormatter());
-        series2Format.configure(getContext(),
-                R.xml.line_point_formatter_with_labels_2);
+        plot.addSeries(sensor1, series1Format); //TODO Change the format
+        plot.addSeries(sensor2, series1Format);
+        plot.addSeries(sensor3, series1Format);
+        plot.addSeries(sensor4, series1Format);
+        plot.addSeries(sensor5, series1Format);
+        plot.addSeries(sensor6, series1Format);
 
-        // add an "dash" effect to the series2 line:
-        series2Format.getLinePaint().setPathEffect(
-                new DashPathEffect(new float[] {
+        dataSource.addObserver(plotUpdater); //Will make the plotUpdater update the graph when dataSource notifies it
 
-                        // always use DP when specifying pixel sizes, to keep things consistent across devices:
-                        PixelUtils.dpToPix(20),
-                        PixelUtils.dpToPix(15)}, 0));
+        plot.setDomainStepMode(StepMode.INCREMENT_BY_VAL);
+        plot.setDomainStepValue(5);
 
-        // just for fun, add some smoothing to the lines:
-        // see: http://androidplot.com/smooth-curves-and-androidplot/
-        series1Format.setInterpolationParams(
-                new CatmullRomInterpolator.Params(10, CatmullRomInterpolator.Type.Centripetal));
+        plot.setRangeStepMode(StepMode.INCREMENT_BY_VAL);
+        plot.setRangeStepValue(10);
 
-        series2Format.setInterpolationParams(
-                new CatmullRomInterpolator.Params(10, CatmullRomInterpolator.Type.Centripetal));
+        plot.getGraph().getLineLabelStyle(
+                XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("###.#"));
 
-        // add a new series' to the xyplot:
-        plot.addSeries(series1, series1Format);
-        plot.addSeries(series2, series2Format);
+        // uncomment this line to freeze the range boundaries:
+        plot.setRangeBoundaries(0, 10000, BoundaryMode.FIXED);
 
-        // reduce the number of range labels
+        // create a dash effect for domain and range grid lines:
+        DashPathEffect dashFx = new DashPathEffect(
+                new float[] {PixelUtils.dpToPix(3), PixelUtils.dpToPix(3)}, 0);
+        plot.getGraph().getDomainGridLinePaint().setPathEffect(dashFx);
+        plot.getGraph().getRangeGridLinePaint().setPathEffect(dashFx);
 
-        //plot.setTicksPerRangeLabel(3);
-
-        // rotate domain labels 45 degrees to make them more compact horizontally:
-       // plot.getGraphWidget().setDomainLabelOrientation(-45);
 
         return frag;
+    }
+
+
+    //-------------Get Data, Manipulate Data & Notify PlotUpdater-----------
+    public class GraphDataSource extends Thread{
+
+        private MyObservable notifier = new MyObservable();
+
+        class MyObservable extends Observable {
+            @Override
+            public void notifyObservers() {
+                setChanged();
+                super.notifyObservers();
+            }
+        }
+
+        public void addObserver(Observer observer){
+            notifier.addObserver(observer);
+        }
+
+        public void removeObserver(Observer observer){
+            notifier.deleteObserver(observer);
+        }
+
+        public void run(){
+            Looper.prepare();
+            //Do something
+            handler = new Handler(){
+                public void handleMessage(Message msg){
+                    String aResponse = msg.getData().getString("data"); //Data received
+                    Log.d("Goyle!", aResponse);
+                    if(dataValid(aResponse)){
+                        ArrayList<ArrayList<Integer>> sensors = spliceData(aResponse);
+                        //TODO: Add data to the plot
+                        //TODO: Notify the observers
+                        notifier.notifyObservers(); //tells the graph to redraw
+                    }
+
+                }
+            };
+            Looper.loop(); //Waits for messages?
+        }
+
+        /**
+         *
+         * @param data string of the udp data
+         * @return true if the data isn't corrupted..aka the correct length
+         */
+        private boolean dataValid(String data){
+            return ((data.length() == 1350) );
+        }
+
+        /**
+         *
+         * @param data String of the entire data
+         * @return ArrayList of ArrayLists.. Inner arrayLists are the
+         * values of the individual sensors
+         */
+        private ArrayList<ArrayList<Integer>> spliceData(String data){
+            ArrayList<ArrayList<Integer>> DataPoints = new ArrayList<>();
+            String[] dataSplit = data.split(",");
+            DataPoints.add(spliceToSensors(dataSplit, 1));
+            DataPoints.add(spliceToSensors(dataSplit, 2));
+            DataPoints.add(spliceToSensors(dataSplit, 3));
+            DataPoints.add(spliceToSensors(dataSplit, 4));
+            DataPoints.add(spliceToSensors(dataSplit, 5));
+            DataPoints.add(spliceToSensors(dataSplit, 6));
+            xcounter = xcounter + 45;
+            return DataPoints;
+        }
+
+        /**
+         *
+         * @param dataSplit data to split into individual sensor array
+         *                  must contain only string representations of numbers
+         * @param sensorNumber which sensors to collect the data points of
+         * @return ArrayList<DataPoint> List of DataPoint values for an individual
+         * sensor
+         */
+        private ArrayList<Integer> spliceToSensors(String[] dataSplit, int sensorNumber){
+            sensorNumber -= 1;
+            int xcount = xcounter;
+            ArrayList<Integer> sensor = new ArrayList<>();
+            int i = sensorNumber;
+            int dataSize = dataSplit.length - 1;
+
+            while(true){
+                //DataPoint xy;
+                String num = "1";
+                if(i < 6){ //This is the base case...add the first set of data
+                    num = dataSplit[i];
+                    sensor.add(Integer.parseInt(num));
+                }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
+                    num = dataSplit[i];
+                    sensor.add(Integer.parseInt(num));
+                }else{
+                    xcount++;
+                    break;
+                }
+                i += 6;
+                xcount++;
+            }
+            return sensor;
+        }
+
+
+        public int getItemCount(int series){
+            //return SAMPLE_SIZE;
+            throw new RuntimeException("Unimplemented");
+        }
+
+        public int getX(int series, int index){
+//            if (index >= SAMPLE_SIZE) {
+//                throw new IllegalArgumentException();
+//            }
+//            return index;
+            throw new RuntimeException("Unimplemented");
+        }
+
+        public int getY(int series, int index){
+//            if (index >= SAMPLE_SIZE) {
+//                throw new IllegalArgumentException();
+//            }
+//            double angle = (index + (phase))/FREQUENcY;
+//            double amp = sinAmp * Math.sin(angle);
+//            switch (series) {
+//                case SINE1:
+//                    return amp;
+//                case SINE2:
+//                    return -amp;
+//                default:
+//                    throw new IllegalArgumentException();
+//            }
+            throw new RuntimeException("Unimplemented");
+        }
+
+
+
+    }
+
+    //-----------------Plot Updater-------------------
+
+    // redraws a plot whenever an update is received:
+    private class MyPlotUpdater implements Observer {
+        Plot plot;
+
+        public MyPlotUpdater(Plot plot) {
+            this.plot = plot; //Plot has the new values in it
+        }
+
+        @Override
+        public void update(Observable o, Object arg) {
+            plot.redraw(); //Redraw the plot...
+        }
+    }
+
+
+    //---------------Data Representation------------------
+
+    class DynamicSeries implements XYSeries{
+        private GraphDataSource datasource;
+        private int seriesIndex;
+        private String title;
+
+        public DynamicSeries(GraphDataSource datasource, int seriesIndex, String title) {
+            this.datasource = datasource;
+            this.seriesIndex = seriesIndex;
+            this.title = title;
+        }
+
+        @Override
+        public String getTitle() {
+            return title;
+        }
+
+        @Override
+        public int size() {
+            return datasource.getItemCount(seriesIndex);
+        }
+
+        @Override
+        public Number getX(int index) {
+            return datasource.getX(seriesIndex, index);
+        }
+
+        @Override
+        public Number getY(int index) {
+            return datasource.getY(seriesIndex, index);
+        }
+    }
+
+
+    //---------------GraphFragment methods---------------
+
+    /**
+     * If there isn't already a data listener create one
+     * and start listening to data. Data listener notifies the UI thread
+     * each time it has a new data packet full of valid data
+     * UI thread then graphes it (not implemented)
+     */
+    public void startGraphing(){
+        if(!listenerExists) {
+            listenerExists = true;
+            client = new UdpClient(hostname, remotePort, localPort, 45);
+            client.setStreamData(true);
+            dataSource.start(); //TODO: This might be a problem
+            UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //When we press start graphing.. We pass handler object.
+            listener.start();
+        }
+    }
+
+    /**
+     * Tell the data listener to stop listening to data
+     */
+    public void stopGraphing(){
+        if (listenerExists) {
+            client.setStreamData(false);
+            listenerExists = false;
+        }
     }
 
     /**
@@ -125,132 +363,6 @@ public class GraphFragment extends Fragment {
      */
     public void updateHostname(String hostname){
         this.hostname = hostname;
-    }
-
-    /**
-     * If there isn't already a data listener create one
-     * and start listening to data. Data listener notifies the UI thread
-     * each time it has a new data packet full of valid data
-     * UI thread then graphes it (not implemented)
-     */
-    public void startGraphing(){
-        if(!listenerExists) {
-            listenerExists = true;
-            client = new UdpClient(hostname, remotePort, localPort, 45);
-            client.setStreamData(true);
-            GraphLooper graphLooper = new GraphLooper();
-            graphLooper.start(); //initializes the handler in the next line (below)
-            UdpClient.UdpDataListener listener = client.new UdpDataListener(handler);
-            listener.start();
-        }
-    }
-
-    /**
-     * Tell the data listener to stop listening to data
-     */
-    public void stopGraphing(){
-        if (listenerExists) {
-            client.setStreamData(false);
-            listenerExists = false;
-        }
-    }
-
-
-    //Nested Class for Graphing Values
-    //TODO determine if this is necessary...
-    //TODO: Look at the two examples to see how they handle the graphing...
-    public class GraphLooper extends Thread{
-
-        //TODO: What is this thread doing???
-        // Is this thread necessary or can the main thread do the graphing????
-        public void run(){
-            //Do something
-            handler = new Handler(){
-                public void handleMessage(Message msg){
-                    String aResponse = msg.getData().getString("data"); //Data received
-                    //TODO: How to handle the data
-                    //resetData
-                    //appendData
-                }
-            };
-            Looper.loop(); //Waits for messages?
-            //^Run the message queue in this thread
-        }
-
-        public void startGraphing(){
-
-        }
-
-
-    }
-
-    /**
-     *
-     * @param data string of the udp data
-     * @return true if the data isn't corrupted..aka the correct length
-     * TODO: add a regex test (again...)
-     */
-    private boolean dataValid(String data){
-        return ((data.length() == 1350) );
-    }
-
-    /**
-     *
-     * @param data String of the entire data
-     * @return ArrayList of ArrayLists.. Inner arrayLists are the
-     * values of the individual sensors
-     */
-    //private ArrayList<ArrayList<DataPoint>> spliceData(String data){
-    private void spliceData(String data){
-        //ArrayList<ArrayList<DataPoint>> DataPoints = new ArrayList<>();
-        String[] dataSplit = data.split(",");
-//        DataPoints.add(spliceToSensors(dataSplit, 1));
-//        DataPoints.add(spliceToSensors(dataSplit, 2));
-//        DataPoints.add(spliceToSensors(dataSplit, 3));
-//        DataPoints.add(spliceToSensors(dataSplit, 4));
-//        DataPoints.add(spliceToSensors(dataSplit, 5));
-//        DataPoints.add(spliceToSensors(dataSplit, 6));
-        xcounter = xcounter + 45;
-        //return DataPoints;
-    }
-
-    /**
-     *
-     * @param dataSplit data to split into individual sensor array
-     *                  must contain only string representations of numbers
-     * @param sensorNumber which sensors to collect the data points of
-     * @return ArrayList<DataPoint> List of DataPoint values for an individual
-     * sensor
-     */
-    //private ArrayList<DataPoint> spliceToSensors(String[] dataSplit, int sensorNumber){
-    private void spliceToSensors(String[] dataSplit, int sensorNumber){
-        sensorNumber -= 1;
-        int xcount = xcounter;
-        //ArrayList<DataPoint> sensor = new ArrayList<>();
-        int i = sensorNumber;
-        int dataSize = dataSplit.length - 1;
-
-        while(true){
-            //DataPoint xy;
-            String num = "1";
-            if(i < 6){ //This is the base case...add the first set of data
-                num = dataSplit[i];
-                //xy = new DataPoint(xcount, Integer.parseInt(num));
-                //Log.d("MATT!",xy.toString());//This could throw an error there
-               // sensor.add(xy);
-            }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
-                num = dataSplit[i];
-                //xy = new DataPoint(xcount, Integer.parseInt(num));
-                //Log.d("MATT!",xy.toString());
-                //sensor.add(xy);
-            }else{
-                xcount++;
-                break;
-            }
-            i += 6;
-            xcount++;
-        }
-        //return sensor;
     }
 
 

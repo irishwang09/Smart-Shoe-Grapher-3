@@ -34,12 +34,10 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         setContentView(R.layout.activity_main);
 
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
-//        graphFragment.setActivity
 
         //Pass a handle to
         settingsFragment = (UdpSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.client_fragment_layout); //This is null???
         settingsFragment.setActivityHandler(this.mHandler);
-
     }
 
 
@@ -69,9 +67,9 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         this.hostname = verifiedHostname;
         this.localPort = verifiedLocalPort;
         this.remotePort = verifiedRemotePort;
-        //graphFragment.updateHostname(hostname);
-        // graphFragment.updateLocalPort(localPort);
-        // graphFragment.updateRemotePort(remotePort);
+        graphFragment.updateHostname(hostname);
+        graphFragment.updateLocalPort(localPort);
+        graphFragment.updateRemotePort(remotePort);
         Log.d("MATT!", "Verified Host: " + verifiedHostname);
         Log.d("MATT!", "Verified Local Port : " + verifiedLocalPort);
         Log.d("MATT!", "Verified Remote Port : " + verifiedRemotePort);
@@ -82,9 +80,9 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         this.hostname = defaultHostname;
         this.localPort = defaultLocalPort;
         this.remotePort = defaultRemotePort;
-        //graphFragment.updateHostname(hostname);
-        //graphFragment.updateLocalPort(localPort);
-        //graphFragment.updateRemotePort(remotePort);
+        graphFragment.updateHostname(hostname);
+        graphFragment.updateLocalPort(localPort);
+        graphFragment.updateRemotePort(remotePort);
         Log.d("MATT!", "default hostname: " + defaultHostname);
         Log.d("MATT!", "default remotePort: " + defaultRemotePort);
         Log.d("MATT!", "default localPort: " + defaultLocalPort);
@@ -92,23 +90,23 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
 
     @Override
     public void startGraphing() {
-        //graphFragment.startGraphing();
-        if(!listenerExists) {
-            listenerExists = true;
-            client = new UdpClient(hostname, remotePort, localPort, 45);
-            client.setStreamData(true);
-            UdpClient.UdpDataListener listener = client.new UdpDataListener(mHandler);
-            listener.start();
-        }
+        graphFragment.startGraphing();
+//        if(!listenerExists) {
+//            listenerExists = true;
+//            client = new UdpClient(hostname, remotePort, localPort, 45);
+//            client.setStreamData(true);
+//            UdpClient.UdpDataListener listener = client.new UdpDataListener(mHandler);
+//            listener.start();
+//        }
     }
 
     @Override
     public void stopGraphing() {
-        //graphFragment.stopGraphing();
-        if (listenerExists) {
-            client.setStreamData(false);
-            listenerExists = false;
-        }
+        graphFragment.stopGraphing();
+//        if (listenerExists) {
+//            client.setStreamData(false);
+//            listenerExists = false;
+//        }
     }
 
     @Override

@@ -151,10 +151,10 @@ public class UdpClient  {
      */
     public class UdpDataListener extends Thread {
 
-        private Handler handler;
+        private Handler mhandler;
 
         public UdpDataListener(Handler handler){
-            this.handler = handler; //This will be used to pass data to the Graph Fragment
+            this.mhandler = handler; //This will be used to pass data to the Graph Fragment
         }
 
         public void run(){
@@ -179,9 +179,9 @@ public class UdpClient  {
                         rcvdPacket = new DatagramPacket(buf, buf.length);
                         receiveSocket.receive(rcvdPacket);
                         received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
-                        dataToSend = received.substring(0, received.length() - 2);
+                        dataToSend = received.substring(0, received.length() - 2); //Get the data
                         threadMsg(dataToSend);
-                        Log.d("MATT!", dataToSend);
+                        //Log.d("MATT!", dataToSend);
                 }
             }catch (SocketException e){
                 e.printStackTrace();
@@ -205,11 +205,11 @@ public class UdpClient  {
 
         private void threadMsg(String msg) { //Send the data to the Graph Fragment
             if (!msg.equals(null) && !msg.equals("")) {
-                Message msgObj = handler.obtainMessage();
+                Message msgObj = mhandler.obtainMessage();
                 Bundle b = new Bundle();    //Is this the best way to do this??
                 b.putString("data", msg);
                 msgObj.setData(b);
-                handler.sendMessage(msgObj);
+                mhandler.sendMessage(msgObj);
             }
         }
 
