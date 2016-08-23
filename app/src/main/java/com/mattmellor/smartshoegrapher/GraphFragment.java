@@ -52,7 +52,7 @@ public class GraphFragment extends Fragment {
 
     private boolean listenerExists = false;
     private int xcounter = 0;
-    private int xBound = 1000;
+    private int xBound = 3000;
     private boolean redrawerBeenPressed = false;
 
     @Override //inflate the fragment view in the mainActivity view
@@ -68,7 +68,7 @@ public class GraphFragment extends Fragment {
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat((new DecimalFormat("0")));
 
 
-        DynamicSeries sensor1 = new DynamicSeries(0 , "S1", 100000);
+        DynamicSeries sensor1 = new DynamicSeries(0 , "S1", 3000);
 //        DynamicSeries sensor2 = new DynamicSeries(1 , "S2", 100000);
 //        DynamicSeries sensor3 = new DynamicSeries(2 , "S3", 100000);
 //        DynamicSeries sensor4 = new DynamicSeries(3 , "S4", 100000);
@@ -82,7 +82,7 @@ public class GraphFragment extends Fragment {
         // and configure them from xml:
         LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.rgb(0, 200, 0), null, null, null);
         series1Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
-        series1Format.getLinePaint().setStrokeWidth(1);
+        series1Format.getLinePaint().setStrokeWidth(2);
 
         plot.addSeries(sensor1, series1Format);
 //        plot.addSeries(sensor2, series1Format);
@@ -92,9 +92,9 @@ public class GraphFragment extends Fragment {
 //        plot.addSeries(sensor6, series1Format);
 
         plot.setRangeBoundaries(0, 4500, BoundaryMode.FIXED);
-        plot.setDomainBoundaries(0, 10000, BoundaryMode.FIXED);
+        plot.setDomainBoundaries(0, 3000, BoundaryMode.FIXED);
         plot.setLinesPerRangeLabel(3);
-        plot.setLinesPerDomainLabel(3);
+        plot.setLinesPerDomainLabel(5);
 
 
         dataSource = new GraphDataSource();
@@ -185,7 +185,7 @@ public class GraphFragment extends Fragment {
             sensorNumber--;
             int dataSize = seriesList.get(sensorNumber).data.size();
             if(dataSize + sensor.size() > xBound){  //TODO Double check this...
-                //seriesList.get(sensorNumber).resetData();
+                seriesList.get(sensorNumber).resetData();
             }
             seriesList.get(sensorNumber).data.addAll(sensor);
         }
