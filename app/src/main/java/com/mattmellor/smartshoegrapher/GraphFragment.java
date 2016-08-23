@@ -40,7 +40,6 @@ public class GraphFragment extends Fragment {
     private int remotePort;
     private int localPort;
 
-    private LinearLayout graphContainer;
     private Handler handler;
 
     private XYPlot plot;
@@ -49,58 +48,76 @@ public class GraphFragment extends Fragment {
 
     private ArrayList<DynamicSeries> seriesList;
 
-
     private boolean listenerExists = false;
-    private int xcounter = 0;
-    private int xBound = 3000;
+    private int xBound = 10000;
     private boolean redrawerBeenPressed = false;
+    private int redraw_count = 0;
 
     @Override //inflate the fragment view in the mainActivity view
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View frag = inflater.inflate(R.layout.graph_fragment, container, false);
-        graphContainer = (LinearLayout) frag.findViewById(R.id.graph);
 
         //Code until the end of this method is a place holder
         plot = (XYPlot) frag.findViewById(R.id.dynamic_plot);
 
-
         //Display only whole numbers in domain labels
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat((new DecimalFormat("0")));
+        plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat((new DecimalFormat("0")));
 
-
-        DynamicSeries sensor1 = new DynamicSeries(0 , "S1", 3000);
-//        DynamicSeries sensor2 = new DynamicSeries(1 , "S2", 100000);
-//        DynamicSeries sensor3 = new DynamicSeries(2 , "S3", 100000);
-//        DynamicSeries sensor4 = new DynamicSeries(3 , "S4", 100000);
-//        DynamicSeries sensor5 = new DynamicSeries(4 , "S5", 100000);
-//        DynamicSeries sensor6 = new DynamicSeries(5 , "S6", 100000);
+        DynamicSeries sensor1 = new DynamicSeries(0 , "1", xBound);
+        DynamicSeries sensor2 = new DynamicSeries(1 , "2", xBound);
+        DynamicSeries sensor3 = new DynamicSeries(2 , "3", xBound);
+        DynamicSeries sensor4 = new DynamicSeries(3 , "4", xBound);
+        DynamicSeries sensor5 = new DynamicSeries(4 , "5", xBound);
+        DynamicSeries sensor6 = new DynamicSeries(5 , "6", xBound);
 
         //seriesList = new ArrayList<>(Arrays.asList(sensor1,sensor2, sensor3, sensor4, sensor5, sensor6));
-        seriesList = new ArrayList<>(Arrays.asList(sensor1));
+        seriesList = new ArrayList<>(Arrays.asList(sensor1, sensor2, sensor3, sensor4, sensor5, sensor6));
 
         // create formatters to use for drawing a series using LineAndPointRenderer
         // and configure them from xml:
-        LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.rgb(0, 200, 0), null, null, null);
-        series1Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
+        LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.GREEN, null, null, null);
+        //series1Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
         series1Format.getLinePaint().setStrokeWidth(2);
 
-        plot.addSeries(sensor1, series1Format);
-//        plot.addSeries(sensor2, series1Format);
-//        plot.addSeries(sensor3, series1Format);
-//        plot.addSeries(sensor4, series1Format);
-//        plot.addSeries(sensor5, series1Format);
-//        plot.addSeries(sensor6, series1Format);
+        LineAndPointFormatter series2Format = new LineAndPointFormatter(Color.BLUE, null, null, null);
+        //series2Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
+        series2Format.getLinePaint().setStrokeWidth(2);
+
+        LineAndPointFormatter series3Format = new LineAndPointFormatter(Color.RED, null, null, null);
+        //series3Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
+        series3Format.getLinePaint().setStrokeWidth(2);
+
+        LineAndPointFormatter series4Format = new LineAndPointFormatter(Color.LTGRAY, null, null, null);
+        series4Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
+        series4Format.getLinePaint().setStrokeWidth(2);
+
+        LineAndPointFormatter series5Format = new LineAndPointFormatter(Color.MAGENTA, null, null, null);
+        //series5Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
+        series5Format.getLinePaint().setStrokeWidth(2);
+
+        LineAndPointFormatter series6Format = new LineAndPointFormatter(Color.WHITE, null, null, null);
+        //series6Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
+        series6Format.getLinePaint().setStrokeWidth(2);
+
+
+        plot.addSeries(sensor1, series1Format);         //Ways to make this faster???
+        plot.addSeries(sensor2, series2Format);
+        plot.addSeries(sensor3, series3Format);
+        plot.addSeries(sensor4, series4Format);
+        plot.addSeries(sensor5, series5Format);
+        plot.addSeries(sensor6, series6Format);
 
         plot.setRangeBoundaries(0, 4500, BoundaryMode.FIXED);
-        plot.setDomainBoundaries(0, 3000, BoundaryMode.FIXED);
+        plot.setDomainBoundaries(0, xBound, BoundaryMode.FIXED);
         plot.setLinesPerRangeLabel(3);
-        plot.setLinesPerDomainLabel(5);
+        plot.setLinesPerDomainLabel(3);
 
 
         dataSource = new GraphDataSource();
         dataSource.start();
 
-        redrawer = new Redrawer(plot, 30, false);
+        //redrawer = new Redrawer(plot, 30, false);
 
         return frag;
     }
@@ -115,9 +132,13 @@ public class GraphFragment extends Fragment {
             handler = new Handler(){
                 public void handleMessage(Message msg){
                     String aResponse = msg.getData().getString("data"); //Data received
-                    //Log.d("Goyle!", aResponse);
                     if(dataValid(aResponse)){
                         spliceDataAndAddData(aResponse);
+                        if(redraw_count == 5){
+                            plot.redraw();
+                            redraw_count = 0;
+                        }
+                        redraw_count++;
                     }
                 }
             };
@@ -130,7 +151,7 @@ public class GraphFragment extends Fragment {
          * @return true if the data isn't corrupted..aka the correct length
          */
         private boolean dataValid(String data){
-            return ((data.length() == 1350)); //TODO: implement a better regular expression
+            return ((data.length() == 1350) && !data.contains("")); //TODO: implement a better regular expression
         }
 
         /**
@@ -143,11 +164,11 @@ public class GraphFragment extends Fragment {
             data = data.replaceAll("\\s", "");
             String[] dataSplit = data.split(",");
             addDataToSensors(spliceToSensors(dataSplit, 1),1);
-//            addDataToSensors(spliceToSensors(dataSplit, 2),2);
-//            addDataToSensors(spliceToSensors(dataSplit, 3),3);
-//            addDataToSensors(spliceToSensors(dataSplit, 4),4);
-//            addDataToSensors(spliceToSensors(dataSplit, 5),5);
-//            addDataToSensors(spliceToSensors(dataSplit, 6),6);
+            addDataToSensors(spliceToSensors(dataSplit, 2),2);
+            addDataToSensors(spliceToSensors(dataSplit, 3),3);
+            addDataToSensors(spliceToSensors(dataSplit, 4),4);
+            addDataToSensors(spliceToSensors(dataSplit, 5),5);
+            addDataToSensors(spliceToSensors(dataSplit, 6),6);
         }
 
         /**
@@ -163,16 +184,22 @@ public class GraphFragment extends Fragment {
             ArrayList<Integer> sensor = new ArrayList<>();
             int i = sensorNumber;
             int dataSize = dataSplit.length - 1;
-
+            String num = "";
             while(true){
-                //DataPoint xy;
-                String num = "1";
                 if(i < 6){ //This is the base case...add the first set of data
                     num = dataSplit[i];
-                    sensor.add(Integer.parseInt(num));
+                    try {
+                        sensor.add(Integer.parseInt(num));
+                    }catch (Exception e){
+                        //Corrupt data
+                    }
                 }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
                     num = dataSplit[i];
-                    sensor.add(Integer.parseInt(num));
+                    try {
+                        sensor.add(Integer.parseInt(num));
+                    }catch (Exception e){
+                        //Corrupt data
+                    }
                 }else{
                     break;
                 }
@@ -214,7 +241,6 @@ public class GraphFragment extends Fragment {
             this.seriesIndex = seriesIndex;
             this.bounds = size;
             this.title = title;
-            data.add(200);
         }
 
         @Override
@@ -239,7 +265,6 @@ public class GraphFragment extends Fragment {
 
         public void resetData(){
             data.clear();
-            data.add(0);
         }
 
     }
@@ -260,10 +285,10 @@ public class GraphFragment extends Fragment {
             client.setStreamData(true);
             UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //When we press start graphing.. We pass handler object.
             listener.start();
-            if(!redrawerBeenPressed){
-                redrawer.start();
-                redrawerBeenPressed = true;
-            }
+//            if(!redrawerBeenPressed){
+//                redrawer.start();
+//                redrawerBeenPressed = true;
+//            }
 
         }
     }
@@ -275,8 +300,8 @@ public class GraphFragment extends Fragment {
         if (listenerExists) {
             client.setStreamData(false);
             listenerExists = false;
-            redrawer.finish();
-            redrawerBeenPressed = false;
+            //redrawer.finish();
+            //redrawerBeenPressed = false;
         }
     }
 
