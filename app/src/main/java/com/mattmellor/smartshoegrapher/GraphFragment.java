@@ -52,6 +52,7 @@ public class GraphFragment extends Fragment {
     private int xBound = 10000;
     private boolean redrawerBeenPressed = false;
     private int redraw_count = 0;
+    private boolean applyBeenPressed = false;
 
     @Override //inflate the fragment view in the mainActivity view
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,16 +64,18 @@ public class GraphFragment extends Fragment {
         //Display only whole numbers in domain labels
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat((new DecimalFormat("0")));
         plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat((new DecimalFormat("0")));
+//        plot.setDomainLabel("Count");
+//        plot.setRangeLabel("Sensor Values (V)");
 
         DynamicSeries sensor1 = new DynamicSeries(0 , "1", xBound);
-        DynamicSeries sensor2 = new DynamicSeries(1 , "2", xBound);
-        DynamicSeries sensor3 = new DynamicSeries(2 , "3", xBound);
-        DynamicSeries sensor4 = new DynamicSeries(3 , "4", xBound);
-        DynamicSeries sensor5 = new DynamicSeries(4 , "5", xBound);
-        DynamicSeries sensor6 = new DynamicSeries(5 , "6", xBound);
+//        DynamicSeries sensor2 = new DynamicSeries(1 , "2", xBound);
+//        DynamicSeries sensor3 = new DynamicSeries(2 , "3", xBound);
+//        DynamicSeries sensor4 = new DynamicSeries(3 , "4", xBound);
+//        DynamicSeries sensor5 = new DynamicSeries(4 , "5", xBound);
+//        DynamicSeries sensor6 = new DynamicSeries(5 , "6", xBound);
 
         //seriesList = new ArrayList<>(Arrays.asList(sensor1,sensor2, sensor3, sensor4, sensor5, sensor6));
-        seriesList = new ArrayList<>(Arrays.asList(sensor1, sensor2, sensor3, sensor4, sensor5, sensor6));
+        seriesList = new ArrayList<>(Arrays.asList(sensor1));
 
         // create formatters to use for drawing a series using LineAndPointRenderer
         // and configure them from xml:
@@ -102,11 +105,11 @@ public class GraphFragment extends Fragment {
 
 
         plot.addSeries(sensor1, series1Format);         //Ways to make this faster???
-        plot.addSeries(sensor2, series2Format);
-        plot.addSeries(sensor3, series3Format);
-        plot.addSeries(sensor4, series4Format);
-        plot.addSeries(sensor5, series5Format);
-        plot.addSeries(sensor6, series6Format);
+//        plot.addSeries(sensor2, series2Format);
+//        plot.addSeries(sensor3, series3Format);
+//        plot.addSeries(sensor4, series4Format);
+//        plot.addSeries(sensor5, series5Format);
+//        plot.addSeries(sensor6, series6Format);
 
         plot.setRangeBoundaries(0, 4500, BoundaryMode.FIXED);
         plot.setDomainBoundaries(0, xBound, BoundaryMode.FIXED);
@@ -117,7 +120,7 @@ public class GraphFragment extends Fragment {
         dataSource = new GraphDataSource();
         dataSource.start();
 
-        //redrawer = new Redrawer(plot, 30, false);
+        redrawer = new Redrawer(plot, 30, false);
 
         return frag;
     }
@@ -132,13 +135,15 @@ public class GraphFragment extends Fragment {
             handler = new Handler(){
                 public void handleMessage(Message msg){
                     String aResponse = msg.getData().getString("data"); //Data received
+                    //Log.d("MATT!", aResponse);
                     if(dataValid(aResponse)){
+                        //Log.d("MATT!", aResponse);
                         spliceDataAndAddData(aResponse);
-                        if(redraw_count == 5){
-                            plot.redraw();
-                            redraw_count = 0;
-                        }
-                        redraw_count++;
+//                        if(redraw_count == 5){
+//                            plot.redraw();
+//                            redraw_count = 0;
+//                        }
+//                        redraw_count++;
                     }
                 }
             };
@@ -151,7 +156,7 @@ public class GraphFragment extends Fragment {
          * @return true if the data isn't corrupted..aka the correct length
          */
         private boolean dataValid(String data){
-            return ((data.length() == 1350) && !data.contains("")); //TODO: implement a better regular expression
+            return ((data.length() == 1350)); //TODO: implement a better regular expression
         }
 
         /**
@@ -164,11 +169,11 @@ public class GraphFragment extends Fragment {
             data = data.replaceAll("\\s", "");
             String[] dataSplit = data.split(",");
             addDataToSensors(spliceToSensors(dataSplit, 1),1);
-            addDataToSensors(spliceToSensors(dataSplit, 2),2);
-            addDataToSensors(spliceToSensors(dataSplit, 3),3);
-            addDataToSensors(spliceToSensors(dataSplit, 4),4);
-            addDataToSensors(spliceToSensors(dataSplit, 5),5);
-            addDataToSensors(spliceToSensors(dataSplit, 6),6);
+//            addDataToSensors(spliceToSensors(dataSplit, 2),2);
+//            addDataToSensors(spliceToSensors(dataSplit, 3),3);
+//            addDataToSensors(spliceToSensors(dataSplit, 4),4);
+//            addDataToSensors(spliceToSensors(dataSplit, 5),5);
+//            addDataToSensors(spliceToSensors(dataSplit, 6),6);
         }
 
         /**
@@ -189,7 +194,7 @@ public class GraphFragment extends Fragment {
                 if(i < 6){ //This is the base case...add the first set of data
                     num = dataSplit[i];
                     try {
-                        sensor.add(Integer.parseInt(num));
+                        sensor.add(Integer.parseInt(num)); //TODO: Change this.....
                     }catch (Exception e){
                         //Corrupt data
                     }
@@ -211,7 +216,7 @@ public class GraphFragment extends Fragment {
         private void addDataToSensors(ArrayList<Integer> sensor, Integer sensorNumber){
             sensorNumber--;
             int dataSize = seriesList.get(sensorNumber).data.size();
-            if(dataSize + sensor.size() > xBound){  //TODO Double check this...
+            if(dataSize + sensor.size() > xBound){
                 seriesList.get(sensorNumber).resetData();
             }
             seriesList.get(sensorNumber).data.addAll(sensor);
@@ -278,20 +283,28 @@ public class GraphFragment extends Fragment {
      * each time it has a new data packet full of valid data
      * UI thread then graphes it (not implemented)
      */
-    public void startGraphing(){
+    public void startGraphing(){ //TODO: Change this to reset the graph upon pressing start
+        //TODO: Change logic so won't start unless apply been pressed
         if(!listenerExists) {
             listenerExists = true;
             client = new UdpClient(hostname, remotePort, localPort, 45);
             client.setStreamData(true);
             UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //When we press start graphing.. We pass handler object.
             listener.start();
-//            if(!redrawerBeenPressed){
-//                redrawer.start();
-//                redrawerBeenPressed = true;
-//            }
+            if(!redrawerBeenPressed){
+                redrawer.start();
+                redrawerBeenPressed = true;
+            }
 
         }
     }
+
+    private void resetGraph(){
+        for(DynamicSeries s: seriesList){
+            s.resetData();
+        }
+    }
+
 
     /**
      * Tell the data listener to stop listening to data
@@ -300,8 +313,8 @@ public class GraphFragment extends Fragment {
         if (listenerExists) {
             client.setStreamData(false);
             listenerExists = false;
-            //redrawer.finish();
-            //redrawerBeenPressed = false;
+            redrawer.finish();
+            redrawerBeenPressed = false;
         }
     }
 
