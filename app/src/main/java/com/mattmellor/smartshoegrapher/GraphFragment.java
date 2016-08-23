@@ -177,6 +177,8 @@ public class GraphFragment extends Fragment {
 //            addDataToSensors(spliceToSensors(dataSplit, 6),6);
         }
 
+
+        //TODO: Change this to make it more robust
         /**
          *
          * @param dataSplit data to split into individual sensor array
