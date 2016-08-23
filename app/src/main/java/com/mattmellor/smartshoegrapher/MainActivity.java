@@ -89,24 +89,24 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
     }
 
     @Override
+    public void applyBeenPressed() {
+        graphFragment.setApplyBeenPressed(true);
+    }
+
+    @Override
+    public void updatesBeingMadeStopGraphing() {
+        graphFragment.setApplyBeenPressed(false);
+        graphFragment.stopGraphing();
+    }
+
+    @Override
     public void startGraphing() {
         graphFragment.startGraphing();
-//        if(!listenerExists) {
-//            listenerExists = true;
-//            client = new UdpClient(hostname, remotePort, localPort, 45);
-//            client.setStreamData(true);
-//            UdpClient.UdpDataListener listener = client.new UdpDataListener(mHandler);
-//            listener.start();
-//        }
     }
 
     @Override
     public void stopGraphing() {
         graphFragment.stopGraphing();
-//        if (listenerExists) {
-//            client.setStreamData(false);
-//            listenerExists = false;
-//        }
     }
 
     @Override

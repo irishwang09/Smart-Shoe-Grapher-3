@@ -71,6 +71,7 @@ public class UdpSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 applyPressed = false;
+                updatesBeingMadeStopGraphing();
             }
         });
 
@@ -78,6 +79,7 @@ public class UdpSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 applyPressed = false;
+                updatesBeingMadeStopGraphing();
             }
         });
 
@@ -85,6 +87,7 @@ public class UdpSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 applyPressed = false;
+                updatesBeingMadeStopGraphing(); //Makes sure that the graphing fragment stops graphing
             }
         });
 
@@ -182,15 +185,23 @@ public class UdpSettingsFragment extends Fragment {
     public interface OnDataPass{
          public void onDataPassUdpSettings(String hostname,int localPort, int remotePort);
          public void onDataPassUdpReset(String defaultHostname, int defaultLocalPort, int defaultRemotePort);
+         public void applyBeenPressed();
+         public void updatesBeingMadeStopGraphing(); //Stop Graphing
     }
 
     public void applyClickedPassData(){
         dataPassHandle.onDataPassUdpSettings(hostname,localPort,remotePort);
+        dataPassHandle.applyBeenPressed();
     }
 
     public void resetClickedPassDefaults(){
         dataPassHandle.onDataPassUdpReset(defaultHostname, defaultLocalPort, defaultRemotePort);
     }
+
+    public void updatesBeingMadeStopGraphing(){
+        dataPassHandle.updatesBeingMadeStopGraphing();
+    }
+
 
     public void reportPingResult(boolean result){
         if(result){

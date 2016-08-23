@@ -1,5 +1,6 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -11,7 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.androidplot.util.Redrawer;
 import com.androidplot.xy.BoundaryMode;
@@ -50,7 +51,7 @@ public class GraphFragment extends Fragment {
 
     private boolean listenerExists = false;
     private int xBound = 10000;
-    private boolean redrawerBeenPressed = false;
+    private boolean redrawerBeenInitialized = false;
     private int redraw_count = 0;
     private boolean applyBeenPressed = false;
 
@@ -120,7 +121,7 @@ public class GraphFragment extends Fragment {
         dataSource = new GraphDataSource();
         dataSource.start();
 
-        redrawer = new Redrawer(plot, 30, false);
+        //redrawer = new Redrawer(plot, 30, false);
 
         return frag;
     }
@@ -283,19 +284,29 @@ public class GraphFragment extends Fragment {
      * each time it has a new data packet full of valid data
      * UI thread then graphes it (not implemented)
      */
-    public void startGraphing(){ //TODO: Change this to reset the graph upon pressing start
-        //TODO: Change logic so won't start unless apply been pressed
-        if(!listenerExists) {
-            listenerExists = true;
-            client = new UdpClient(hostname, remotePort, localPort, 45);
-            client.setStreamData(true);
-            UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //When we press start graphing.. We pass handler object.
-            listener.start();
-            if(!redrawerBeenPressed){
-                redrawer.start();
-                redrawerBeenPressed = true;
+    public void startGraphing(){
+        if(applyBeenPressed) {
+            if (!listenerExists) {
+                resetGraph();
+                listenerExists = true;
+                client = new UdpClient(hostname, remotePort, localPort, 45);
+                client.setStreamData(true);
+                UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //When we press start graphing.. We pass handler object.
+                listener.start();
+                if (!redrawerBeenInitialized) {
+                    redrawer = new Redrawer(plot, 30, true);
+                    redrawerBeenInitialized = true;
+                }else{
+                    redrawer.run();
+                }
             }
-
+        }
+        else{
+            Context context = getActivity();
+            CharSequence text = "Apply UDP Settings";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
         }
     }
 
@@ -314,7 +325,7 @@ public class GraphFragment extends Fragment {
             client.setStreamData(false);
             listenerExists = false;
             redrawer.finish();
-            redrawerBeenPressed = false;
+            redrawerBeenInitialized = false;
         }
     }
 
@@ -342,5 +353,9 @@ public class GraphFragment extends Fragment {
         this.hostname = hostname;
     }
 
+
+    public void setApplyBeenPressed(boolean pressedOrNot){
+        applyBeenPressed = pressedOrNot;
+    }
 
 }
