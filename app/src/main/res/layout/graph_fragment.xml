@@ -8,11 +8,12 @@
 
 
     <com.androidplot.xy.XYPlot
-        style="@style/APDefacto.Light"
-        android:id="@+id/plot"
+        style="@style/APDefacto.Dark"
+        android:id="@+id/dynamic_plot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        androidplot.renderMode="use_background_thread" />
+        ap:title="@string/plotTitle"
+        ap:renderMode="use_background_thread" />
 
 </LinearLayout>
 

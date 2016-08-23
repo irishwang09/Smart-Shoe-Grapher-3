@@ -1,7 +1,6 @@
 package com.mattmellor.smartshoegrapher;
 
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,23 +13,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.androidplot.Plot;
-import com.androidplot.util.PixelUtils;
+import com.androidplot.util.Redrawer;
 import com.androidplot.xy.BoundaryMode;
 import com.androidplot.xy.LineAndPointFormatter;
-import com.androidplot.xy.PointLabelFormatter;
-import com.androidplot.xy.SimpleXYSeries;
-import com.androidplot.xy.StepMode;
+
 import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
 
-import java.lang.reflect.Array;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Observable;
-import java.util.Observer;
+
 
 /**
  * Created by Matthew on 8/15/2016.
@@ -49,8 +44,8 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private XYPlot plot;
-    private MyPlotUpdater plotUpdater;
     private GraphDataSource dataSource;
+    private Redrawer redrawer;
 
     private ArrayList<DynamicSeries> seriesList;
 
@@ -58,6 +53,7 @@ public class GraphFragment extends Fragment {
     private boolean listenerExists = false;
     private int xcounter = 0;
     private int xBound = 1000;
+    private boolean redrawerBeenPressed = false;
 
     @Override //inflate the fragment view in the mainActivity view
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,58 +61,46 @@ public class GraphFragment extends Fragment {
         graphContainer = (LinearLayout) frag.findViewById(R.id.graph);
 
         //Code until the end of this method is a place holder
-        plot = (XYPlot) frag.findViewById(R.id.plot);
-        //TODO: Make plot redraw be on a background thread
-        //Change the setting^
-        plotUpdater = new MyPlotUpdater(plot);
+        plot = (XYPlot) frag.findViewById(R.id.dynamic_plot);
 
 
         //Display only whole numbers in domain labels
-        plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM);
+        plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat((new DecimalFormat("0")));
 
 
-        DynamicSeries sensor1 = new DynamicSeries(0 , "Sensor 1", 10000);
-        DynamicSeries sensor2 = new DynamicSeries(1 , "Sensor 2", 10000);
-        DynamicSeries sensor3 = new DynamicSeries(2 , "Sensor 3", 10000);
-        DynamicSeries sensor4 = new DynamicSeries(3 , "Sensor 4", 10000);
-        DynamicSeries sensor5 = new DynamicSeries(4 , "Sensor 5", 10000);
-        DynamicSeries sensor6 = new DynamicSeries(5 , "Sensor 6", 10000);
+        DynamicSeries sensor1 = new DynamicSeries(0 , "S1", 100000);
+//        DynamicSeries sensor2 = new DynamicSeries(1 , "S2", 100000);
+//        DynamicSeries sensor3 = new DynamicSeries(2 , "S3", 100000);
+//        DynamicSeries sensor4 = new DynamicSeries(3 , "S4", 100000);
+//        DynamicSeries sensor5 = new DynamicSeries(4 , "S5", 100000);
+//        DynamicSeries sensor6 = new DynamicSeries(5 , "S6", 100000);
 
-        seriesList = new ArrayList<>(Arrays.asList(sensor1,sensor2, sensor3, sensor4, sensor5, sensor6));
-
+        //seriesList = new ArrayList<>(Arrays.asList(sensor1,sensor2, sensor3, sensor4, sensor5, sensor6));
+        seriesList = new ArrayList<>(Arrays.asList(sensor1));
 
         // create formatters to use for drawing a series using LineAndPointRenderer
         // and configure them from xml:
         LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.rgb(0, 200, 0), null, null, null);
-        series1Format.setPointLabelFormatter(new PointLabelFormatter());
         series1Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
-        series1Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
+        series1Format.getLinePaint().setStrokeWidth(1);
 
-        plot.addSeries(sensor1, series1Format); //TODO Change the format
-        plot.addSeries(sensor2, series1Format);
-        plot.addSeries(sensor3, series1Format);
-        plot.addSeries(sensor4, series1Format);
-        plot.addSeries(sensor5, series1Format);
-        plot.addSeries(sensor6, series1Format);
+        plot.addSeries(sensor1, series1Format);
+//        plot.addSeries(sensor2, series1Format);
+//        plot.addSeries(sensor3, series1Format);
+//        plot.addSeries(sensor4, series1Format);
+//        plot.addSeries(sensor5, series1Format);
+//        plot.addSeries(sensor6, series1Format);
 
-        dataSource.addObserver(plotUpdater); //Will make the plotUpdater update the graph when dataSource notifies it
+        plot.setRangeBoundaries(0, 4500, BoundaryMode.FIXED);
+        plot.setDomainBoundaries(0, 10000, BoundaryMode.FIXED);
+        plot.setLinesPerRangeLabel(3);
+        plot.setLinesPerDomainLabel(3);
 
-        plot.setDomainStepMode(StepMode.INCREMENT_BY_VAL);
-        plot.setDomainStepValue(5);
 
-        plot.setRangeStepMode(StepMode.INCREMENT_BY_VAL);
-        plot.setRangeStepValue(10);
+        dataSource = new GraphDataSource();
+        dataSource.start();
 
-        plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("###.#"));
-
-        // uncomment this line to freeze the range boundaries:
-        plot.setRangeBoundaries(0, 10000, BoundaryMode.FIXED);
-
-        // create a dash effect for domain and range grid lines:
-        DashPathEffect dashFx = new DashPathEffect(new float[] {PixelUtils.dpToPix(3), PixelUtils.dpToPix(3)}, 0);
-        plot.getGraph().getDomainGridLinePaint().setPathEffect(dashFx);
-        plot.getGraph().getRangeGridLinePaint().setPathEffect(dashFx);
-
+        redrawer = new Redrawer(plot, 30, false);
 
         return frag;
     }
@@ -125,38 +109,19 @@ public class GraphFragment extends Fragment {
     //-------------Get Data, Manipulate Data & Notify PlotUpdater-----------
     public class GraphDataSource extends Thread{
 
-        private MyObservable notifier = new MyObservable();
-
-        class MyObservable extends Observable {
-            @Override
-            public void notifyObservers() {
-                setChanged();
-                super.notifyObservers();
-            }
-        }
-
-        public void addObserver(Observer observer){
-            notifier.addObserver(observer);
-        }
-
-        public void removeObserver(Observer observer){
-            notifier.deleteObserver(observer);
-        }
-
         public void run(){
             Looper.prepare();
             //Do something
             handler = new Handler(){
                 public void handleMessage(Message msg){
                     String aResponse = msg.getData().getString("data"); //Data received
-                    Log.d("Goyle!", aResponse);
+                    //Log.d("Goyle!", aResponse);
                     if(dataValid(aResponse)){
                         spliceDataAndAddData(aResponse);
-                        notifier.notifyObservers(); //tells the graph to redraw
                     }
                 }
             };
-            Looper.loop(); //Waits for messages?
+            Looper.loop();
         }
 
         /**
@@ -165,7 +130,7 @@ public class GraphFragment extends Fragment {
          * @return true if the data isn't corrupted..aka the correct length
          */
         private boolean dataValid(String data){
-            return ((data.length() == 1350) );
+            return ((data.length() == 1350)); //TODO: implement a better regular expression
         }
 
         /**
@@ -175,13 +140,14 @@ public class GraphFragment extends Fragment {
          * values of the individual sensors
          */
         private void spliceDataAndAddData(String data){
+            data = data.replaceAll("\\s", "");
             String[] dataSplit = data.split(",");
             addDataToSensors(spliceToSensors(dataSplit, 1),1);
-            addDataToSensors(spliceToSensors(dataSplit, 2),2);
-            addDataToSensors(spliceToSensors(dataSplit, 3),3);
-            addDataToSensors(spliceToSensors(dataSplit, 4),4);
-            addDataToSensors(spliceToSensors(dataSplit, 5),5);
-            addDataToSensors(spliceToSensors(dataSplit, 6),6);
+//            addDataToSensors(spliceToSensors(dataSplit, 2),2);
+//            addDataToSensors(spliceToSensors(dataSplit, 3),3);
+//            addDataToSensors(spliceToSensors(dataSplit, 4),4);
+//            addDataToSensors(spliceToSensors(dataSplit, 5),5);
+//            addDataToSensors(spliceToSensors(dataSplit, 6),6);
         }
 
         /**
@@ -194,7 +160,6 @@ public class GraphFragment extends Fragment {
          */
         private ArrayList<Integer> spliceToSensors(String[] dataSplit, int sensorNumber){
             sensorNumber -= 1;
-            int xcount = xcounter;
             ArrayList<Integer> sensor = new ArrayList<>();
             int i = sensorNumber;
             int dataSize = dataSplit.length - 1;
@@ -209,23 +174,21 @@ public class GraphFragment extends Fragment {
                     num = dataSplit[i];
                     sensor.add(Integer.parseInt(num));
                 }else{
-                    xcount++;
                     break;
                 }
                 i += 6;
-                xcount++;
             }
             return sensor;
         }
 
         private void addDataToSensors(ArrayList<Integer> sensor, Integer sensorNumber){
+            sensorNumber--;
             int dataSize = seriesList.get(sensorNumber).data.size();
             if(dataSize + sensor.size() > xBound){  //TODO Double check this...
-                seriesList.get(sensorNumber).resetData();
+                //seriesList.get(sensorNumber).resetData();
             }
             seriesList.get(sensorNumber).data.addAll(sensor);
         }
-
 
         public Number getX(int series, int index){
             return index;
@@ -237,26 +200,10 @@ public class GraphFragment extends Fragment {
 
     }
 
-    //-----------------Plot Updater-------------------
-
-    // redraws a plot whenever an update is received:
-    private class MyPlotUpdater implements Observer {
-        Plot plot;
-
-        public MyPlotUpdater(Plot plot) {
-            this.plot = plot; //Plot has the new values in it
-        }
-
-        @Override
-        public void update(Observable o, Object arg) {
-            plot.redraw(); //Redraw the plot...
-        }
-    }
 
 
     //---------------Data Representation------------------
 
-    //TODO: figure out how to implement XYSeries in a reasonable manner
     class DynamicSeries implements XYSeries{
         private int seriesIndex;
         private String title;
@@ -267,6 +214,7 @@ public class GraphFragment extends Fragment {
             this.seriesIndex = seriesIndex;
             this.bounds = size;
             this.title = title;
+            data.add(200);
         }
 
         @Override
@@ -281,21 +229,18 @@ public class GraphFragment extends Fragment {
 
         @Override
         public Number getX(int index) {
-            //return data.getX(seriesIndex, index);
-            throw new RuntimeException("Unimplemened");
+            return index;
         }
 
         @Override
         public Number getY(int index) {
-            //return datasource.getY(seriesIndex, index);
-            throw new RuntimeException("Unimplemented");
+            return data.get(index);
         }
 
         public void resetData(){
             data.clear();
+            data.add(0);
         }
-
-
 
     }
 
@@ -313,10 +258,13 @@ public class GraphFragment extends Fragment {
             listenerExists = true;
             client = new UdpClient(hostname, remotePort, localPort, 45);
             client.setStreamData(true);
-            dataSource = new GraphDataSource();
-            dataSource.start(); //TODO: This might be a problem
             UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //When we press start graphing.. We pass handler object.
             listener.start();
+            if(!redrawerBeenPressed){
+                redrawer.start();
+                redrawerBeenPressed = true;
+            }
+
         }
     }
 
@@ -327,6 +275,8 @@ public class GraphFragment extends Fragment {
         if (listenerExists) {
             client.setStreamData(false);
             listenerExists = false;
+            redrawer.finish();
+            redrawerBeenPressed = false;
         }
     }
 
