@@ -71,7 +71,7 @@ public class UdpSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 applyPressed = false;
-                updatesBeingMadeStopGraphing();
+                updatesBeingMadeStopGraphing(); //TODO: Change this when UDP Settings have been moved off screen
             }
         });
 

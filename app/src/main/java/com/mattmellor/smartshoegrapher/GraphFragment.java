@@ -234,7 +234,6 @@ public class GraphFragment extends Fragment {
     }
 
 
-
     //---------------Data Representation------------------
 
     class DynamicSeries implements XYSeries{
@@ -291,7 +290,7 @@ public class GraphFragment extends Fragment {
                 listenerExists = true;
                 client = new UdpClient(hostname, remotePort, localPort, 45);
                 client.setStreamData(true);
-                UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //When we press start graphing.. We pass handler object.
+                UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //Handler has been waiting in the background for data(Since onCreateView)..It is the handler for this fragment
                 listener.start();
                 if (!redrawerBeenInitialized) {
                     redrawer = new Redrawer(plot, 30, true);
@@ -315,7 +314,6 @@ public class GraphFragment extends Fragment {
             s.resetData();
         }
     }
-
 
     /**
      * Tell the data listener to stop listening to data
