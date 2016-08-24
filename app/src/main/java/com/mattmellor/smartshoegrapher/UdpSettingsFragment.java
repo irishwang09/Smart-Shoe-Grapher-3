@@ -67,6 +67,7 @@ public class UdpSettingsFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         final View frag = inflater.inflate(R.layout.udp_client_fragment_layout, container, false);
+        getDialog().setTitle("UDP Settings");
 
         ping = (Button) frag.findViewById(R.id.ping);
         apply = (Button) frag.findViewById(R.id.apply_button);

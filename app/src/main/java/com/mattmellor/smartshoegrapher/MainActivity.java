@@ -1,6 +1,5 @@
 package com.mattmellor.smartshoegrapher;
 
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,12 +8,9 @@ import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 
 public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass, UdpStartStopFragment.PassStartStopData{
@@ -129,10 +125,6 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-    //TODO: implement an asynchronous task for working on graphing???
-    //I think perhaps it is better to just
 
 
 }
