@@ -1,24 +1,19 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="4dp"
+    android:layout_margin="1dp"
     android:orientation="horizontal"
     android:id="@+id/bg"
     tools:context=".MainActivity">
+
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_margin="2dp"
         android:orientation="vertical">
-
-        <fragment
-            android:name="com.mattmellor.smartshoegrapher.UdpSettingsFragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:layout="@layout/udp_client_fragment_layout"
-            android:id="@+id/client_fragment_layout"/>
 
         <fragment
             android:name="com.mattmellor.smartshoegrapher.UdpStartStopFragment"
@@ -38,6 +33,6 @@
         android:layout_margin="2dp"
         tools:layout="@layout/graph_fragment" />
 
-  
+
 
 </LinearLayout>

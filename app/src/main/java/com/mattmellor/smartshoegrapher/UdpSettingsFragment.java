@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,15 +16,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import static com.mattmellor.smartshoegrapher.R.string.connectedComplete;
-
 /**
  * Created by Matthew on 8/11/2016.
  * Holds the data about the UDP Connection and contains the wiring
  *
  */
 
-public class UdpSettingsFragment extends Fragment {
+public class UdpSettingsFragment extends DialogFragment {
 
     private Button ping;
     private Button apply;
@@ -45,6 +44,15 @@ public class UdpSettingsFragment extends Fragment {
 
     private OnDataPass dataPassHandle;
     private Handler activityHandler;
+
+    public UdpSettingsFragment(){
+        //Blank on purpose
+    }
+
+    public static UdpSettingsFragment newInstance(){
+        return new UdpSettingsFragment();
+    }
+
 
     @Override
     public void onAttach(Context context){
@@ -166,7 +174,6 @@ public class UdpSettingsFragment extends Fragment {
         return frag;
     }
 
-
     /**
      * Starts a thread to ping the server
      */
@@ -202,7 +209,6 @@ public class UdpSettingsFragment extends Fragment {
         dataPassHandle.updatesBeingMadeStopGraphing();
     }
 
-
     public void reportPingResult(boolean result){
         if(result){
             Context context = getActivity();
@@ -223,7 +229,6 @@ public class UdpSettingsFragment extends Fragment {
     public void setActivityHandler(Handler handler){
         this.activityHandler = handler;
     }
-
 
     //-------------Helper Functions-------------
     /**

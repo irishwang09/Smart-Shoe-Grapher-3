@@ -1,17 +1,20 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+
+import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
-
+import android.widget.Toast;
 
 
 public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass, UdpStartStopFragment.PassStartStopData{
@@ -19,13 +22,10 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
     private String hostname;
     private int remotePort;
     private int localPort;
-    private UdpClient client;
 
     private UdpSettingsFragment settingsFragment;
     private GraphFragment graphFragment;
 
-    private boolean listenerExists = false;
-    private int xcounter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +34,6 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         setContentView(R.layout.activity_main);
 
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
-
-        //Pass a handle to
-        settingsFragment = (UdpSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.client_fragment_layout); //This is null???
-        settingsFragment.setActivityHandler(this.mHandler);
     }
 
 
@@ -124,7 +120,11 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.udp_settings_button) {
+            FragmentManager fm = getSupportFragmentManager();
+            settingsFragment = UdpSettingsFragment.newInstance();
+            settingsFragment.setActivityHandler(this.mHandler);
+            settingsFragment.show(fm, "MATT!");
             return true;
         }
         return super.onOptionsItemSelected(item);
