@@ -13,12 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.androidplot.util.Redrawer;
+import com.scichart.charting.model.dataSeries.IXyDataSeries;
 import com.scichart.charting.visuals.SciChartSurface;
+import com.scichart.core.framework.UpdateSuspender;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
 
 /**
  * Created by Matthew on 8/15/2016.
@@ -37,7 +39,6 @@ public class GraphFragment extends Fragment {
 
     private SciChartSurface plot;
     private GraphDataSource dataSource;
-    private Redrawer redrawer;
 
     //private ArrayList<DynamicSeries> seriesList;
 
@@ -45,16 +46,28 @@ public class GraphFragment extends Fragment {
     private int xBound = 10000;
     private boolean applyBeenPressed = false;
 
+    //private final IXyDataSeries<Double, Double> dataSeries = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+
+
+
     @Override //inflate the fragment view in the mainActivity view
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View frag = inflater.inflate(R.layout.graph_fragment, container, false);
 
         //Code until the end of this method is a place holder
         plot = (SciChartSurface) frag.findViewById(R.id.dynamic_plot);
-        //TODO implement correct sciChart implementation
 
         dataSource = new GraphDataSource();
         dataSource.start();
+
+//        UpdateSuspender.using(plot, new Runnable() {
+//            @Override
+//            public void run() {
+//                final DoubleSeries fourierSeries = DataManager.getInstance().getFourierSeries(1.0,0.1,5000);
+//
+//
+//            }
+//        });
 
 
         return frag;
