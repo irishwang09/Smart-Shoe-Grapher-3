@@ -1,8 +1,7 @@
 package com.mattmellor.smartshoegrapher;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Paint;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,18 +14,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.androidplot.util.Redrawer;
-import com.androidplot.xy.BoundaryMode;
-import com.androidplot.xy.LineAndPointFormatter;
-
-import com.androidplot.xy.XYGraphWidget;
-import com.androidplot.xy.XYPlot;
-import com.androidplot.xy.XYSeries;
+import com.scichart.charting.visuals.SciChartSurface;
 
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 
 /**
  * Created by Matthew on 8/15/2016.
@@ -43,16 +35,14 @@ public class GraphFragment extends Fragment {
 
     private Handler handler;
 
-    private XYPlot plot;
+    private SciChartSurface plot;
     private GraphDataSource dataSource;
     private Redrawer redrawer;
 
-    private ArrayList<DynamicSeries> seriesList;
+    //private ArrayList<DynamicSeries> seriesList;
 
     private boolean listenerExists = false;
     private int xBound = 10000;
-    private boolean redrawerBeenInitialized = false;
-    private int redraw_count = 0;
     private boolean applyBeenPressed = false;
 
     @Override //inflate the fragment view in the mainActivity view
@@ -60,68 +50,12 @@ public class GraphFragment extends Fragment {
         final View frag = inflater.inflate(R.layout.graph_fragment, container, false);
 
         //Code until the end of this method is a place holder
-        plot = (XYPlot) frag.findViewById(R.id.dynamic_plot);
-
-        //Display only whole numbers in domain labels
-        plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat((new DecimalFormat("0")));
-        plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat((new DecimalFormat("0")));
-//        plot.setDomainLabel("Count");
-//        plot.setRangeLabel("Sensor Values (V)");
-
-        DynamicSeries sensor1 = new DynamicSeries(0 , "1", xBound);
-//        DynamicSeries sensor2 = new DynamicSeries(1 , "2", xBound);
-//        DynamicSeries sensor3 = new DynamicSeries(2 , "3", xBound);
-//        DynamicSeries sensor4 = new DynamicSeries(3 , "4", xBound);
-//        DynamicSeries sensor5 = new DynamicSeries(4 , "5", xBound);
-//        DynamicSeries sensor6 = new DynamicSeries(5 , "6", xBound);
-
-        //seriesList = new ArrayList<>(Arrays.asList(sensor1,sensor2, sensor3, sensor4, sensor5, sensor6));
-        seriesList = new ArrayList<>(Arrays.asList(sensor1));
-
-        // create formatters to use for drawing a series using LineAndPointRenderer
-        // and configure them from xml:
-        LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.GREEN, null, null, null);
-        //series1Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
-        series1Format.getLinePaint().setStrokeWidth(2);
-
-        LineAndPointFormatter series2Format = new LineAndPointFormatter(Color.BLUE, null, null, null);
-        //series2Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
-        series2Format.getLinePaint().setStrokeWidth(2);
-
-        LineAndPointFormatter series3Format = new LineAndPointFormatter(Color.RED, null, null, null);
-        //series3Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
-        series3Format.getLinePaint().setStrokeWidth(2);
-
-        LineAndPointFormatter series4Format = new LineAndPointFormatter(Color.LTGRAY, null, null, null);
-        series4Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
-        series4Format.getLinePaint().setStrokeWidth(2);
-
-        LineAndPointFormatter series5Format = new LineAndPointFormatter(Color.MAGENTA, null, null, null);
-        //series5Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
-        series5Format.getLinePaint().setStrokeWidth(2);
-
-        LineAndPointFormatter series6Format = new LineAndPointFormatter(Color.WHITE, null, null, null);
-        //series6Format.getLinePaint().setStrokeJoin(Paint.Join.ROUND);
-        series6Format.getLinePaint().setStrokeWidth(2);
-
-
-        plot.addSeries(sensor1, series1Format);         //Ways to make this faster???
-//        plot.addSeries(sensor2, series2Format);
-//        plot.addSeries(sensor3, series3Format);
-//        plot.addSeries(sensor4, series4Format);
-//        plot.addSeries(sensor5, series5Format);
-//        plot.addSeries(sensor6, series6Format);
-
-        plot.setRangeBoundaries(0, 4500, BoundaryMode.FIXED);
-        plot.setDomainBoundaries(0, xBound, BoundaryMode.FIXED);
-        plot.setLinesPerRangeLabel(3);
-        plot.setLinesPerDomainLabel(3);
-
+        plot = (SciChartSurface) frag.findViewById(R.id.dynamic_plot);
+        //TODO implement correct sciChart implementation
 
         dataSource = new GraphDataSource();
         dataSource.start();
 
-        //redrawer = new Redrawer(plot, 30, false);
 
         return frag;
     }
@@ -218,12 +152,12 @@ public class GraphFragment extends Fragment {
         }
 
         private void addDataToSensors(ArrayList<Integer> sensor, Integer sensorNumber){
-            sensorNumber--;
-            int dataSize = seriesList.get(sensorNumber).data.size();
-            if(dataSize + sensor.size() > xBound){
-                seriesList.get(sensorNumber).resetData();
-            }
-            seriesList.get(sensorNumber).data.addAll(sensor);
+//            sensorNumber--;
+//            int dataSize = seriesList.get(sensorNumber).data.size();
+//            if(dataSize + sensor.size() > xBound){
+//                seriesList.get(sensorNumber).resetData();
+//            }
+//            seriesList.get(sensorNumber).data.addAll(sensor);
         }
 
         public Number getX(int series, int index){
@@ -231,51 +165,12 @@ public class GraphFragment extends Fragment {
         }
 
         public Number getY(int series, int index){
-            return seriesList.get(series).data.get(index); //TODO: Double check this so no null pointer ref
+            //return seriesList.get(series).data.get(index); //TODO: Double check this so no null pointer ref
+            throw new RuntimeException("Unimplemented");
         }
 
     }
 
-
-    //---------------Data Representation------------------
-
-    class DynamicSeries implements XYSeries{
-        private int seriesIndex;
-        private String title;
-        private int bounds;
-        public ArrayList<Integer> data = new ArrayList<>();
-
-        public DynamicSeries(int seriesIndex, String title, int size) {
-            this.seriesIndex = seriesIndex;
-            this.bounds = size;
-            this.title = title;
-        }
-
-        @Override
-        public String getTitle() {
-            return title;
-        }
-
-        @Override
-        public int size() {
-            return data.size();
-        }
-
-        @Override
-        public Number getX(int index) {
-            return index;
-        }
-
-        @Override
-        public Number getY(int index) {
-            return data.get(index);
-        }
-
-        public void resetData(){
-            data.clear();
-        }
-
-    }
 
 
     //---------------GraphFragment methods---------------
@@ -295,12 +190,6 @@ public class GraphFragment extends Fragment {
                 client.setStreamData(true);
                 UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //Handler has been waiting in the background for data(Since onCreateView)..It is the handler for this fragment
                 listener.start();
-                if (!redrawerBeenInitialized) {
-                    redrawer = new Redrawer(plot, 30, true);
-                    redrawerBeenInitialized = true;
-                }else{
-                    redrawer.run();
-                }
             }
         }
         else{
@@ -313,9 +202,7 @@ public class GraphFragment extends Fragment {
     }
 
     private void resetGraph(){
-        for(DynamicSeries s: seriesList){
-            s.resetData();
-        }
+
     }
 
     /**
@@ -325,8 +212,6 @@ public class GraphFragment extends Fragment {
         if (listenerExists) {
             client.setStreamData(false);
             listenerExists = false;
-            redrawer.finish();
-            redrawerBeenInitialized = false;
         }
     }
 

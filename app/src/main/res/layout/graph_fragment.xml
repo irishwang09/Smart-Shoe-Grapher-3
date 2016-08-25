@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ap="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/graph">
 
 
-    <com.androidplot.xy.XYPlot
-        style="@style/APDefacto.Dark"
+    <com.scichart.charting.visuals.SciChartSurface
         android:id="@+id/dynamic_plot"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        ap:title="@string/plotTitle"
-        ap:marginLeft="4dp"
-        ap:marginRight="4dp"
-        ap:renderMode="use_background_thread" />
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+
+
 
 </LinearLayout>
 
