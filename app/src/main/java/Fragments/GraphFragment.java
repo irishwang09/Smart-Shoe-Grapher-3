@@ -171,6 +171,10 @@ public class GraphFragment extends Fragment {
                 if(i < 6){ //This is the base case...add the first set of data
                     num = dataSplit[i];
                     try {
+                        if(xcounter > xBound){
+                            xcounter = 0;
+                            dataSeriesList.get(sensorNumber).clear();//TODO: Does this clear the graph?
+                        }
                         dataSeriesList.get(sensorNumber).append(xcounter, Double.parseDouble(num)); //Does this need to be
                     }catch (Exception e){
                         //Corrupt data
@@ -178,6 +182,10 @@ public class GraphFragment extends Fragment {
                 }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
                     num = dataSplit[i];
                     try {
+                        if(xcounter > xBound){
+                            xcounter = 0;
+                            dataSeriesList.get(sensorNumber).clear();//TODO: Does this clear the graph?
+                        }
                         dataSeriesList.get(sensorNumber).append(xcounter, Double.parseDouble(num));
                     }catch (Exception e){
                         //Corrupt data
