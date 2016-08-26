@@ -110,13 +110,18 @@ public class GraphFragment extends Fragment {
             //Do something
             handler = new Handler(){
                 public void handleMessage(Message msg){
-                    String aResponse = msg.getData().getString("data"); //Data received
+                    final String aResponse = msg.getData().getString("data"); //Data received
                     //Log.d("MATT!", aResponse);
                     if(dataValid(aResponse)){
-                        //Log.d("MATT!", aResponse);
-                        spliceDataAndAddData(aResponse);
-                        //TODO: Notify observer it is time to update graph
-                        //TODO: Figure out the best way to do that ^
+
+                        UpdateSuspender.using(plotSurface, new Runnable(){
+                            @Override
+                            public void run(){
+                                spliceDataAndAddData(aResponse);
+                            }
+
+                        });
+
                     }
                 }
             };
@@ -157,7 +162,7 @@ public class GraphFragment extends Fragment {
          * @return ArrayList<DataPoint> List of DataPoint values for an individual
          * sensor
          */
-        private void addToSensorSeries(String[] dataSplit, int sensorSeriesNumber){
+        private synchronized void addToSensorSeries(String[] dataSplit, int sensorSeriesNumber){ //TODO: synchronized necessary?
             sensorSeriesNumber -= 1;
             double xcounter = xCounters.get(sensorSeriesNumber);
             int i = sensorSeriesNumber;
