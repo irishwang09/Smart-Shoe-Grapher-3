@@ -8,6 +8,6 @@ Features Include:
 
 *Note: Graphing uses an implementation that depends on a restrictive Server/Client communication protocol...Therefore this application won't work currently with any sensors. It will work only with sensors that send out properly formatted UDP packets
 
-![alt tag](https://raw.githubusercontent.com/matthewmellor/Smart-Shoe-Grapher/blob/master/images/smartShoeGrapher.png)
+![alt tag](https://github.com/matthewmellor/Smart-Shoe-Grapher/blob/master/images/smartShoeGrapher.png)
 
-![alt tag](https://raw.githubusercontent.com/matthewmellor/Smart-Shoe-Grapher/blob/master/images/udpSettingsAndroid.png)
+![alt tag](https://github.com/matthewmellor/Smart-Shoe-Grapher/blob/master/images/udpSettingsAndroid.png)
