@@ -74,7 +74,7 @@ public class GraphFragment extends Fragment {
         //Code until the end of this method is a place holder
         plotSurface = (SciChartSurface) frag.findViewById(R.id.dynamic_plot);
 
-        dataSource = new GraphDataSource();
+        dataSource = new GraphDataSource(); //Run the data handling on a separate thread
         dataSource.start();
 
         UpdateSuspender.using(plotSurface, new Runnable() {
@@ -96,7 +96,6 @@ public class GraphFragment extends Fragment {
                 Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6);
             }
         });
-
 
         return frag;
     }
@@ -142,12 +141,12 @@ public class GraphFragment extends Fragment {
         private void spliceDataAndAddData(String data){
             data = data.replaceAll("\\s", "");
             String[] dataSplit = data.split(",");
-            addToSensors(dataSplit, 1);
-            addToSensors(dataSplit, 2);
-            addToSensors(dataSplit, 3);
-            addToSensors(dataSplit, 4);
-            addToSensors(dataSplit, 5);
-            addToSensors(dataSplit, 6);
+            addToSensorSeries(dataSplit, 1);
+            addToSensorSeries(dataSplit, 2);
+            addToSensorSeries(dataSplit, 3);
+            addToSensorSeries(dataSplit, 4);
+            addToSensorSeries(dataSplit, 5);
+            addToSensorSeries(dataSplit, 6);
         }
 
         /**
@@ -158,7 +157,7 @@ public class GraphFragment extends Fragment {
          * @return ArrayList<DataPoint> List of DataPoint values for an individual
          * sensor
          */
-        private void addToSensors(String[] dataSplit, int sensorSeriesNumber){
+        private void addToSensorSeries(String[] dataSplit, int sensorSeriesNumber){
             sensorSeriesNumber -= 1;
             double xcounter = xCounters.get(sensorSeriesNumber);
             int i = sensorSeriesNumber;
@@ -229,7 +228,14 @@ public class GraphFragment extends Fragment {
     }
 
     private void resetGraph(){
-
+        UpdateSuspender.using(plotSurface, new Runnable() {
+            @Override
+            public void run() {
+                for(IXyDataSeries<Double, Double> dataSeriesSensor : dataSeriesList){
+                    dataSeriesSensor.clear();
+                }
+            }
+        });
     }
 
     /**
