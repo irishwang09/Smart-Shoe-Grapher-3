@@ -233,6 +233,9 @@ public class GraphFragment extends Fragment {
     }
 
     private void resetGraph(){
+        for(int i = 0 ;  i <= 5; i++ ){
+            xCounters.set(i, 0.0);
+        }
         UpdateSuspender.using(plotSurface, new Runnable() {
             @Override
             public void run() {
