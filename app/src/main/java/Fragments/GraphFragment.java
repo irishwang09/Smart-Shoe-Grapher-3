@@ -118,7 +118,7 @@ public class GraphFragment extends Fragment {
                         UpdateSuspender.using(plotSurface, new Runnable(){
                             @Override
                             public void run(){
-                                spliceDataAndAddData(dataSplit);
+                                spliceDataAndAddData(dataSplit); //Want this to include basically only appending
                             }
 
                         });
@@ -198,6 +198,15 @@ public class GraphFragment extends Fragment {
             }
             xCounters.set(sensorSeriesNumber,xcounter);
         }
+
+
+        private void spliceDataWithXAndYSets(String dataSplit, int sensorSeriesNumber){
+
+        }
+
+
+
+
 
     }
 
