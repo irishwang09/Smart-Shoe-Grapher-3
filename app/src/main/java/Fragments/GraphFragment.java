@@ -110,14 +110,15 @@ public class GraphFragment extends Fragment {
             //Do something
             handler = new Handler(){
                 public void handleMessage(Message msg){
-                    final String aResponse = msg.getData().getString("data"); //Data received
+                    String aResponse = msg.getData().getString("data"); //Data received
                     //Log.d("MATT!", aResponse);
                     if(dataValid(aResponse)){
-
+                        aResponse = aResponse.replaceAll("\\s", "");
+                        final String[] dataSplit = aResponse.split(",");
                         UpdateSuspender.using(plotSurface, new Runnable(){
                             @Override
                             public void run(){
-                                spliceDataAndAddData(aResponse);
+                                spliceDataAndAddData(dataSplit);
                             }
 
                         });
@@ -139,14 +140,12 @@ public class GraphFragment extends Fragment {
 
         /**
          *
-         * @param data String of the entire data
+         * @param dataSplit String[] of the entire data
          * @return ArrayList of ArrayLists.. Inner arrayLists are the
          * values of the individual sensors
          */
-        private void spliceDataAndAddData(String data){
-            data = data.replaceAll("\\s", "");
-            String[] dataSplit = data.split(",");
-            addToSensorSeries(dataSplit, 1);
+        private void spliceDataAndAddData(String[] dataSplit){
+            addToSensorSeries(dataSplit, 1); //TODO: Need to think of a better way to do this...
             addToSensorSeries(dataSplit, 2);
             addToSensorSeries(dataSplit, 3);
             addToSensorSeries(dataSplit, 4);
@@ -162,7 +161,7 @@ public class GraphFragment extends Fragment {
          * @return ArrayList<DataPoint> List of DataPoint values for an individual
          * sensor
          */
-        private synchronized void addToSensorSeries(String[] dataSplit, int sensorSeriesNumber){ //TODO: synchronized necessary?
+        private void addToSensorSeries(String[] dataSplit, int sensorSeriesNumber){ //TODO: synchronized necessary?
             sensorSeriesNumber -= 1;
             double xcounter = xCounters.get(sensorSeriesNumber);
             int i = sensorSeriesNumber;
