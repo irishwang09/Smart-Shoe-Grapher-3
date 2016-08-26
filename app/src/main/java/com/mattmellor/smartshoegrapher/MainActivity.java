@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import Fragments.GraphFragment;
 import Fragments.UdpSettingsFragment;
 import Fragments.UdpStartStopFragment;
+import SciChartUserClasses.SciChartBuilder;
 
 
 public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass, UdpStartStopFragment.PassStartStopData{
@@ -29,6 +30,7 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SciChartBuilder.init(this);
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);

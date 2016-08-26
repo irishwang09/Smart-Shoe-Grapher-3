@@ -17,11 +17,16 @@ import com.mattmellor.smartshoegrapher.R;
 import com.mattmellor.smartshoegrapher.UdpClient;
 import com.scichart.charting.model.dataSeries.IXyDataSeries;
 import com.scichart.charting.visuals.SciChartSurface;
+import com.scichart.charting.visuals.axes.AutoRange;
+import com.scichart.charting.visuals.axes.NumericAxis;
+import com.scichart.charting.visuals.renderableSeries.IRenderableSeries;
 import com.scichart.core.framework.UpdateSuspender;
+import com.scichart.drawing.utility.ColorUtil;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import SciChartUserClasses.SciChartBuilder;
 
@@ -47,17 +52,16 @@ public class GraphFragment extends Fragment {
     private int xBound = 10000;
     private boolean applyBeenPressed = false;
 
-    private SciChartSurface plot;
+    private SciChartSurface plotSurface;
     private GraphDataSource dataSource;
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
-    private final IXyDataSeries<Double, Double> dataSeries1 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeries2 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeries3 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeries4 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeries5 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeries6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-
+    private final IXyDataSeries<Double, Double> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor2 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor3 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor4 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor5 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
 
 
     @Override //inflate the fragment view in the mainActivity view
@@ -65,19 +69,30 @@ public class GraphFragment extends Fragment {
         final View frag = inflater.inflate(R.layout.graph_fragment, container, false);
 
         //Code until the end of this method is a place holder
-        plot = (SciChartSurface) frag.findViewById(R.id.dynamic_plot);
+        plotSurface = (SciChartSurface) frag.findViewById(R.id.dynamic_plot);
 
         dataSource = new GraphDataSource();
         dataSource.start();
 
-//        UpdateSuspender.using(plot, new Runnable() {
-//            @Override
-//            public void run() {
-//                final DoubleSeries fourierSeries = DataManager.getInstance().getFourierSeries(1.0,0.1,5000);
-//
-//
-//            }
-//        });
+        UpdateSuspender.using(plotSurface, new Runnable() {
+            @Override
+            public void run() {
+                final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,10000).build();
+
+                final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0, 4500).build();
+
+                final IRenderableSeries rs1 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor1).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
+                final IRenderableSeries rs2 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor2).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xA5, 0x00)).build(); //Light Pink Color
+                final IRenderableSeries rs3 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor3).withStrokeStyle(ColorUtil.argb(0xFF, 0xE1, 0x32, 0x19)).build(); //Orange Red Color
+                final IRenderableSeries rs4 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor4).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0xFF)).build(); //White color
+                final IRenderableSeries rs5 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor5).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0x99)).build(); //Light Yellow color
+                final IRenderableSeries rs6 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor6).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0x99, 0x33)).build(); //Light Orange color
+
+                Collections.addAll(plotSurface.getXAxes(), xAxis);
+                Collections.addAll(plotSurface.getYAxes(), yAxis);
+                Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6);
+            }
+        });
 
 
         return frag;
@@ -99,7 +114,7 @@ public class GraphFragment extends Fragment {
                         //Log.d("MATT!", aResponse);
                         spliceDataAndAddData(aResponse);
 //                        if(redraw_count == 5){
-//                            plot.redraw();
+//                            plotSurface.redraw();
 //                            redraw_count = 0;
 //                        }
 //                        redraw_count++;
