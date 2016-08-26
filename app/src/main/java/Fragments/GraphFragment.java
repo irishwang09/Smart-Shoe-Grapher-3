@@ -50,6 +50,7 @@ public class GraphFragment extends Fragment {
 
     private boolean listenerExists = false;
     private int xBound = 10000;
+    private int yBound = 5000;
     private boolean applyBeenPressed = false;
 
     private SciChartSurface plotSurface;
@@ -77,9 +78,9 @@ public class GraphFragment extends Fragment {
         UpdateSuspender.using(plotSurface, new Runnable() {
             @Override
             public void run() {
-                final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,10000).build();
+                final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,xBound).build();
 
-                final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0, 4500).build();
+                final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0, yBound).build();
 
                 final IRenderableSeries rs1 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor1).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
                 final IRenderableSeries rs2 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor2).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xA5, 0x00)).build(); //Light Pink Color

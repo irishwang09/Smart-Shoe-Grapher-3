@@ -30,7 +30,7 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SciChartBuilder.init(this);
+        SciChartBuilder.init(this); //This is important for GraphFragment...
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
