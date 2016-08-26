@@ -116,11 +116,8 @@ public class GraphFragment extends Fragment {
                     if(dataValid(aResponse)){
                         //Log.d("MATT!", aResponse);
                         spliceDataAndAddData(aResponse);
-//                        if(redraw_count == 5){
-//                            plotSurface.redraw();
-//                            redraw_count = 0;
-//                        }
-//                        redraw_count++;
+                        //TODO: Notify observer it is time to update graph
+                        //TODO: Figure out the best way to do that ^
                     }
                 }
             };
@@ -145,26 +142,26 @@ public class GraphFragment extends Fragment {
         private void spliceDataAndAddData(String data){
             data = data.replaceAll("\\s", "");
             String[] dataSplit = data.split(",");
-            spliceToSensors(dataSplit, 1);
-            spliceToSensors(dataSplit, 2);
-            spliceToSensors(dataSplit, 3);
-            spliceToSensors(dataSplit, 4);
-            spliceToSensors(dataSplit, 5);
-            spliceToSensors(dataSplit, 6);
+            addToSensors(dataSplit, 1);
+            addToSensors(dataSplit, 2);
+            addToSensors(dataSplit, 3);
+            addToSensors(dataSplit, 4);
+            addToSensors(dataSplit, 5);
+            addToSensors(dataSplit, 6);
         }
 
         /**
          *
          * @param dataSplit data to split into individual sensor array
          *                  must contain only string representations of numbers
-         * @param sensorNumber which sensors to collect the data points of
+         * @param sensorSeriesNumber which sensors to collect the data points of
          * @return ArrayList<DataPoint> List of DataPoint values for an individual
          * sensor
          */
-        private void spliceToSensors(String[] dataSplit, int sensorNumber){
-            sensorNumber -= 1;
-            double xcounter = xCounters.get(sensorNumber);
-            int i = sensorNumber;
+        private void addToSensors(String[] dataSplit, int sensorSeriesNumber){
+            sensorSeriesNumber -= 1;
+            double xcounter = xCounters.get(sensorSeriesNumber);
+            int i = sensorSeriesNumber;
             int dataSize = dataSplit.length - 1;
             String num = "";
             while(true){
@@ -173,9 +170,9 @@ public class GraphFragment extends Fragment {
                     try {
                         if(xcounter > xBound){
                             xcounter = 0;
-                            dataSeriesList.get(sensorNumber).clear();//TODO: Does this clear the graph?
+                            dataSeriesList.get(sensorSeriesNumber).clear();//TODO: Does this clear the graph?
                         }
-                        dataSeriesList.get(sensorNumber).append(xcounter, Double.parseDouble(num)); //Does this need to be
+                        dataSeriesList.get(sensorSeriesNumber).append(xcounter, Double.parseDouble(num)); //Does this need to be
                     }catch (Exception e){
                         //Corrupt data
                     }
@@ -184,9 +181,9 @@ public class GraphFragment extends Fragment {
                     try {
                         if(xcounter > xBound){
                             xcounter = 0;
-                            dataSeriesList.get(sensorNumber).clear();//TODO: Does this clear the graph?
+                            dataSeriesList.get(sensorSeriesNumber).clear();//TODO: Does this clear the graph?
                         }
-                        dataSeriesList.get(sensorNumber).append(xcounter, Double.parseDouble(num));
+                        dataSeriesList.get(sensorSeriesNumber).append(xcounter, Double.parseDouble(num));
                     }catch (Exception e){
                         //Corrupt data
                     }
@@ -196,7 +193,7 @@ public class GraphFragment extends Fragment {
                 xcounter++;
                 i += 6;
             }
-            xCounters.set(sensorNumber,xcounter);
+            xCounters.set(sensorSeriesNumber,xcounter);
         }
 
     }
