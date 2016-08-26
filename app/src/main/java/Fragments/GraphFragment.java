@@ -63,6 +63,8 @@ public class GraphFragment extends Fragment {
     private final IXyDataSeries<Double, Double> dataSeriesSensor4 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor5 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private ArrayList<IXyDataSeries<Double,Double>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2, dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6));
+    private ArrayList<Double> xCounters = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0));
 
 
     @Override //inflate the fragment view in the mainActivity view
@@ -143,16 +145,14 @@ public class GraphFragment extends Fragment {
         private void spliceDataAndAddData(String data){
             data = data.replaceAll("\\s", "");
             String[] dataSplit = data.split(",");
-            addDataToSensors(spliceToSensors(dataSplit, 1),1);
-//            addDataToSensors(spliceToSensors(dataSplit, 2),2);
-//            addDataToSensors(spliceToSensors(dataSplit, 3),3);
-//            addDataToSensors(spliceToSensors(dataSplit, 4),4);
-//            addDataToSensors(spliceToSensors(dataSplit, 5),5);
-//            addDataToSensors(spliceToSensors(dataSplit, 6),6);
+            spliceToSensors(dataSplit, 1);
+            spliceToSensors(dataSplit, 2);
+            spliceToSensors(dataSplit, 3);
+            spliceToSensors(dataSplit, 4);
+            spliceToSensors(dataSplit, 5);
+            spliceToSensors(dataSplit, 6);
         }
 
-
-        //TODO: Change this to make it more robust
         /**
          *
          * @param dataSplit data to split into individual sensor array
@@ -161,9 +161,9 @@ public class GraphFragment extends Fragment {
          * @return ArrayList<DataPoint> List of DataPoint values for an individual
          * sensor
          */
-        private ArrayList<Integer> spliceToSensors(String[] dataSplit, int sensorNumber){
+        private void spliceToSensors(String[] dataSplit, int sensorNumber){
             sensorNumber -= 1;
-            ArrayList<Integer> sensor = new ArrayList<>();
+            double xcounter = xCounters.get(sensorNumber);
             int i = sensorNumber;
             int dataSize = dataSplit.length - 1;
             String num = "";
@@ -171,41 +171,24 @@ public class GraphFragment extends Fragment {
                 if(i < 6){ //This is the base case...add the first set of data
                     num = dataSplit[i];
                     try {
-                        sensor.add(Integer.parseInt(num)); //TODO: Change this.....
+                        dataSeriesList.get(sensorNumber).append(xcounter, Double.parseDouble(num)); //Does this need to be
                     }catch (Exception e){
                         //Corrupt data
                     }
                 }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
                     num = dataSplit[i];
                     try {
-                        sensor.add(Integer.parseInt(num));
+                        dataSeriesList.get(sensorNumber).append(xcounter, Double.parseDouble(num));
                     }catch (Exception e){
                         //Corrupt data
                     }
                 }else{
                     break;
                 }
+                xcounter++;
                 i += 6;
             }
-            return sensor;
-        }
-
-        private void addDataToSensors(ArrayList<Integer> sensor, Integer sensorNumber){
-//            sensorNumber--;
-//            int dataSize = seriesList.get(sensorNumber).data.size();
-//            if(dataSize + sensor.size() > xBound){
-//                seriesList.get(sensorNumber).resetData();
-//            }
-//            seriesList.get(sensorNumber).data.addAll(sensor);
-        }
-
-        public Number getX(int series, int index){
-            return index;
-        }
-
-        public Number getY(int series, int index){
-            //return seriesList.get(series).data.get(index); //TODO: Double check this so no null pointer ref
-            throw new RuntimeException("Unimplemented");
+            xCounters.set(sensorNumber,xcounter);
         }
 
     }
