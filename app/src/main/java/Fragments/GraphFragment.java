@@ -1,4 +1,4 @@
-package com.mattmellor.smartshoegrapher;
+package Fragments;
 
 import android.content.Context;
 
@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.mattmellor.smartshoegrapher.R;
+import com.mattmellor.smartshoegrapher.UdpClient;
 import com.scichart.charting.model.dataSeries.IXyDataSeries;
 import com.scichart.charting.visuals.SciChartSurface;
 import com.scichart.core.framework.UpdateSuspender;
@@ -20,6 +22,8 @@ import com.scichart.core.framework.UpdateSuspender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import SciChartUserClasses.SciChartBuilder;
 
 
 /**
@@ -30,23 +34,29 @@ import java.util.Arrays;
 
 public class GraphFragment extends Fragment {
 
+    //UDP Settings
     private UdpClient client;
     private String hostname;
     private int remotePort;
     private int localPort;
 
+    //Communication With Other Threads Outside GraphFragment class
     private Handler handler;
-
-    private SciChartSurface plot;
-    private GraphDataSource dataSource;
-
-    //private ArrayList<DynamicSeries> seriesList;
 
     private boolean listenerExists = false;
     private int xBound = 10000;
     private boolean applyBeenPressed = false;
 
-    //private final IXyDataSeries<Double, Double> dataSeries = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private SciChartSurface plot;
+    private GraphDataSource dataSource;
+    protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
+
+    private final IXyDataSeries<Double, Double> dataSeries1 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeries2 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeries3 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeries4 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeries5 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeries6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
 
 
 

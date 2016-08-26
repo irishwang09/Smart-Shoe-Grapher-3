@@ -1,11 +1,10 @@
-package com.mattmellor.smartshoegrapher;
+package Fragments;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +12,10 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.mattmellor.smartshoegrapher.R;
+import com.mattmellor.smartshoegrapher.UdpClient;
 
 /**
  * Created by Matthew on 8/11/2016.

@@ -16,7 +16,7 @@
         android:orientation="vertical">
 
         <fragment
-            android:name="com.mattmellor.smartshoegrapher.UdpStartStopFragment"
+            android:name="Fragments.UdpStartStopFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/stream_control_fragment_landscape"
@@ -26,7 +26,7 @@
 
 
     <fragment
-        android:name="com.mattmellor.smartshoegrapher.GraphFragment"
+        android:name="Fragments.GraphFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/graph_fragment"

@@ -1,4 +1,4 @@
-package com.mattmellor.smartshoegrapher;
+package Fragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import com.mattmellor.smartshoegrapher.R;
 
 /**
  * Created by Matthew on 8/11/2016.

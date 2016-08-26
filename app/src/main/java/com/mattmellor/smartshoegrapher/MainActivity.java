@@ -12,6 +12,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import Fragments.GraphFragment;
+import Fragments.UdpSettingsFragment;
+import Fragments.UdpStartStopFragment;
+
 
 public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass, UdpStartStopFragment.PassStartStopData{
 
