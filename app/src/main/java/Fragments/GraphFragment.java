@@ -59,6 +59,7 @@ public class GraphFragment extends Fragment {
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
     //The following are the lists that we actually add the udp sensor data to...
+    //
     private final IXyDataSeries<Double, Double> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor2 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor3 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
@@ -90,6 +91,7 @@ public class GraphFragment extends Fragment {
                 final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0, yBound).build();
 
                 //These are wrappers for the series we added the data to...It contains the formatting
+                //TODO: Try changing these to FastLineRenderableSeries
                 final IRenderableSeries rs1 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor1).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
                 final IRenderableSeries rs2 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor2).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xA5, 0x00)).build(); //Light Pink Color
                 final IRenderableSeries rs3 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor3).withStrokeStyle(ColorUtil.argb(0xFF, 0xE1, 0x32, 0x19)).build(); //Orange Red Color
@@ -102,6 +104,9 @@ public class GraphFragment extends Fragment {
                 Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6);
             }
         });
+
+
+        //TODO Change to using FastLineRenderableSeries
 
         return frag;
     }
@@ -263,7 +268,7 @@ public class GraphFragment extends Fragment {
             ArrayList<Double> yVals = dataPoints.get(1);
             sensorSeriesNumber -= 1;
             dataSeriesList.get(sensorSeriesNumber).append(xVals,yVals); //This will cause an error
-            //TODO: test the following function after testing the code with the 
+            //TODO: test the following function after testing the code with the
         }
     }
 
