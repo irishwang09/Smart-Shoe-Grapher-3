@@ -45,7 +45,7 @@ public class GraphFragment extends Fragment {
     private int remotePort;
     private int localPort;
 
-    //Communication With Other Threads Outside GraphFragment class
+    //Allows Communication With Other Threads Outside GraphFragment class
     private Handler handler;
 
     private boolean listenerExists = false;
@@ -57,6 +57,7 @@ public class GraphFragment extends Fragment {
     private GraphDataSource dataSource;
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
+    //The following are the lists that we actually add the udp sensor data to...
     private final IXyDataSeries<Double, Double> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor2 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor3 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
@@ -65,6 +66,8 @@ public class GraphFragment extends Fragment {
     private final IXyDataSeries<Double, Double> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private ArrayList<IXyDataSeries<Double,Double>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2, dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6));
     private ArrayList<Double> xCounters = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0));
+
+    private int refreshCount = 0;
 
 
     @Override //inflate the fragment view in the mainActivity view
@@ -84,6 +87,7 @@ public class GraphFragment extends Fragment {
 
                 final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0, yBound).build();
 
+                //These are wrappers for the series we added the data to...It contains the formatting
                 final IRenderableSeries rs1 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor1).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
                 final IRenderableSeries rs2 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor2).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xA5, 0x00)).build(); //Light Pink Color
                 final IRenderableSeries rs3 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor3).withStrokeStyle(ColorUtil.argb(0xFF, 0xE1, 0x32, 0x19)).build(); //Orange Red Color
@@ -114,14 +118,17 @@ public class GraphFragment extends Fragment {
                     //Log.d("MATT!", aResponse);
                     if(dataValid(aResponse)){
                         aResponse = aResponse.replaceAll("\\s", "");
-                        final String[] dataSplit = aResponse.split(",");
-                        UpdateSuspender.using(plotSurface, new Runnable(){
-                            @Override
-                            public void run(){
-                                spliceDataAndAddData(dataSplit); //Want this to include basically only appending
-                            }
+                        final String[] dataSplit = aResponse.split(","); //split the data at the commas
 
-                        });
+                        if(refreshCount == 3) { //Only update the graph every 3rd data packet
+                            UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
+                                @Override
+                                public void run() {
+                                    spliceDataAndAddData(dataSplit); //Want this to include basically only appending
+                                }
+                            });
+                            refreshCount = 0;
+                        }else refreshCount++;
 
                     }
                 }
@@ -200,12 +207,9 @@ public class GraphFragment extends Fragment {
         }
 
 
-        private void spliceDataWithXAndYSets(String dataSplit, int sensorSeriesNumber){
-
-        }
-
-
-
+//        private void spliceDataWithXAndYSets(String dataSplit, int sensorSeriesNumber){
+//            dataSeriesList.get(0).//Make this for sets
+//        }
 
 
     }
