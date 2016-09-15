@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ShareCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,7 +50,7 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
-    private int xBound = 10000;
+    private int xBound = 10000; //We want to be able to change this
     private int yBound = 5000;
     private boolean applyBeenPressed = false;
 
@@ -64,7 +65,8 @@ public class GraphFragment extends Fragment {
     private final IXyDataSeries<Double, Double> dataSeriesSensor4 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor5 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private ArrayList<IXyDataSeries<Double,Double>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2, dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6));
+    private ArrayList<IXyDataSeries<Double,Double>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2,
+            dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6));
     private ArrayList<Double> xCounters = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0));
 
     private int refreshCount = 0;
@@ -180,9 +182,9 @@ public class GraphFragment extends Fragment {
                     try {
                         if(xcounter > xBound){
                             xcounter = 0;
-                            dataSeriesList.get(sensorSeriesNumber).clear();//TODO: Does this clear the graph?
+                            dataSeriesList.get(sensorSeriesNumber).clear();
                         }
-                        dataSeriesList.get(sensorSeriesNumber).append(xcounter, Double.parseDouble(num)); //Does this need to be
+                        dataSeriesList.get(sensorSeriesNumber).append(xcounter, Double.parseDouble(num)); //appends every number...
                     }catch (Exception e){
                         //Corrupt data
                     }
@@ -191,7 +193,7 @@ public class GraphFragment extends Fragment {
                     try {
                         if(xcounter > xBound){
                             xcounter = 0;
-                            dataSeriesList.get(sensorSeriesNumber).clear();//TODO: Does this clear the graph?
+                            dataSeriesList.get(sensorSeriesNumber).clear();
                         }
                         dataSeriesList.get(sensorSeriesNumber).append(xcounter, Double.parseDouble(num));
                     }catch (Exception e){
@@ -207,11 +209,62 @@ public class GraphFragment extends Fragment {
         }
 
 
-//        private void spliceDataWithXAndYSets(String dataSplit, int sensorSeriesNumber){
-//            dataSeriesList.get(0).//Make this for sets
-//        }
+        //Want to be able to splice the data so it can be added in sets for the graphing
+        //Essentially do what is done in addToSensorSeries but instead of adding the data to the IXySeries
+        //Add it to a regular list so that we can add the ordered data to IXySeries in bulk
+        private ArrayList<ArrayList<Double>> spliceDataWithXAndYSets(String[] dataSplit, int sensorSeriesNumber){
+            ArrayList<Double> xVals = new ArrayList<>();
+            ArrayList<Double> yVals = new ArrayList<>();
+            ArrayList<ArrayList<Double>> dataPoints = new ArrayList<>();
+
+            sensorSeriesNumber -= 1;
+            double xcounter = xCounters.get(sensorSeriesNumber);
+            int i = sensorSeriesNumber;
+            int dataSize = dataSplit.length - 1;
+            String num = "";
+            while(true){
+                if(i < 6){ //This is the base case...add the first set of data
+                    num = dataSplit[i];
+                    try {
+                        if(xcounter > xBound){ //What should I do when this is the case?
+                            xcounter = 0;
+                        }
+                        xVals.add(xcounter);
+                        yVals.add(Double.parseDouble(num));
+                    }catch (Exception e){
+                        //Corrupt data
+                    }
+                }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
+                    num = dataSplit[i];
+                    try {
+                        if(xcounter > xBound){ //TODO: need to figure out what to do here....
+                            xcounter = 0;
+                        }
+                        xVals.add(xcounter);
+                        yVals.add(Double.parseDouble(num));
+                    }catch (Exception e){
+                        //Corrupt data
+                    }
+                }else{
+                    break;
+                }
+                xcounter++;
+                i += 6;
+            }
+            xCounters.set(sensorSeriesNumber,xcounter);
+            dataPoints.add(xVals);
+            dataPoints.add(yVals);
+            return dataPoints;
+        }
 
 
+        private void addDataToIXySeriesForUpdate(ArrayList<ArrayList<Double>> dataPoints, int sensorSeriesNumber){
+            ArrayList<Double> xVals = dataPoints.get(0);
+            ArrayList<Double> yVals = dataPoints.get(1);
+            sensorSeriesNumber -= 1;
+            dataSeriesList.get(sensorSeriesNumber).append(xVals,yVals); //This will cause an error
+            //TODO: test the following function after testing the code with the 
+        }
     }
 
 
