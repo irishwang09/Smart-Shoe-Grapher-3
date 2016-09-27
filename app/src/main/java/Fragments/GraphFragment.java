@@ -152,16 +152,13 @@ public class GraphFragment extends Fragment {
                         aResponse = aResponse.replaceAll("\\s", "");
                         final String[] dataSplit = aResponse.split(","); //split the data at the commas
 
-                        if(refreshCount == 1) { //Only update the graph every 3rd data packet
-                            UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
+                        UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                 @Override
                                 public void run() {
                                     spliceDataAndAddData(dataSplit); //Want this to include basically only appending
                                     //TODO: Test this....
                                 }
                             });
-                            refreshCount = 0;
-                        }else refreshCount++;
 
                     }
                 }
