@@ -80,6 +80,20 @@ public class GraphFragment extends Fragment {
         //Code until the end of this method is a place holder
         plotSurface = (SciChartSurface) frag.findViewById(R.id.dynamic_plot);
 
+        try{
+            plotSurface.setRuntimeLicenseKey(
+                    "<LicenseContract>\n" +
+                            "<Customer>Trial Ext</Customer>\n" +
+                            "<OrderId />\n <LicenseCount>1</LicenseCount>\n" +
+                            " <IsTrialLicense>true</IsTrialLicense>\n" +
+                            "<SupportExpires>11/27/2016 00:00:00</SupportExpires>\n\n " +
+                            " <ProductCode>SC-ANDROID-2D-PRO</ProductCode>\n\n" +
+                            " <KeyCode>d7cf477553b6d058bd23bffb5226013a8a817eec968c665224c8d33d9dc4db50425689a229503215526c8500fe32bbc9fbc449b732e61f361d477b10d7c967f5da5c1a7e60e9843d38640764eb33d0a534580705f0427f2fa111f391cd6b6e5d8652d68144f956b8115ba61cba0b18f599a1758bbfacf810b909cb899eac7b71926a09238b765c86846ddacd23001441083221</KeyCode>\n" +
+                            "</LicenseContract>" );
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         dataSource = new GraphDataSource(); //Run the data handling on a separate thread
         dataSource.start();
 
@@ -132,6 +146,7 @@ public class GraphFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     spliceDataAndAddData(dataSplit); //Want this to include basically only appending
+                                    //TODO: Test this....
                                 }
                             });
                             refreshCount = 0;
@@ -175,7 +190,7 @@ public class GraphFragment extends Fragment {
          * @return ArrayList<DataPoint> List of DataPoint values for an individual
          * sensor
          */
-        private void addToSensorSeries(String[] dataSplit, int sensorSeriesNumber){ //TODO: synchronized necessary?
+        private void addToSensorSeries(String[] dataSplit, int sensorSeriesNumber){
             sensorSeriesNumber -= 1;
             double xcounter = xCounters.get(sensorSeriesNumber);
             int i = sensorSeriesNumber;
