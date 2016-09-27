@@ -141,7 +141,7 @@ public class GraphFragment extends Fragment {
                         aResponse = aResponse.replaceAll("\\s", "");
                         final String[] dataSplit = aResponse.split(","); //split the data at the commas
 
-                        if(refreshCount == 3) { //Only update the graph every 3rd data packet
+                        if(refreshCount == 2) { //Only update the graph every 3rd data packet
                             UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                 @Override
                                 public void run() {
