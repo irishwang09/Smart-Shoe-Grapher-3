@@ -34,11 +34,6 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         super.onCreate(savedInstanceState);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
-
-        //Make sure the license is activated
-
-
-
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
     }
 

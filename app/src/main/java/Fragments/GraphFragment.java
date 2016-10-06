@@ -51,7 +51,7 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
-    private int xBound = 10000; //We want to be able to change this
+    private int xBound = 100000; //We want to be able to change this
     private int yBound = 5000;
     private boolean applyBeenPressed = false;
 
@@ -60,7 +60,7 @@ public class GraphFragment extends Fragment {
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
     //The following are the lists that we actually add the udp sensor data to...
-    //TODO: Test the data set adding methods (instead of add individual points method)
+    //TODO: Change the Series to XyyDataSeries
     private final IXyDataSeries<Double, Double> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor2 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor3 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
@@ -71,8 +71,6 @@ public class GraphFragment extends Fragment {
             dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6));
     private ArrayList<Double> xCounters = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0));
 
-    private int refreshCount = 0;
-
     @Override //inflate the fragment view in the mainActivity view
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View frag = inflater.inflate(R.layout.graph_fragment, container, false);
@@ -80,6 +78,7 @@ public class GraphFragment extends Fragment {
         //Code until the end of this method is a place holder
         plotSurface = (SciChartSurface) frag.findViewById(R.id.dynamic_plot);
 
+        //Ensure that the license is added & SciChart Runs
         try{
             plotSurface.setRuntimeLicenseKey(
                     "<LicenseContract>\n" +
@@ -128,7 +127,7 @@ public class GraphFragment extends Fragment {
 
         public void run(){
             Looper.prepare();
-            //Do something
+            //Get the data from the UDP Data Class when its available
             handler = new Handler(){
                 public void handleMessage(Message msg){
                     String aResponse = msg.getData().getString("data"); //Data received
@@ -140,10 +139,10 @@ public class GraphFragment extends Fragment {
                         UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                 @Override
                                 public void run() {
-                                    spliceDataAndAddData(dataSplit); //Want this to include basically only appending
+                                    //spliceDataAndAddData(dataSplit);
+                                    spliceAndAddDataInSets(dataSplit);
                                 }
                             });
-
                     }
                 }
             };
@@ -166,7 +165,7 @@ public class GraphFragment extends Fragment {
          * values of the individual sensors
          */
         private void spliceDataAndAddData(String[] dataSplit){
-            addToSensorSeries(dataSplit, 1); //TODO: Need to think of a better way to do this...
+            addToSensorSeries(dataSplit, 1);
             addToSensorSeries(dataSplit, 2);
             addToSensorSeries(dataSplit, 3);
             addToSensorSeries(dataSplit, 4);
@@ -179,18 +178,19 @@ public class GraphFragment extends Fragment {
          * @param dataSplit data to split into individual sensor array
          *                  must contain only string representations of numbers
          * @param sensorSeriesNumber which sensors to collect the data points of
-         * @return ArrayList<DataPoint> List of DataPoint values for an individual
-         * sensor
          */
-        private void addToSensorSeries(String[] dataSplit, int sensorSeriesNumber){
-            sensorSeriesNumber -= 1;
-            double xcounter = xCounters.get(sensorSeriesNumber);
+        private void addToSensorSeries(String[] dataSplit, int sensorSeriesNumber){ //Ths cost of this should be constant
+            sensorSeriesNumber -= 1;  //Adds each value individually to the series
+            //TODO: What does Xbound affect?
+                //The size of the XYDataSeries
+                //Xcounter operations should be basically constant
+            double xcounter = xCounters.get(sensorSeriesNumber); //returns an int of 6 ints
             int i = sensorSeriesNumber;
             int dataSize = dataSplit.length - 1;
             String num = "";
             while(true){
                 if(i < 6){ //This is the base case...add the first set of data
-                    num = dataSplit[i];
+                    num = dataSplit[i]; //Length of DataSplit stays constant
                     try {
                         if(xcounter > xBound){
                             xcounter = 0;
@@ -218,6 +218,26 @@ public class GraphFragment extends Fragment {
                 i += 6;
             }
             xCounters.set(sensorSeriesNumber,xcounter);
+        }
+
+
+        //--------------------Add Data in Sets----------------------------
+
+
+        private void spliceAndAddDataInSets(String[] dataSplit){
+            ArrayList<ArrayList<Double>> splicedIntoPoints1 = spliceDataWithXAndYSets(dataSplit, 0);
+            ArrayList<ArrayList<Double>> splicedIntoPoints2 = spliceDataWithXAndYSets(dataSplit, 0);
+            ArrayList<ArrayList<Double>> splicedIntoPoints3 = spliceDataWithXAndYSets(dataSplit, 0);
+            ArrayList<ArrayList<Double>> splicedIntoPoints4 = spliceDataWithXAndYSets(dataSplit, 0);
+            ArrayList<ArrayList<Double>> splicedIntoPoints5 = spliceDataWithXAndYSets(dataSplit, 0);
+            ArrayList<ArrayList<Double>> splicedIntoPoints6 = spliceDataWithXAndYSets(dataSplit, 0);
+
+            addDataToIXySeriesForUpdate(splicedIntoPoints1,0);
+            addDataToIXySeriesForUpdate(splicedIntoPoints2,1);
+            addDataToIXySeriesForUpdate(splicedIntoPoints3,2);
+            addDataToIXySeriesForUpdate(splicedIntoPoints4,3);
+            addDataToIXySeriesForUpdate(splicedIntoPoints5,4);
+            addDataToIXySeriesForUpdate(splicedIntoPoints6,5);
         }
 
 
@@ -275,7 +295,6 @@ public class GraphFragment extends Fragment {
             ArrayList<Double> yVals = dataPoints.get(1);
             sensorSeriesNumber -= 1;
             dataSeriesList.get(sensorSeriesNumber).append(xVals,yVals); //This will cause an error
-            //TODO: Test this function
         }
     }
 
