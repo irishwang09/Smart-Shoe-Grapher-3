@@ -51,7 +51,7 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
-    private int xBound = 100000; //We want to be able to change this
+    private int xBound = 100000; //Make this dynamic
     private int yBound = 5000;
     private boolean applyBeenPressed = false;
 
@@ -60,7 +60,7 @@ public class GraphFragment extends Fragment {
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
     //The following are the lists that we actually add the udp sensor data to...
-    //TODO: Change the Series to XyyDataSeries
+    //TODO: Change the Series to XyyDataSeries...How does XyyDataSeries Work?
     private final IXyDataSeries<Double, Double> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor2 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor3 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
@@ -118,10 +118,10 @@ public class GraphFragment extends Fragment {
                 Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6);
             }
         });
-
         return frag;
     }
 
+    //current problem
 
 
     //-------------Get Data, Manipulate Data & Notify PlotUpdater-----------
@@ -132,17 +132,27 @@ public class GraphFragment extends Fragment {
             //Get the data from the UDP Data Class when its available
             handler = new Handler(){
                 public void handleMessage(Message msg){
-                    String aResponse = msg.getData().getString("data"); //Data received
-                    //Log.d("MATT!", aResponse);
-                    if(dataValid(aResponse)){
-                        aResponse = aResponse.replaceAll("\\s", "");
-                        final String[] dataSplit = aResponse.split(","); //split the data at the commas
+                    String sensorData = msg.getData().getString("data"); //Data received
+
+                    if(dataValid(sensorData)){
+                        sensorData = sensorData.replaceAll("\\s", "");
+                        final String[] dataSplit = sensorData.split(","); //split the data at the commas
+                        final ArrayList<ArrayList<Double>> splicedIntoPoints1 = spliceDataWithXAndYSets(dataSplit, 1);
+                        final ArrayList<ArrayList<Double>> splicedIntoPoints2 = spliceDataWithXAndYSets(dataSplit, 2);
+                        final ArrayList<ArrayList<Double>> splicedIntoPoints3 = spliceDataWithXAndYSets(dataSplit, 3);
+                        final ArrayList<ArrayList<Double>> splicedIntoPoints4 = spliceDataWithXAndYSets(dataSplit, 4);
+                        final ArrayList<ArrayList<Double>> splicedIntoPoints5 = spliceDataWithXAndYSets(dataSplit, 5);
+                        final ArrayList<ArrayList<Double>> splicedIntoPoints6 = spliceDataWithXAndYSets(dataSplit, 6);
 
                         UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                 @Override
                                 public void run() {
-                                    //spliceDataAndAddData(dataSplit);
-                                    spliceAndAddDataInSets(dataSplit);
+                                    addDataToIXySeriesForUpdate(splicedIntoPoints1,1);
+                                    addDataToIXySeriesForUpdate(splicedIntoPoints2,2);
+                                    addDataToIXySeriesForUpdate(splicedIntoPoints3,3);
+                                    addDataToIXySeriesForUpdate(splicedIntoPoints4,4);
+                                    addDataToIXySeriesForUpdate(splicedIntoPoints5,5);
+                                    addDataToIXySeriesForUpdate(splicedIntoPoints6,6);
                                 }
                             });
                     }
@@ -159,72 +169,6 @@ public class GraphFragment extends Fragment {
         private boolean dataValid(String data){
             return ((data.length() == 1350)); //TODO: implement a better regular expression
         }
-
-        /**
-         *
-         * @param dataSplit String[] of the entire data
-         * @return ArrayList of ArrayLists.. Inner arrayLists are the
-         * values of the individual sensors
-         */
-        private void spliceDataAndAddData(String[] dataSplit){
-            addToSensorSeries(dataSplit, 1);
-            addToSensorSeries(dataSplit, 2);
-            addToSensorSeries(dataSplit, 3);
-            addToSensorSeries(dataSplit, 4);
-            addToSensorSeries(dataSplit, 5);
-            addToSensorSeries(dataSplit, 6);
-        }
-
-        /**
-         *
-         * @param dataSplit data to split into individual sensor array
-         *                  must contain only string representations of numbers
-         * @param sensorSeriesNumber which sensors to collect the data points of
-         */
-        private void addToSensorSeries(String[] dataSplit, int sensorSeriesNumber){ //Ths cost of this should be constant
-            sensorSeriesNumber -= 1;  //Adds each value individually to the series
-            //TODO: What does Xbound affect?
-                //The size of the XYDataSeries
-                //Xcounter operations should be basically constant
-            double xcounter = xCounters.get(sensorSeriesNumber); //returns an int of 6 ints
-            int i = sensorSeriesNumber;
-            int dataSize = dataSplit.length - 1;
-            String num = "";
-            while(true){
-                if(i < 6){ //This is the base case...add the first set of data
-                    num = dataSplit[i]; //Length of DataSplit stays constant
-                    try {
-                        if(xcounter > xBound){
-                            xcounter = 0;
-                            dataSeriesList.get(sensorSeriesNumber).clear();
-                        }
-                        dataSeriesList.get(sensorSeriesNumber).append(xcounter, Double.parseDouble(num)); //appends every number...
-                    }catch (Exception e){
-                        //Corrupt data
-                    }
-                }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
-                    num = dataSplit[i];
-                    try {
-                        if(xcounter > xBound){
-                            xcounter = 0;
-                            dataSeriesList.get(sensorSeriesNumber).clear();
-                        }
-                        dataSeriesList.get(sensorSeriesNumber).append(xcounter, Double.parseDouble(num));
-                    }catch (Exception e){
-                        //Corrupt data
-                    }
-                }else{
-                    break;
-                }
-                xcounter++;
-                i += 6;
-            }
-            xCounters.set(sensorSeriesNumber,xcounter);
-        }
-
-
-        //--------------------Add Data in Sets----------------------------
-
 
         private void spliceAndAddDataInSets(String[] dataSplit){
             ArrayList<ArrayList<Double>> splicedIntoPoints1 = spliceDataWithXAndYSets(dataSplit, 1);
@@ -262,6 +206,7 @@ public class GraphFragment extends Fragment {
             while(true){
                 if(i < 6){ //This is the base case...add the first set of data
                     num = dataSplit[i];
+
                     try {
                         if(xcounter > xBound){ //What should I do when this is the case?
                             xcounter = 0;
@@ -272,11 +217,13 @@ public class GraphFragment extends Fragment {
                     }catch (Exception e){
                         //Corrupt data
                     }
+
                 }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
                     num = dataSplit[i];
+
                     try {
-                        if(xcounter > xBound){ //TODO: need to figure out what to do here....
-                            xcounter = 0;   //TODO: How to clear the bounds
+                        if(xcounter > xBound){
+                            xcounter = 0;
                             break;
                         }
                         xVals.add(xcounter);
@@ -284,6 +231,7 @@ public class GraphFragment extends Fragment {
                     }catch (Exception e){
                         //Corrupt data
                     }
+
                 }else{
                     break;
                 }
@@ -293,7 +241,6 @@ public class GraphFragment extends Fragment {
             xCounters.set(sensorSeriesNumber,xcounter);
             dataPoints.add(xVals);
             dataPoints.add(yVals);
-
             return dataPoints;
         }
 
