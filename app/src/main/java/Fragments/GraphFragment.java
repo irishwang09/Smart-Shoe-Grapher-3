@@ -51,7 +51,7 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
-    private int xBound = 100000; //Make this dynamic
+    private int xBound = 1000000; //Make this dynamic
     private int yBound = 5000;
     private boolean applyBeenPressed = false;
 
@@ -59,8 +59,6 @@ public class GraphFragment extends Fragment {
     private GraphDataSource dataSource;
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
-    //The following are the lists that we actually add the udp sensor data to...
-    //TODO: Change the Series to XyyDataSeries...How does XyyDataSeries Work?
     private final IXyDataSeries<Double, Double> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor2 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor3 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
@@ -68,16 +66,15 @@ public class GraphFragment extends Fragment {
     private final IXyDataSeries<Double, Double> dataSeriesSensor5 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
 
-
     private ArrayList<IXyDataSeries<Double,Double>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2,
             dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6));
+
     private ArrayList<Double> xCounters = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0));
 
     @Override //inflate the fragment view in the mainActivity view
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View frag = inflater.inflate(R.layout.graph_fragment, container, false);
 
-        //Code until the end of this method is a place holder
         plotSurface = (SciChartSurface) frag.findViewById(R.id.dynamic_plot);
 
         //Ensure that the license is added & SciChart Runs
@@ -94,9 +91,6 @@ public class GraphFragment extends Fragment {
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        dataSource = new GraphDataSource(); //Run the data handling on a separate thread
-        dataSource.start();
 
         UpdateSuspender.using(plotSurface, new Runnable() {
             @Override
@@ -118,11 +112,12 @@ public class GraphFragment extends Fragment {
                 Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6);
             }
         });
+
+        dataSource = new GraphDataSource(); //Run the data receiving & handling on a separate thread
+        dataSource.start();
+        
         return frag;
     }
-
-    //current problem
-
 
     //-------------Get Data, Manipulate Data & Notify PlotUpdater-----------
     public class GraphDataSource extends Thread{
@@ -170,26 +165,7 @@ public class GraphFragment extends Fragment {
             return ((data.length() == 1350)); //TODO: implement a better regular expression
         }
 
-        private void spliceAndAddDataInSets(String[] dataSplit){
-            ArrayList<ArrayList<Double>> splicedIntoPoints1 = spliceDataWithXAndYSets(dataSplit, 1);
-            ArrayList<ArrayList<Double>> splicedIntoPoints2 = spliceDataWithXAndYSets(dataSplit, 2);
-            ArrayList<ArrayList<Double>> splicedIntoPoints3 = spliceDataWithXAndYSets(dataSplit, 3);
-            ArrayList<ArrayList<Double>> splicedIntoPoints4 = spliceDataWithXAndYSets(dataSplit, 4);
-            ArrayList<ArrayList<Double>> splicedIntoPoints5 = spliceDataWithXAndYSets(dataSplit, 5);
-            ArrayList<ArrayList<Double>> splicedIntoPoints6 = spliceDataWithXAndYSets(dataSplit, 6);
-
-            addDataToIXySeriesForUpdate(splicedIntoPoints1,1);
-            addDataToIXySeriesForUpdate(splicedIntoPoints2,2);
-            addDataToIXySeriesForUpdate(splicedIntoPoints3,3);
-            addDataToIXySeriesForUpdate(splicedIntoPoints4,4);
-            addDataToIXySeriesForUpdate(splicedIntoPoints5,5);
-            addDataToIXySeriesForUpdate(splicedIntoPoints6,6);
-        }
-
-
-        //Want to be able to splice the data so it can be added in sets for the graphing
-        //Essentially do what is done in addToSensorSeries but instead of adding the data to the IXySeries
-        //Add it to a regular list so that we can add the ordered data to IXySeries in bulk
+        //Operational cost of this method should be constant...
         private ArrayList<ArrayList<Double>> spliceDataWithXAndYSets(String[] dataSplit, int sensorSeriesNumber){
             ArrayList<Double> xVals = new ArrayList<>();
             ArrayList<Double> yVals = new ArrayList<>();
@@ -330,7 +306,6 @@ public class GraphFragment extends Fragment {
     public void updateHostname(String hostname){
         this.hostname = hostname;
     }
-
 
     public void setApplyBeenPressed(boolean pressedOrNot){
         applyBeenPressed = pressedOrNot;
