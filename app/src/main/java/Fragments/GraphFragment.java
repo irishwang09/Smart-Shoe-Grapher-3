@@ -51,7 +51,8 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
-    private int xBound = 1000000; //Make this dynamic
+    private int xBound = 400000; //400,000
+    private int xBoundDiv = 200000;
     private int yBound = 5000;
     private boolean applyBeenPressed = false;
 
@@ -59,15 +60,25 @@ public class GraphFragment extends Fragment {
     private GraphDataSource dataSource;
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
+    //TODO: Use get set methods for these... Don't write them out...bad code
     private final IXyDataSeries<Double, Double> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor2 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor3 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor4 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor5 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor7 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor8 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor9 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor10 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor11 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+    private final IXyDataSeries<Double, Double> dataSeriesSensor12 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
 
+
+    //TODO: Test this...
     private ArrayList<IXyDataSeries<Double,Double>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2,
-            dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6));
+            dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6, dataSeriesSensor7,dataSeriesSensor8,
+            dataSeriesSensor9, dataSeriesSensor10, dataSeriesSensor11, dataSeriesSensor12));
 
     private ArrayList<Double> xCounters = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0));
 
@@ -106,16 +117,23 @@ public class GraphFragment extends Fragment {
                 final FastLineRenderableSeries rs4 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor4).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0xFF)).build(); //White color
                 final FastLineRenderableSeries rs5 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor5).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0x99)).build(); //Light Yellow color
                 final FastLineRenderableSeries rs6 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor6).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0x99, 0x33)).build(); //Light Orange color
+                final FastLineRenderableSeries rs7 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor7).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
+                final FastLineRenderableSeries rs8 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor8).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xA5, 0x00)).build(); //Light Pink Color
+                final FastLineRenderableSeries rs9 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor9).withStrokeStyle(ColorUtil.argb(0xFF, 0xE1, 0x32, 0x19)).build(); //Orange Red Color
+                final FastLineRenderableSeries rs10 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor10).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0xFF)).build(); //White color
+                final FastLineRenderableSeries rs11 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor11).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0x99)).build(); //Light Yellow color
+                final FastLineRenderableSeries rs12 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor12).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0x99, 0x33)).build(); //Light Orange color
+
 
                 Collections.addAll(plotSurface.getXAxes(), xAxis);
                 Collections.addAll(plotSurface.getYAxes(), yAxis);
-                Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6);
+                Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6,rs7, rs8, rs9, rs10, rs11, rs12);
             }
         });
 
         dataSource = new GraphDataSource(); //Run the data receiving & handling on a separate thread
         dataSource.start();
-        
+
         return frag;
     }
 
@@ -310,5 +328,6 @@ public class GraphFragment extends Fragment {
     public void setApplyBeenPressed(boolean pressedOrNot){
         applyBeenPressed = pressedOrNot;
     }
+
 
 }
