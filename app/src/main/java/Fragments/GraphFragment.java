@@ -51,7 +51,7 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
-    private int xBound = 50000; //We want to be able to change this
+    private int xBound = 100000; //We want to be able to change this
     private int yBound = 5000;
     private boolean applyBeenPressed = false;
 
@@ -141,8 +141,8 @@ public class GraphFragment extends Fragment {
                         UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                 @Override
                                 public void run() {
-                                    spliceDataAndAddData(dataSplit);
-                                    //spliceAndAddDataInSets(dataSplit);
+                                    //spliceDataAndAddData(dataSplit);
+                                    spliceAndAddDataInSets(dataSplit);
                                 }
                             });
                     }
@@ -227,19 +227,19 @@ public class GraphFragment extends Fragment {
 
 
         private void spliceAndAddDataInSets(String[] dataSplit){
-            ArrayList<ArrayList<Double>> splicedIntoPoints1 = spliceDataWithXAndYSets(dataSplit, 0);
-            ArrayList<ArrayList<Double>> splicedIntoPoints2 = spliceDataWithXAndYSets(dataSplit, 0);
-            ArrayList<ArrayList<Double>> splicedIntoPoints3 = spliceDataWithXAndYSets(dataSplit, 0);
-            ArrayList<ArrayList<Double>> splicedIntoPoints4 = spliceDataWithXAndYSets(dataSplit, 0);
-            ArrayList<ArrayList<Double>> splicedIntoPoints5 = spliceDataWithXAndYSets(dataSplit, 0);
-            ArrayList<ArrayList<Double>> splicedIntoPoints6 = spliceDataWithXAndYSets(dataSplit, 0);
+            ArrayList<ArrayList<Double>> splicedIntoPoints1 = spliceDataWithXAndYSets(dataSplit, 1);
+            ArrayList<ArrayList<Double>> splicedIntoPoints2 = spliceDataWithXAndYSets(dataSplit, 2);
+            ArrayList<ArrayList<Double>> splicedIntoPoints3 = spliceDataWithXAndYSets(dataSplit, 3);
+            ArrayList<ArrayList<Double>> splicedIntoPoints4 = spliceDataWithXAndYSets(dataSplit, 4);
+            ArrayList<ArrayList<Double>> splicedIntoPoints5 = spliceDataWithXAndYSets(dataSplit, 5);
+            ArrayList<ArrayList<Double>> splicedIntoPoints6 = spliceDataWithXAndYSets(dataSplit, 6);
 
-            addDataToIXySeriesForUpdate(splicedIntoPoints1,0);
-            addDataToIXySeriesForUpdate(splicedIntoPoints2,1);
-            addDataToIXySeriesForUpdate(splicedIntoPoints3,2);
-            addDataToIXySeriesForUpdate(splicedIntoPoints4,3);
-            addDataToIXySeriesForUpdate(splicedIntoPoints5,4);
-            addDataToIXySeriesForUpdate(splicedIntoPoints6,5);
+            addDataToIXySeriesForUpdate(splicedIntoPoints1,1);
+            addDataToIXySeriesForUpdate(splicedIntoPoints2,2);
+            addDataToIXySeriesForUpdate(splicedIntoPoints3,3);
+            addDataToIXySeriesForUpdate(splicedIntoPoints4,4);
+            addDataToIXySeriesForUpdate(splicedIntoPoints5,5);
+            addDataToIXySeriesForUpdate(splicedIntoPoints6,6);
         }
 
 
@@ -253,6 +253,9 @@ public class GraphFragment extends Fragment {
 
             sensorSeriesNumber -= 1;
             double xcounter = xCounters.get(sensorSeriesNumber);
+            if(xcounter == 0){
+                dataSeriesList.get(sensorSeriesNumber).clear();
+            }
             int i = sensorSeriesNumber;
             int dataSize = dataSplit.length - 1;
             String num = "";
@@ -262,6 +265,7 @@ public class GraphFragment extends Fragment {
                     try {
                         if(xcounter > xBound){ //What should I do when this is the case?
                             xcounter = 0;
+                            break; //Lose a little data/chop off the end
                         }
                         xVals.add(xcounter);
                         yVals.add(Double.parseDouble(num));
@@ -273,6 +277,7 @@ public class GraphFragment extends Fragment {
                     try {
                         if(xcounter > xBound){ //TODO: need to figure out what to do here....
                             xcounter = 0;   //TODO: How to clear the bounds
+                            break;
                         }
                         xVals.add(xcounter);
                         yVals.add(Double.parseDouble(num));
@@ -288,6 +293,7 @@ public class GraphFragment extends Fragment {
             xCounters.set(sensorSeriesNumber,xcounter);
             dataPoints.add(xVals);
             dataPoints.add(yVals);
+
             return dataPoints;
         }
 
