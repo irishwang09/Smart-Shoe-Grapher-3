@@ -51,7 +51,7 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
-    private int xBound = 100000; //We want to be able to change this
+    private int xBound = 50000; //We want to be able to change this
     private int yBound = 5000;
     private boolean applyBeenPressed = false;
 
@@ -67,6 +67,8 @@ public class GraphFragment extends Fragment {
     private final IXyDataSeries<Double, Double> dataSeriesSensor4 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor5 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+
+
     private ArrayList<IXyDataSeries<Double,Double>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2,
             dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6));
     private ArrayList<Double> xCounters = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0));
@@ -139,8 +141,8 @@ public class GraphFragment extends Fragment {
                         UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                 @Override
                                 public void run() {
-                                    //spliceDataAndAddData(dataSplit);
-                                    spliceAndAddDataInSets(dataSplit);
+                                    spliceDataAndAddData(dataSplit);
+                                    //spliceAndAddDataInSets(dataSplit);
                                 }
                             });
                     }
