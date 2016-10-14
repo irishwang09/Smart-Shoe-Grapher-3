@@ -51,7 +51,7 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
-    private int xBound = 1_000_000; //
+    private int xBound = 24_000_000; 
     private int yBound = 5000;
     private boolean applyBeenPressed = false;
 
@@ -66,14 +66,10 @@ public class GraphFragment extends Fragment {
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor5 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
 
-    //TODO: Test this...
     private ArrayList<IXyDataSeries<Integer,Integer>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2,
-            dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6));//, dataSeriesSensor7,dataSeriesSensor8,
-           // dataSeriesSensor9, dataSeriesSensor10, dataSeriesSensor11, dataSeriesSensor12));
+            dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6));
 
-    private ArrayList<Integer> xCounters = new ArrayList<>(Arrays.asList(0,0,0,0,0,0));
     private int xCounter = 0;
-
 
     @Override //inflate the fragment view in the mainActivity view
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -132,28 +128,14 @@ public class GraphFragment extends Fragment {
             handler = new Handler(){
                 public void handleMessage(Message msg){
                     String sensorData = msg.getData().getString("data"); //Data received
-
                     if(dataValid(sensorData)){
                         sensorData = sensorData.replaceAll("\\s", "");
                         final String[] dataSplit = sensorData.split(","); //split the data at the commas
                         final ArrayList<ArrayList<Integer>> data = spliceDataIntoPointsSets(dataSplit);
-//                        final ArrayList<ArrayList<Integer>> splicedIntoPoints1 = spliceDataWithXAndYSets(dataSplit, 1);
-//                        final ArrayList<ArrayList<Integer>> splicedIntoPoints2 = spliceDataWithXAndYSets(dataSplit, 2);
-//                        final ArrayList<ArrayList<Integer>> splicedIntoPoints3 = spliceDataWithXAndYSets(dataSplit, 3);
-//                        final ArrayList<ArrayList<Integer>> splicedIntoPoints4 = spliceDataWithXAndYSets(dataSplit, 4);
-//                        final ArrayList<ArrayList<Integer>> splicedIntoPoints5 = spliceDataWithXAndYSets(dataSplit, 5);
-//                        final ArrayList<ArrayList<Integer>> splicedIntoPoints6 = spliceDataWithXAndYSets(dataSplit, 6);
-
                         UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                 @Override
                                 public void run() {
                                     addDataToSeries(data);
-//                                    addDataToIXySeriesForUpdate(splicedIntoPoints1,1);
-//                                    addDataToIXySeriesForUpdate(splicedIntoPoints2,2);
-//                                    addDataToIXySeriesForUpdate(splicedIntoPoints3,3);
-//                                    addDataToIXySeriesForUpdate(splicedIntoPoints4,4);
-//                                    addDataToIXySeriesForUpdate(splicedIntoPoints5,5);
-//                                    addDataToIXySeriesForUpdate(splicedIntoPoints6,6);
                                 }
                             });
                     }
@@ -170,62 +152,6 @@ public class GraphFragment extends Fragment {
         private boolean dataValid(String data){
             return ((data.length() == 1350));
         }
-
-        //Operational cost of this method should be constant...
-        private ArrayList<ArrayList<Integer>> spliceDataWithXAndYSets(String[] dataSplit, int sensorSeriesNumber){
-            ArrayList<Integer> xVals = new ArrayList<>();
-            ArrayList<Integer> yVals = new ArrayList<>();
-            ArrayList<ArrayList<Integer>> dataPoints = new ArrayList<>();
-
-            sensorSeriesNumber -= 1;
-            int xcounter = xCounters.get(sensorSeriesNumber);
-            if(xcounter == 0){
-                dataSeriesList.get(sensorSeriesNumber).clear();
-            }
-            int i = sensorSeriesNumber;
-            int dataSize = dataSplit.length - 1;
-            String num = "";
-            while(true){
-                if(i < 6){ //This is the base case...add the first set of data
-                    num = dataSplit[i];
-
-                    try {
-                        if(xcounter > xBound){ //What should I do when this is the case?
-                            xcounter = 0;
-                            break; //Lose a little data/chop off the end
-                        }
-                        xVals.add(xcounter);
-                        yVals.add(Integer.parseInt(num));
-                    }catch (Exception e){
-                        //Corrupt data
-                    }
-
-                }else if((i) <= dataSize && i >= 6){ //Will start to get hit after the second time
-                    num = dataSplit[i];
-
-                    try {
-                        if(xcounter > xBound){
-                            xcounter = 0;
-                            break;
-                        }
-                        xVals.add(xcounter);
-                        yVals.add(Integer.parseInt(num));
-                    }catch (Exception e){
-                        //Corrupt data
-                    }
-
-                }else{
-                    break;
-                }
-                xcounter++;
-                i += 6;
-            }
-            xCounters.set(sensorSeriesNumber,xcounter);
-            dataPoints.add(xVals);
-            dataPoints.add(yVals);
-            return dataPoints;
-        }
-
 
         private ArrayList<ArrayList<Integer>> spliceDataIntoPointsSets(String[] dataSplit){
             ArrayList<ArrayList<Integer>> orderedData = new ArrayList<>();
@@ -309,15 +235,6 @@ public class GraphFragment extends Fragment {
             return orderedData;
         }
 
-
-
-        private void addDataToIXySeriesForUpdate(ArrayList<ArrayList<Integer>> dataPoints, int sensorSeriesNumber){
-            ArrayList<Integer> xVals = dataPoints.get(0);
-            ArrayList<Integer> yVals = dataPoints.get(1);
-            sensorSeriesNumber -= 1;
-            dataSeriesList.get(sensorSeriesNumber).append(xVals,yVals);
-        }
-
         private void addDataToSeries(ArrayList<ArrayList<Integer>> data){
             //Add x_1, y_1 set to IXySeries
             dataSeriesList.get(0).append(data.get(0), data.get(1));
@@ -329,8 +246,6 @@ public class GraphFragment extends Fragment {
         }
 
     }
-
-
 
     //---------------GraphFragment methods---------------
 
@@ -361,9 +276,6 @@ public class GraphFragment extends Fragment {
     }
 
     private void resetGraph(){
-//        for(int i = 0 ;  i <= 5; i++ ){
-//            xCounters.set(i, 0);
-//        }
         xCounter = 0;
         UpdateSuspender.using(plotSurface, new Runnable() {
             @Override
