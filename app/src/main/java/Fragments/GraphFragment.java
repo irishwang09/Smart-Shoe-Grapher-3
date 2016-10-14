@@ -51,7 +51,7 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
-    private int xBound = 400000; //400,000
+    private int xBound = 1_000_000; //400,000
     private int xBoundDiv = 200000;
     private int yBound = 5000;
     private boolean applyBeenPressed = false;
@@ -64,21 +64,21 @@ public class GraphFragment extends Fragment {
     private final IXyDataSeries<Double, Double> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor2 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
     private final IXyDataSeries<Double, Double> dataSeriesSensor3 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeriesSensor4 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeriesSensor5 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeriesSensor7 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeriesSensor8 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeriesSensor9 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeriesSensor10 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeriesSensor11 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
-    private final IXyDataSeries<Double, Double> dataSeriesSensor12 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+//    private final IXyDataSeries<Double, Double> dataSeriesSensor4 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+//    private final IXyDataSeries<Double, Double> dataSeriesSensor5 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+//    private final IXyDataSeries<Double, Double> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+//    private final IXyDataSeries<Double, Double> dataSeriesSensor7 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+//    private final IXyDataSeries<Double, Double> dataSeriesSensor8 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+//    private final IXyDataSeries<Double, Double> dataSeriesSensor9 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+//    private final IXyDataSeries<Double, Double> dataSeriesSensor10 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+//    private final IXyDataSeries<Double, Double> dataSeriesSensor11 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
+//    private final IXyDataSeries<Double, Double> dataSeriesSensor12 = sciChartBuilder.newXyDataSeries(Double.class, Double.class).build();
 
 
     //TODO: Test this...
     private ArrayList<IXyDataSeries<Double,Double>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2,
-            dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6, dataSeriesSensor7,dataSeriesSensor8,
-            dataSeriesSensor9, dataSeriesSensor10, dataSeriesSensor11, dataSeriesSensor12));
+            dataSeriesSensor3));//, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6, dataSeriesSensor7,dataSeriesSensor8,
+           // dataSeriesSensor9, dataSeriesSensor10, dataSeriesSensor11, dataSeriesSensor12));
 
     private ArrayList<Double> xCounters = new ArrayList<>(Arrays.asList(0.0,0.0,0.0,0.0,0.0,0.0));
 
@@ -114,20 +114,20 @@ public class GraphFragment extends Fragment {
                 final FastLineRenderableSeries rs1 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor1).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
                 final FastLineRenderableSeries rs2 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor2).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xA5, 0x00)).build(); //Light Pink Color
                 final FastLineRenderableSeries rs3 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor3).withStrokeStyle(ColorUtil.argb(0xFF, 0xE1, 0x32, 0x19)).build(); //Orange Red Color
-                final FastLineRenderableSeries rs4 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor4).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0xFF)).build(); //White color
-                final FastLineRenderableSeries rs5 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor5).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0x99)).build(); //Light Yellow color
-                final FastLineRenderableSeries rs6 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor6).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0x99, 0x33)).build(); //Light Orange color
-                final FastLineRenderableSeries rs7 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor7).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
-                final FastLineRenderableSeries rs8 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor8).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xA5, 0x00)).build(); //Light Pink Color
-                final FastLineRenderableSeries rs9 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor9).withStrokeStyle(ColorUtil.argb(0xFF, 0xE1, 0x32, 0x19)).build(); //Orange Red Color
-                final FastLineRenderableSeries rs10 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor10).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0xFF)).build(); //White color
-                final FastLineRenderableSeries rs11 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor11).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0x99)).build(); //Light Yellow color
-                final FastLineRenderableSeries rs12 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor12).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0x99, 0x33)).build(); //Light Orange color
+//                final FastLineRenderableSeries rs4 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor4).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0xFF)).build(); //White color
+//                final FastLineRenderableSeries rs5 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor5).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0x99)).build(); //Light Yellow color
+//                final FastLineRenderableSeries rs6 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor6).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0x99, 0x33)).build(); //Light Orange color
+//                final FastLineRenderableSeries rs7 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor7).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
+//                final FastLineRenderableSeries rs8 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor8).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xA5, 0x00)).build(); //Light Pink Color
+//                final FastLineRenderableSeries rs9 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor9).withStrokeStyle(ColorUtil.argb(0xFF, 0xE1, 0x32, 0x19)).build(); //Orange Red Color
+//                final FastLineRenderableSeries rs10 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor10).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0xFF)).build(); //White color
+//                final FastLineRenderableSeries rs11 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor11).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0x99)).build(); //Light Yellow color
+//                final FastLineRenderableSeries rs12 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor12).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0x99, 0x33)).build(); //Light Orange color
 
 
                 Collections.addAll(plotSurface.getXAxes(), xAxis);
                 Collections.addAll(plotSurface.getYAxes(), yAxis);
-                Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6,rs7, rs8, rs9, rs10, rs11, rs12);
+                Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3);//, rs4, rs5, rs6,rs7, rs8, rs9, rs10, rs11, rs12);
             }
         });
 
@@ -153,9 +153,9 @@ public class GraphFragment extends Fragment {
                         final ArrayList<ArrayList<Double>> splicedIntoPoints1 = spliceDataWithXAndYSets(dataSplit, 1);
                         final ArrayList<ArrayList<Double>> splicedIntoPoints2 = spliceDataWithXAndYSets(dataSplit, 2);
                         final ArrayList<ArrayList<Double>> splicedIntoPoints3 = spliceDataWithXAndYSets(dataSplit, 3);
-                        final ArrayList<ArrayList<Double>> splicedIntoPoints4 = spliceDataWithXAndYSets(dataSplit, 4);
-                        final ArrayList<ArrayList<Double>> splicedIntoPoints5 = spliceDataWithXAndYSets(dataSplit, 5);
-                        final ArrayList<ArrayList<Double>> splicedIntoPoints6 = spliceDataWithXAndYSets(dataSplit, 6);
+//                        final ArrayList<ArrayList<Double>> splicedIntoPoints4 = spliceDataWithXAndYSets(dataSplit, 4);
+//                        final ArrayList<ArrayList<Double>> splicedIntoPoints5 = spliceDataWithXAndYSets(dataSplit, 5);
+//                        final ArrayList<ArrayList<Double>> splicedIntoPoints6 = spliceDataWithXAndYSets(dataSplit, 6);
 
                         UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                 @Override
@@ -163,9 +163,9 @@ public class GraphFragment extends Fragment {
                                     addDataToIXySeriesForUpdate(splicedIntoPoints1,1);
                                     addDataToIXySeriesForUpdate(splicedIntoPoints2,2);
                                     addDataToIXySeriesForUpdate(splicedIntoPoints3,3);
-                                    addDataToIXySeriesForUpdate(splicedIntoPoints4,4);
-                                    addDataToIXySeriesForUpdate(splicedIntoPoints5,5);
-                                    addDataToIXySeriesForUpdate(splicedIntoPoints6,6);
+//                                    addDataToIXySeriesForUpdate(splicedIntoPoints4,4);
+//                                    addDataToIXySeriesForUpdate(splicedIntoPoints5,5);
+//                                    addDataToIXySeriesForUpdate(splicedIntoPoints6,6);
                                 }
                             });
                     }
