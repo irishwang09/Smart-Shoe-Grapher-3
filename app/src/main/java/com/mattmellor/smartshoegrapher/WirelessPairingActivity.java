@@ -19,7 +19,7 @@ public class WirelessPairingActivity extends Activity {
         setContentView(R.layout.wireless_pairing_layout);
     }
 
-    //Allow for dynamic creation of
+    //Allow for dynamic creation of UDP Connection Fragments
 
 
 

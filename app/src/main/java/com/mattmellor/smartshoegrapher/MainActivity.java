@@ -14,11 +14,10 @@ import android.view.MenuItem;
 
 import Fragments.GraphFragment;
 import Fragments.UdpSettingsFragment;
-import Fragments.UdpStartStopFragment;
 import SciChartUserClasses.SciChartBuilder;
 
 
-public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass, UdpStartStopFragment.PassStartStopData{
+public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass{
 
     private String hostname;
     private int remotePort;
@@ -96,13 +95,11 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
         graphFragment.stopGraphing();
     }
 
-    @Override
-    public void startGraphing() {
+    private void startGraphing() {
         graphFragment.startGraphing();
     }
 
-    @Override
-    public void stopGraphing() {
+    private void stopGraphing() {
         graphFragment.stopGraphing();
     }
 
@@ -127,6 +124,14 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
             settingsFragment.setActivityHandler(this.mHandler);
             settingsFragment.show(fm, "MATT!");
             return true;
+        }
+
+        else if (id == R.id.stop_graphing_button){
+            stopGraphing();
+        }
+
+        else if (id == R.id.start_graphing_button){
+            startGraphing();
         }
         return super.onOptionsItemSelected(item);
     }

@@ -9,7 +9,30 @@
         android:title="@string/udp_settings"
         android:icon="@android:drawable/ic_menu_preferences"
         android:orderInCategory="100"
-        app:showAsAction="always|withText" />
+        app:showAsAction="always"
+        android:visible="true"
+        android:enabled="true"
+        android:checkable="false" />
+
+    <item
+        android:id="@+id/stop_graphing_button"
+        android:title="@string/stop"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:visible="true"
+        android:enabled="true"
+        android:checkable="false" />
+
+    <item
+        android:id="@+id/start_graphing_button"
+        android:title="@string/start"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:visible="true"
+        android:enabled="true"
+        android:checkable="false" />
 
 
 </menu>

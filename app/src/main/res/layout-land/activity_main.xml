@@ -9,22 +9,6 @@
     tools:context=".MainActivity">
 
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_margin="2dp"
-        android:orientation="vertical">
-
-        <fragment
-            android:name="Fragments.UdpStartStopFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/stream_control_fragment_landscape"
-            tools:layout="@layout/udp_stream_control_fragment" />
-
-    </LinearLayout>
-
-
     <fragment
         android:name="Fragments.GraphFragment"
         android:layout_width="match_parent"

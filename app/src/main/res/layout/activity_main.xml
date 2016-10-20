@@ -18,14 +18,4 @@
             android:id="@+id/graph_fragment"
             tools:layout="@layout/graph_fragment" />
 
-
-        <fragment
-            android:name="Fragments.UdpStartStopFragment"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="20"
-            android:id="@+id/stream_control_fragment"
-            tools:layout="@layout/udp_stream_control_fragment" />
-
-
 </LinearLayout>
