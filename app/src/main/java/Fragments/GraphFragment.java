@@ -51,7 +51,7 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
-    private int xBound = 24_000_000; 
+    private int xBound = 100_000;
     private int yBound = 5000;
     private boolean applyBeenPressed = false;
 
