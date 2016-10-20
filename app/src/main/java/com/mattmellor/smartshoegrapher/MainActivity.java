@@ -8,6 +8,7 @@ import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,7 +56,6 @@ public class MainActivity extends FragmentActivity implements UdpSettingsFragmen
             }
         }
     };
-
 
 
     @Override //Passes Data from the UdpClient Fragment to main activity
