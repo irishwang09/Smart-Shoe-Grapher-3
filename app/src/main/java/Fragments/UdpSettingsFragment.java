@@ -20,7 +20,7 @@ import com.mattmellor.smartshoegrapher.UdpClient;
 /**
  * Created by Matthew on 8/11/2016.
  * Holds the data about the UDP Connection and contains the wiring
- *
+ * Created as a popup to work
  */
 
 public class UdpSettingsFragment extends DialogFragment {

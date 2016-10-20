@@ -36,7 +36,7 @@ import SciChartUserClasses.SciChartBuilder;
 /**
  * Created by Matthew on 8/15/2016.
  * Fragment to hold a single graph and its underlying UDP Data Collection
- *
+ * Real Time Graphing is implemented in this class
  */
 
 public class GraphFragment extends Fragment {
