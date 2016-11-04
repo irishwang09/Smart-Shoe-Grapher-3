@@ -2,7 +2,10 @@ package com.mattmellor.smartshoegrapher;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+
+import UserDataDataBase.UDPDataBaseHelper;
 
 /**
  * Created by Matthew on 10/20/2016.
@@ -19,8 +22,11 @@ public class WirelessPairingActivity extends Activity {
         setContentView(R.layout.wireless_pairing_layout);
     }
 
-    //Allow for dynamic creation of UDP Connection Fragments
+    //TODO: Allow for dynamic creation of UDP Connection Fragments
 
+    //Open or Create the UDPSensor SQL database
+    UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
+    SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
 
 }
