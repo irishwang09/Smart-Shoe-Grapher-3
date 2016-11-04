@@ -4,8 +4,13 @@ import android.app.Activity;
 
 import android.content.ContentValues;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import UserDataDataBase.UDPDataBaseHelper;
 import UserDataDataBase.UDPDatabaseContract;
@@ -19,6 +24,7 @@ import UserDataDataBase.UDPDatabaseContract;
 public class WirelessPairingActivity extends Activity {
 
     //Fields
+    //DataBase Access
     UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
     SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
@@ -35,6 +41,8 @@ public class WirelessPairingActivity extends Activity {
 
 
 
+    //----------DataBase Manipulation Methods---------
+
     public void addUDPSettingsToDataBase(String IPAddress, Integer localPort, Integer remotePort){
         //Adding a row to the database
         ContentValues row_value = new ContentValues();
@@ -44,8 +52,36 @@ public class WirelessPairingActivity extends Activity {
         long newRowId = db.insert(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, null, row_value);
     }
 
-    public void readUDPSettingsFromDataBase(){
-        throw new RuntimeException("Unimplemented");
+    public ArrayList<ArrayList<String>> readUDPSettingsFromDataBase(){
+        //These are the columns we are
+        ArrayList<ArrayList<String>> data = new ArrayList<>();
+        String[] projection_Columns_sought = {
+                UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_IP_HOST,
+                UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_LOCAL_PORT,
+                UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_REMOTE_PORT
+        };
+        //Set the query cursor to get the whole table -> thus all of the nulls
+        Cursor cursor = db.query(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, null, null, null, null, null, null);
+        cursor.moveToFirst(); //Moves the cursor to the first row
+        int numRows = cursor.getCount();
+        String remoteHostname;
+        String localPort;
+        String remotePort;
+        for(int rowNumber = 0; rowNumber < numRows; rowNumber++){ //Loop through each row and get the column values
+            remoteHostname = cursor.getString(0);
+            localPort = cursor.getString(1);
+            remotePort = cursor.getString(2);
+            ArrayList<String> sensorSettings = new ArrayList<String>(Arrays.asList(remoteHostname, localPort, remotePort));
+            data.add(sensorSettings);
+            cursor.moveToNext(); //Move to
+        }
+        cursor.close();
+        return data;
     }
+
+    public void deleteSingleUDPDataSetting(String hostname){
+        //TODO: implement deleting the row of the sensor corresponding to the hostname
+    }
+
 
 }

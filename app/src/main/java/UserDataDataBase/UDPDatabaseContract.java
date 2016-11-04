@@ -27,8 +27,8 @@ public final class UDPDatabaseContract {
         public static final String SQL_CREATE_TABLE =
                 "CREATE TABLE " + TABLE_NAME + " (" +
                         UdpDataEntry.COLUMN_NAME_IP_HOST + " TEXT," +
-                        UdpDataEntry.COLUMN_NAME_LOCAL_PORT + " Integer," +
-                        UdpDataEntry.COLUMN_NAME_REMOTE_PORT + " Integer" + ")";
+                        UdpDataEntry.COLUMN_NAME_LOCAL_PORT + " TEXT," +
+                        UdpDataEntry.COLUMN_NAME_REMOTE_PORT + " TEXT" + ")";
 
         //SQL format for DROPing a table (Deleting a table)
         public static final String SQL_DELETE_ENTRIES =
