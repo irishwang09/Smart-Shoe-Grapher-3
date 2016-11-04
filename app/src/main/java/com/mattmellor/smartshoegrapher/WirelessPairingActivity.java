@@ -80,7 +80,10 @@ public class WirelessPairingActivity extends Activity {
     }
 
     public void deleteSingleUDPDataSetting(String hostname){
-        //TODO: implement deleting the row of the sensor corresponding to the hostname
+        String selection = UDPDatabaseContract.UdpDataEntry. COLUMN_NAME_IP_HOST + " LIKE ?";
+        String[] selectionArgs = {hostname}; //Matches the hostname string
+        //Deletes all rows with columns that have values that equal the variable hostname
+        db.delete(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, selection, selectionArgs);
     }
 
 
