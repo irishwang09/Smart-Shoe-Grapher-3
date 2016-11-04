@@ -86,5 +86,9 @@ public class WirelessPairingActivity extends Activity {
         db.delete(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, selection, selectionArgs);
     }
 
+    public void updateHostnameValue(String hostname){
+        //TODO: Search for hostname, delete old row, get new row
+    }
+
 
 }
