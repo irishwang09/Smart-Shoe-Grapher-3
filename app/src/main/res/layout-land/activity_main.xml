@@ -15,7 +15,6 @@
         android:layout_height="match_parent"
         android:id="@+id/graph_fragment"
         android:layout_margin="10dp"
-
         tools:layout="@layout/graph_fragment" />
 
 
