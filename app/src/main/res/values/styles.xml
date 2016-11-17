@@ -1,10 +1,12 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"  xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <!-- Following line makes the actionBar Green -->
+        <item name="colorPrimary">@color/cool_green</item>
     </style>
 
     <style name="SettingsTheme" parent="Base.Theme.AppCompat.Dialog"/>
+
 
 </resources>
