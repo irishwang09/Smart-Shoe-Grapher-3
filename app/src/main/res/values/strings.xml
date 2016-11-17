@@ -19,5 +19,6 @@
     <string name="connectedComplete">Connected</string>
     <string name="plotTitle">Sensor Values Vs Count</string>
     <string name="AddNew">Add New Pairing</string>
+    <string name="ping">Ping</string>
 
 </resources>
