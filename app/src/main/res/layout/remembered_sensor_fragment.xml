@@ -84,23 +84,11 @@
         android:layout_height="match_parent"
         android:layout_weight="33">
 
-
-        <ImageButton
-            android:id="@+id/remove_pairing_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/remove_pairing"
-            android:background="@color/ap_white"
-            android:layout_above="@+id/ping_connected_pair"
-            android:layout_marginBottom="5dp"
-            android:layout_centerHorizontal="true" />
-
         <Button
             android:id="@+id/ping_connected_pair"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ping"
-            android:layout_marginTop="5dp"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
@@ -109,8 +97,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/connect"
-            android:layout_above="@+id/remove_pairing_image"
+            android:layout_above="@+id/ping_connected_pair"
             android:layout_alignStart="@+id/ping_connected_pair" />
+
+        <ImageButton
+            android:id="@+id/remove_pairing_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/remove_pairing"
+            android:background="@color/ap_white"
+            android:layout_below="@+id/ping_connected_pair"
+            android:layout_marginTop="5dp"
+            android:layout_centerHorizontal="true" />
+
 
     </RelativeLayout>
 
