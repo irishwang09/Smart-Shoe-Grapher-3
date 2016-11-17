@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +19,7 @@ import Fragments.UdpSettingsFragment;
 import SciChartUserClasses.SciChartBuilder;
 
 
-public class MainActivity extends FragmentActivity implements UdpSettingsFragment.OnDataPass{
+public class MainActivity extends AppCompatActivity implements UdpSettingsFragment.OnDataPass{
 
     private String hostname;
     private int remotePort;
