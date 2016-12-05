@@ -49,9 +49,10 @@ public class WirelessPairingActivity extends AppCompatActivity {
 //
 //        }
 
-        //TODO Figure out how to dynamically add the fragments
-        //Read the book for the answer <-I've done this before
-        
+
+        //TODO: Add recyclerView to the layout
+
+
     }
 
     @Override
