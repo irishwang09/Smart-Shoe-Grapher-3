@@ -159,12 +159,19 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
         doneButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                if(dataIsVerified){
+                if(dataIsVerified && applyPressed){
                     dataIsVerified = false;
                     passDataToActivity();
                     Log.d("MATT!", "Sent Data to WirelessPairingActivity");
                     //Close the popup
                     dismiss();
+                }
+                else{
+                    Context context = getActivity();
+                    CharSequence text = "Apply Settings";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
                 }
             }
         });
