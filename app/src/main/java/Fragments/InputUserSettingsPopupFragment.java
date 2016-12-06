@@ -23,15 +23,9 @@ import com.mattmellor.smartshoegrapher.UdpClient;
  * Created as a popup to work
  */
 
-//NOTE: This class is depreciated as of 12/6/2016
-    //Will be removed once wireless pairing is done
-    //Replaced by InputUserSettingsPopupFragment.java
+public class InputUserSettingsPopupFragment extends DialogFragment {
 
-public class UdpSettingsFragment extends DialogFragment {
 
-    private Button ping;
-    private Button apply;
-    private Button reset;
     private EditText hostnameEditText;
     private EditText localPortEditText;
     private EditText remotePortEditText;
@@ -46,18 +40,18 @@ public class UdpSettingsFragment extends DialogFragment {
     private final int defaultRemotePort = 2391;
     private final int defaultLocalPort = 5006;
     private boolean applyPressed = false;
+    private boolean dataIsVerified = false;
 
     private OnDataPass dataPassHandle;
     private Handler activityHandler;
 
-    public UdpSettingsFragment(){
+    public InputUserSettingsPopupFragment(){
         //Blank on purpose
     }
 
-    public static UdpSettingsFragment newInstance(){
-        return new UdpSettingsFragment();
+    public static InputUserSettingsPopupFragment newInstance(){
+        return new InputUserSettingsPopupFragment();
     }
-
 
     @Override
     public void onAttach(Context context){
@@ -71,21 +65,21 @@ public class UdpSettingsFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        final View frag = inflater.inflate(R.layout.udp_client_fragment_layout, container, false);
+        final View frag = inflater.inflate(R.layout.input_user_udp_settings_popup, container, false);
         getDialog().setTitle("UDP Settings");
 
-        ping = (Button) frag.findViewById(R.id.ping);
-        apply = (Button) frag.findViewById(R.id.apply_button);
-        reset = (Button) frag.findViewById(R.id.reset_button);
-        hostnameEditText = (EditText) frag.findViewById(R.id.remote_hostname);
-        localPortEditText = (EditText) frag.findViewById(R.id.local_port);
-        remotePortEditText = (EditText) frag.findViewById(R.id.remote_port);
+        Button ping = (Button) frag.findViewById(R.id.ping_popup);
+        Button apply = (Button) frag.findViewById(R.id.apply_button_popup);
+        Button reset = (Button) frag.findViewById(R.id.reset_button_popup);
+        Button doneButton = (Button) frag.findViewById(R.id.done_button_popup);
+        hostnameEditText = (EditText) frag.findViewById(R.id.remote_hostname_popup);
+        localPortEditText = (EditText) frag.findViewById(R.id.local_port_popup);
+        remotePortEditText = (EditText) frag.findViewById(R.id.remote_port_popup);
 
         hostnameEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 applyPressed = false;
-                updatesBeingMadeStopGraphing(); //TODO: Change this when UDP Settings have been moved off screen
             }
         });
 
@@ -93,7 +87,6 @@ public class UdpSettingsFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 applyPressed = false;
-                updatesBeingMadeStopGraphing();
             }
         });
 
@@ -101,7 +94,6 @@ public class UdpSettingsFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 applyPressed = false;
-                updatesBeingMadeStopGraphing(); //Makes sure that the graphing fragment stops graphing
             }
         });
 
@@ -110,7 +102,7 @@ public class UdpSettingsFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 if(applyPressed) {
-                    onClickPing(frag);
+                    onClickPing();
                 }
                 else{
                     Context context = getActivity();
@@ -158,8 +150,21 @@ public class UdpSettingsFragment extends DialogFragment {
                 }
 
                 if(validParameters) {
-                    applyClickedPassData();
+                    dataIsVerified = true;
                     applyPressed = true;
+                }
+            }
+        });
+
+        doneButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(dataIsVerified){
+                    dataIsVerified = false;
+                    passDataToActivity();
+                    Log.d("MATT!", "Sent Data to WirelessPairingActivity");
+                    //Close the popup
+                    dismiss();
                 }
             }
         });
@@ -168,12 +173,11 @@ public class UdpSettingsFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 hostnameEditText.setText(defaultHostname);
-                localPortEditText.setText("" + defaultLocalPort);
-                remotePortEditText.setText("" + defaultRemotePort);
+                localPortEditText.setText(R.string.local_port_example);
+                remotePortEditText.setText(R.string.remote_port_example);
                 hostname = defaultHostname;
                 localPort = defaultLocalPort;
                 remotePort = defaultRemotePort;
-                resetClickedPassDefaults();
                 applyPressed = false;
             }
         });
@@ -183,9 +187,9 @@ public class UdpSettingsFragment extends DialogFragment {
     /**
      * Starts a thread to ping the server
      */
-    public void onClickPing(View frag){
+    public void onClickPing(){
         //set the activity handler
-        UdpClient client = new UdpClient(hostname,remotePort,localPort,45); //Still want to pass this?
+        UdpClient client = new UdpClient(hostname,remotePort,localPort,45);
         UdpClient.UdpServerAcknowledge udpPinger = client.new UdpServerAcknowledge(this.activityHandler);
         udpPinger.start();
     }
@@ -196,25 +200,20 @@ public class UdpSettingsFragment extends DialogFragment {
      * We only pass verified input
      */
     public interface OnDataPass{
-         public void onDataPassUdpSettings(String hostname,int localPort, int remotePort);
-         public void onDataPassUdpReset(String defaultHostname, int defaultLocalPort, int defaultRemotePort);
-         public void applyBeenPressed();
-         public void updatesBeingMadeStopGraphing(); //Stop Graphing
+        void onDataPassUdpSettings(String hostname,int localPort, int remotePort);
     }
 
-    public void applyClickedPassData(){
+    /**
+     * This method passes the inputed sensor data to WirelessPairingActivity
+     * Data passed has to have been verified as a proper hostname, remote port, local port
+     */
+    public void passDataToActivity(){
         dataPassHandle.onDataPassUdpSettings(hostname,localPort,remotePort);
-        dataPassHandle.applyBeenPressed();
     }
 
-    public void resetClickedPassDefaults(){
-        dataPassHandle.onDataPassUdpReset(defaultHostname, defaultLocalPort, defaultRemotePort);
-    }
-
-    public void updatesBeingMadeStopGraphing(){
-        dataPassHandle.updatesBeingMadeStopGraphing();
-    }
-
+    /**
+     * Make a Toast of the results of a ping
+     */
     public void reportPingResult(boolean result){
         if(result){
             Context context = getActivity();
@@ -232,6 +231,10 @@ public class UdpSettingsFragment extends DialogFragment {
         }
     }
 
+    /**
+     *
+     * @param handler of the WirelessPairingActivity
+     */
     public void setActivityHandler(Handler handler){
         this.activityHandler = handler;
     }
@@ -259,7 +262,7 @@ public class UdpSettingsFragment extends DialogFragment {
 
     /**
      *
-     * @param hostname
+     * @param hostname to be tested
      * @return true if hostname is a valid hostname or IP Address according to RFC 1123
      */
     public boolean hostnameValid(String hostname){

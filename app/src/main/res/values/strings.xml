@@ -21,5 +21,6 @@
     <string name="AddNew">Add New Pairing</string>
     <string name="ping">Ping</string>
     <string name="connect">Connect</string>
+    <string name="done_button">Done</string>
 
 </resources>

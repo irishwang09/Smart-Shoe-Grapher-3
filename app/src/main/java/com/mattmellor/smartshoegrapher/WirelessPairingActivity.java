@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Handler;
 
+import Fragments.InputUserSettingsPopupFragment;
 import Fragments.UdpSettingsFragment;
 import UserDataDataBase.UDPDataBaseHelper;
 import UserDataDataBase.UDPDatabaseContract;
@@ -38,7 +39,7 @@ import UserDataDataBase.UDPDatabaseContract;
  * Wifi -UDP Servers
  */
 
-public class WirelessPairingActivity extends AppCompatActivity implements UdpSettingsFragment.OnDataPass{
+public class WirelessPairingActivity extends AppCompatActivity implements InputUserSettingsPopupFragment.OnDataPass{
 
     //Fields
     //DataBase Access
@@ -47,7 +48,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements UdpSet
     private RecyclerView recycPairingList;
     private int numOfPairings;
     private ImageButton addSensor;
-    private UdpSettingsFragment settingsFragment;
+    private InputUserSettingsPopupFragment settingsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +70,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements UdpSet
     }
 
     /**
-     * Handler to receive messages from different threads
+     * Handler to receive messages from the UDPSettingsFragment Popup
      */
     private android.os.Handler mHandler = new android.os.Handler(Looper.getMainLooper()) {
         @Override
@@ -91,9 +92,9 @@ public class WirelessPairingActivity extends AppCompatActivity implements UdpSet
     private View.OnClickListener addSensorListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            //Bring up the data
+            //Bring up the UDPSettingsFragment
             FragmentManager fm = getSupportFragmentManager();
-            settingsFragment = UdpSettingsFragment.newInstance();
+            settingsFragment = InputUserSettingsPopupFragment.newInstance();
             settingsFragment.setActivityHandler(mHandler);
             settingsFragment.show(fm, "MATT!");
         }
@@ -105,21 +106,6 @@ public class WirelessPairingActivity extends AppCompatActivity implements UdpSet
         //TODO: Add the verifiedSensor to the list of Connected Sensors
     }
 
-    @Override
-    public void onDataPassUdpReset(String defaultHostname, int defaultLocalPort, int defaultRemotePort) {
-        //TODO: Send the Data to the DataBase
-    }
-
-    @Override
-    public void applyBeenPressed() {
-        //TODO: This method to be removed later
-    }
-
-    @Override
-    public void updatesBeingMadeStopGraphing() {
-        //TODO: This method to be removed later
-    }
-
 
     @Override
     protected void onDestroy(){
@@ -127,6 +113,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements UdpSet
     }
 
 
+    //-------------Code for RecyclerView -----------------
     private class PairingHolder extends RecyclerView.ViewHolder {
 
         private TextView remotePort;
