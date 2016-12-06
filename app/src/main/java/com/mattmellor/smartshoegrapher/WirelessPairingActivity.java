@@ -7,14 +7,28 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Handler;
 
+import Fragments.UdpSettingsFragment;
 import UserDataDataBase.UDPDataBaseHelper;
 import UserDataDataBase.UDPDatabaseContract;
 
@@ -24,36 +38,88 @@ import UserDataDataBase.UDPDatabaseContract;
  * Wifi -UDP Servers
  */
 
-public class WirelessPairingActivity extends AppCompatActivity {
+public class WirelessPairingActivity extends AppCompatActivity implements UdpSettingsFragment.OnDataPass{
 
     //Fields
     //DataBase Access
     //UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
     //SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    private RecyclerView recycPairingList;
+    private int numOfPairings;
+    private ImageButton addSensor;
+    private UdpSettingsFragment settingsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.wireless_pairing_layout);
+        numOfPairings = 0;
 
-        //Get saved instances from rotating the screen
+        //Recycler Pairing List (Scrollable List)
+        //Used to dynamically add the pairedSensor views to Recycler List
+        recycPairingList = (RecyclerView) findViewById(R.id.pairing_fragment_container);
+        recycPairingList.setHasFixedSize(true);
+        recycPairingList.setLayoutManager(new LinearLayoutManager(this));
 
-//        if(findViewById(R.id.pairing_fragment_container) != null) {
-//
-//            if(savedInstanceState != null){
-//                return;
-//                //If we are being restored from a previous state, then we don't need to do anything
-//                // and should return or otherwise we will end up with overlapping fragments
-//            }
-//
-//        }
-
-
-        //TODO: Add recyclerView to the layout
-
+        //Top Level Code to get a new Sensor from the user
+        addSensor = (ImageButton) findViewById(R.id.add_sensor_pairing);
+        addSensor.setOnClickListener(addSensorListener);
 
     }
+
+    /**
+     * Handler to receive messages from different threads
+     */
+    private android.os.Handler mHandler = new android.os.Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            //Gets the task from the incoming Message object
+            String aResponse = msg.getData().getString("message");
+            if (aResponse.equals("success")) {
+                settingsFragment.reportPingResult(true);
+                Log.d("MATT!", "Succesful Ping");
+            }
+            else {
+                settingsFragment.reportPingResult(false);
+                Log.d("MATT!", "Unsucessful Ping");
+            }
+        }
+    };
+
+    //Listener that brings up the UDPSettingsPopup for Sensor Adding
+    private View.OnClickListener addSensorListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //Bring up the data
+            FragmentManager fm = getSupportFragmentManager();
+            settingsFragment = UdpSettingsFragment.newInstance();
+            settingsFragment.setActivityHandler(mHandler);
+            settingsFragment.show(fm, "MATT!");
+        }
+    };
+
+    @Override //Passes Data from the UdpClient Fragment to main activity
+    public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
+        //TODO: Send the Data to the DataBase
+        //TODO: Add the verifiedSensor to the list of Connected Sensors
+    }
+
+    @Override
+    public void onDataPassUdpReset(String defaultHostname, int defaultLocalPort, int defaultRemotePort) {
+        //TODO: Send the Data to the DataBase
+    }
+
+    @Override
+    public void applyBeenPressed() {
+        //TODO: This method to be removed later
+    }
+
+    @Override
+    public void updatesBeingMadeStopGraphing() {
+        //TODO: This method to be removed later
+    }
+
 
     @Override
     protected void onDestroy(){
@@ -61,10 +127,76 @@ public class WirelessPairingActivity extends AppCompatActivity {
     }
 
 
-    //TODO Communicate with the fragment allows for adding more pairings
-    //This communication will allow for communication from the
+    private class PairingHolder extends RecyclerView.ViewHolder {
+
+        private TextView remotePort;
+        private TextView localPort;
+        private TextView remoteHost;
+        private ImageButton removeButton;
+        private Button pingButton;
+
+        public PairingHolder (View itemView){  //This must be called at least once per item...
+            super(itemView);
+            remotePort = (TextView) itemView.findViewById(R.id.paired_sensor_remote_port_text_view);
+            localPort = (TextView) itemView.findViewById(R.id.paired_sensor_local_port_text_view);
+            remoteHost = (TextView) itemView.findViewById(R.id.remote_hostname_textview);
+            removeButton = (ImageButton) itemView.findViewById(R.id.remove_pairing_image); //Press this button to remove the view
+            pingButton = (Button) itemView.findViewById(R.id.ping_connected_pair);
+            removeButton.setOnClickListener(pingButtonListener);
+            pingButton.setOnClickListener(pingButtonListener);
+        }
+
+        public void bindPairingHolder(){
+            //TODO: how to use the buttons?
+        }
+
+        private View.OnClickListener pingButtonListener = new View.OnClickListener(){
+
+            public void onClick(View v){
+                //TODO: Create the method to do something with this...
+                Toast.makeText(getApplicationContext(), "Ping!", Toast.LENGTH_SHORT).show();
+            }
+
+        };
+
+        private View.OnClickListener removeButtonListener = new View.OnClickListener(){
+
+            public void onClick(View v){
+                //TODO: Create the method to do something with this...
+            }
+
+        };
+
+    }
+
+    private class PairingListAdapter extends RecyclerView.Adapter<PairingHolder>{
+
+        public PairingListAdapter(){
+            //TODO:
+        }
+
+        @Override
+        public WirelessPairingActivity.PairingHolder onCreateViewHolder(ViewGroup parent, int viewType){
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            View v = layoutInflater.inflate(R.layout.paired_sensor_fragment,parent,false);
+            PairingHolder pairingholder = new PairingHolder(v);
+            return pairingholder;
+        }
+
+        @Override
+        public void onBindViewHolder(PairingHolder ph, int position){
+
+        }
+
+        @Override
+        public int getItemCount(){
+            int numberOfConnections = 2; //TODO: change this
+            return numberOfConnections;
+        }
 
 
+
+    }
 
 
     //----------DataBase Manipulation Methods---------
@@ -115,6 +247,7 @@ public class WirelessPairingActivity extends AppCompatActivity {
 //    public void updateHostnameValue(String hostname){
 //        //TODO: Search for hostname, delete old row, get new row
 //    }
+
 
 
 }
