@@ -166,13 +166,6 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
                     //Close the popup
                     dismiss();
                 }
-                else{
-                    Context context = getActivity();
-                    CharSequence text = "Apply Settings";
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(context, text, duration);
-                    toast.show();
-                }
             }
         });
 
