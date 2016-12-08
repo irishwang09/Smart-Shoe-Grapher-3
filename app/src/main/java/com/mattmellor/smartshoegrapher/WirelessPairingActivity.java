@@ -47,19 +47,14 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     SQLiteDatabase db = mDbHelper.getWritableDatabase();
     private RecyclerView recycPairingList;
     private PairingListAdapter mAdapter;
-    private int numOfPairings;
     private ImageButton addSensor;
     private InputUserSettingsPopupFragment settingsFragment;
-    private String hostToAdd = "footsensor1.dynamic-dns.net";
-    private int localPortToAdd = 5006;
-    private int remotePortToAdd = 2391;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.wireless_pairing_layout);
-        numOfPairings = 0;
 
         //Recycler Pairing List (Scrollable List)
         //Used to dynamically add the pairedSensor views to Recycler List
@@ -115,12 +110,8 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         //Send the Data to the DataBase
         addUDPSettingsToDataBase(verifiedHostname, verifiedLocalPort, verifiedRemotePort); //TODO: How can I tell if this is working?
-        //TODO: Add the verifiedSensor to the list of Connected Sensors
-        hostToAdd = verifiedHostname;
-        localPortToAdd = verifiedLocalPort;
-        remotePortToAdd = verifiedRemotePort;
+        //Add the verifiedSensor to the list of Connected Sensors
         addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort, verifiedRemotePort);
-        numOfPairings++;
     }
 
 
@@ -132,7 +123,14 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
 
     //-------------RecyclerView Backend/List of Connected Sensors -----------------
     private void addUDPSensorToConnectedList(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort){
-        throw new RuntimeException("Unimplemented");
+        String verifiedLocalPortString = "" + verifiedLocalPort;
+        String verifiedRemotePortString = "" + verifiedRemotePort;
+        ArrayList<String> dataToAdd = new ArrayList<>(Arrays.asList(verifiedHostname,verifiedLocalPortString, verifiedRemotePortString));
+        mAdapter.addDataSet(dataToAdd);
+    }
+
+    private void removeUDPSensorFromConnectedList(int position){
+        mAdapter.removeDataSet(position);
     }
 
     private class PairingHolder extends RecyclerView.ViewHolder {
@@ -154,15 +152,18 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             pingButton.setOnClickListener(pingButtonListener);
         }
 
-        public void bindPairingHolder(){
-            //TODO: how to use the buttons?
-        }
 
         private View.OnClickListener pingButtonListener = new View.OnClickListener(){
 
             public void onClick(View v){
-                //TODO: Create the method to do something with this...
+                //TODO: Test if this works
                 Toast.makeText(getApplicationContext(), "Ping!", Toast.LENGTH_SHORT).show();
+                int localPortVal = Integer.parseInt(localPort.getText().toString());
+                int remotePortVal = Integer.parseInt(remotePort.getText().toString());
+                String remoteHostVal = remoteHost.getText().toString();
+                UdpClient client = new UdpClient(remoteHostVal,remotePortVal,localPortVal,45); //Still want to pass this?
+                UdpClient.UdpServerAcknowledge udpPinger = client.new UdpServerAcknowledge(mHandler);
+                udpPinger.start(); //Runs on a seperate thread then closes when done.
             }
 
         };
@@ -170,8 +171,8 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         private View.OnClickListener removeButtonListener = new View.OnClickListener(){
 
             public void onClick(View v){
-                //TODO: Create the method to do something with this...
-                numOfPairings--;
+                //TODO: how to know which sensor is being removed?
+                removeUDPSensorFromConnectedList(0);
             }
 
         };
@@ -188,6 +189,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             mdataSet = dataSet;
         }
 
+        //Create new views
         @Override
         public WirelessPairingActivity.PairingHolder onCreateViewHolder(ViewGroup parent, int viewType){
             //This is called whenever a new instance of ViewHolder is created
@@ -197,6 +199,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             return pairingholder;
         }
 
+        // Replace the contents of a view (invoked by layout manager)
         @Override
         public void onBindViewHolder(PairingHolder ph, int position){
             //Called whenever the SO binds the view with the data...in otherwords the
@@ -211,10 +214,15 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             return mdataSet.size();
         }
 
-        public void updateDataSet(){
-            //TODO notifiy there has been a change to the data?
+        public void addDataSet(ArrayList<String> dataToAdd){
+            mdataSet.add(dataToAdd);
+            notifyItemInserted(getItemCount()-1); //Tell layout manager we have an update
         }
 
+        public void removeDataSet(int position){
+            mdataSet.remove(position);
+            notifyItemRemoved(position); //Tell layout manager we have an update
+        }
 
     }
 
