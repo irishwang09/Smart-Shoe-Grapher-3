@@ -46,9 +46,13 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
     SQLiteDatabase db = mDbHelper.getWritableDatabase();
     private RecyclerView recycPairingList;
+    private PairingListAdapter mAdapter;
     private int numOfPairings;
     private ImageButton addSensor;
     private InputUserSettingsPopupFragment settingsFragment;
+    private String hostToAdd = "footsensor1.dynamic-dns.net";
+    private int localPortToAdd = 5006;
+    private int remotePortToAdd = 2391;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +67,9 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         recycPairingList = (RecyclerView) findViewById(R.id.pairing_fragment_container);
         recycPairingList.setHasFixedSize(true);
         recycPairingList.setLayoutManager(new LinearLayoutManager(this));
+        mAdapter = new PairingListAdapter(new ArrayList<ArrayList<String>>()); //TODO: Empty
+        recycPairingList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
+
         //TODO: Check if old sensors exist add them to an old connected sensors list
 
         //Top Level Code to get a new Sensor from the user
@@ -109,6 +116,10 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         //Send the Data to the DataBase
         addUDPSettingsToDataBase(verifiedHostname, verifiedLocalPort, verifiedRemotePort); //TODO: How can I tell if this is working?
         //TODO: Add the verifiedSensor to the list of Connected Sensors
+        hostToAdd = verifiedHostname;
+        localPortToAdd = verifiedLocalPort;
+        remotePortToAdd = verifiedRemotePort;
+        addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort, verifiedRemotePort);
         numOfPairings++;
     }
 
@@ -119,7 +130,11 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     }
 
 
-    //-------------Code for RecyclerView -----------------
+    //-------------RecyclerView Backend/List of Connected Sensors -----------------
+    private void addUDPSensorToConnectedList(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort){
+        throw new RuntimeException("Unimplemented");
+    }
+
     private class PairingHolder extends RecyclerView.ViewHolder {
 
         private TextView remotePort;
@@ -165,12 +180,17 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
 
     private class PairingListAdapter extends RecyclerView.Adapter<PairingHolder>{
 
-        public PairingListAdapter(){
-            //TODO:
+        //Each entry is an array of ['hostname', 'localport', 'remoteport']
+        private ArrayList<ArrayList<String>> mdataSet;
+
+        public PairingListAdapter(ArrayList<ArrayList<String>> dataSet){
+            //Empty on purpose
+            mdataSet = dataSet;
         }
 
         @Override
         public WirelessPairingActivity.PairingHolder onCreateViewHolder(ViewGroup parent, int viewType){
+            //This is called whenever a new instance of ViewHolder is created
             LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
             View v = layoutInflater.inflate(R.layout.paired_sensor_fragment,parent,false);
             PairingHolder pairingholder = new PairingHolder(v);
@@ -179,14 +199,21 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
 
         @Override
         public void onBindViewHolder(PairingHolder ph, int position){
-
+            //Called whenever the SO binds the view with the data...in otherwords the
+            //data is shown in the UI
+            ph.remotePort.setText(mdataSet.get(position).get(1));
+            ph.localPort.setText(mdataSet.get(position).get(2));
+            ph.remoteHost.setText(mdataSet.get(position).get(0));
         }
 
         @Override
         public int getItemCount(){
-            return numOfPairings;
+            return mdataSet.size();
         }
 
+        public void updateDataSet(){
+            //TODO notifiy there has been a change to the data?
+        }
 
 
     }
