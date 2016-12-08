@@ -172,6 +172,8 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
 
             public void onClick(View v){
                 //TODO: how to know which sensor is being removed?
+                //Have a list of UUID's than compare the current being removed to the list of UUI in
+                // order to find position
                 removeUDPSensorFromConnectedList(0);
             }
 
