@@ -1,5 +1,6 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;

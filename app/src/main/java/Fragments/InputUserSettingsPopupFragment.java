@@ -44,6 +44,7 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
 
     private OnDataPass dataPassHandle;
     private Handler activityHandler;
+    private Context context;
 
     public InputUserSettingsPopupFragment(){
         //Blank on purpose
@@ -71,7 +72,8 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
         Button ping = (Button) frag.findViewById(R.id.ping_popup);
         Button apply = (Button) frag.findViewById(R.id.apply_button_popup);
         Button reset = (Button) frag.findViewById(R.id.reset_button_popup);
-        Button doneButton = (Button) frag.findViewById(R.id.done_button_popup);
+        Button closeButton = (Button) frag.findViewById(R.id.close_button_popup);
+        Button connectButton = (Button) frag.findViewById(R.id.connect_button_popup);
         hostnameEditText = (EditText) frag.findViewById(R.id.remote_hostname_popup);
         localPortEditText = (EditText) frag.findViewById(R.id.local_port_popup);
         remotePortEditText = (EditText) frag.findViewById(R.id.remote_port_popup);
@@ -156,15 +158,20 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
             }
         });
 
-        doneButton.setOnClickListener(new View.OnClickListener(){
+        closeButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+
+        connectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(dataIsVerified && applyPressed){
                     dataIsVerified = false;
                     passDataToActivity();
                     Log.d("MATT!", "Sent Data to WirelessPairingActivity");
-                    //Close the popup
-                    dismiss();
                 }
             }
         });
@@ -211,25 +218,6 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
         dataPassHandle.onDataPassUdpSettings(hostname,localPort,remotePort);
     }
 
-    /**
-     * Make a Toast of the results of a ping
-     */
-    public void reportPingResult(boolean result){
-        if(result){
-            Context context = getActivity(); //This is causing an error...
-            CharSequence text = "Server Active: Reply Received";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
-        else{
-            Context context = getActivity();
-            CharSequence text = "No Reply: Verify Settings";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
-    }
 
     /**
      *

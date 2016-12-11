@@ -3,6 +3,7 @@ package com.mattmellor.smartshoegrapher;
 import android.app.Activity;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -85,11 +86,19 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             //Gets the task from the incoming Message object
             String aResponse = msg.getData().getString("message");
             if (aResponse.equals("success")) {
-                settingsFragment.reportPingResult(true);
+                Context context = getBaseContext();
+                CharSequence text = "Server Active: Reply Received";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
                 Log.d("MATT!", "Succesful Ping");
             }
             else {
-                settingsFragment.reportPingResult(false);
+                Context context = getBaseContext();
+                CharSequence text = "No Reply";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
                 Log.d("MATT!", "Unsucessful Ping");
             }
         }
@@ -111,6 +120,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     @Override //Passes Data from the UdpClient Fragment to main activity
     public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         //Send the Data to the DataBase
+        //TODO: Check if data is already in the list
         //addUDPSettingsToDataBase(verifiedHostname, verifiedLocalPort, verifiedRemotePort); //TODO: How can I tell if this is working?
         //Add the verifiedSensor to the list of Connected Sensors
         addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort, verifiedRemotePort);
@@ -158,8 +168,6 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         private View.OnClickListener pingButtonListener = new View.OnClickListener(){
 
             public void onClick(View v){
-                //TODO: Test if this works
-                Toast.makeText(getApplicationContext(), "Ping!", Toast.LENGTH_SHORT).show();
                 int localPortVal = Integer.parseInt(localPort.getText().toString());
                 int remotePortVal = Integer.parseInt(remotePort.getText().toString());
                 String remoteHostVal = remoteHost.getText().toString();

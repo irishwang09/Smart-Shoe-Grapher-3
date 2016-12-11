@@ -102,11 +102,24 @@
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/done_button_popup"
+            android:id="@+id/connect_button_popup"
             android:layout_weight="50"
-            android:text="@string/done_button"/>
+            android:text="@string/connect"/>
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/done_button"
+            android:id="@+id/close_button_popup"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+
 
 
 </LinearLayout>
