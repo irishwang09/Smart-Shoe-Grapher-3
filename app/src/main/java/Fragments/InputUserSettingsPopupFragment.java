@@ -216,7 +216,7 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
      */
     public void reportPingResult(boolean result){
         if(result){
-            Context context = getActivity();
+            Context context = getActivity(); //This is causing an error...
             CharSequence text = "Server Active: Reply Received";
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, text, duration);

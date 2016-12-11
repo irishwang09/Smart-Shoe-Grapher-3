@@ -2,15 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="5dp"
+    android:layout_marginRight="5dp"
+    android:layout_marginTop="5dp"
     android:id="@+id/paired_fragment"
     android:background="@drawable/background_border">
 
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="33"
+        android:layout_weight="50"
+        android:layout_marginLeft="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
         android:orientation="vertical">
 
         <TextView
@@ -30,9 +36,11 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="33"
+        android:layout_weight="25"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
         android:orientation="vertical">
 
         <LinearLayout
@@ -42,17 +50,18 @@
             android:layout_weight="50">
 
             <TextView
-                android:layout_width="match_parent"
+                android:textColor="@color/ap_black"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:text="@string/remote_port"
-                android:layout_weight="50"/>
+                android:layout_weight="60"/>
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:text="@string/remote_port_example"
                 android:id="@+id/paired_sensor_remote_port_text_view"
-                android:layout_weight="50"/>
+                android:layout_weight="40"/>
 
         </LinearLayout>
 
@@ -63,26 +72,30 @@
             android:layout_weight="50">
 
             <TextView
-                android:layout_width="match_parent"
+                android:textColor="@color/ap_black"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:text="@string/local_port"
-                android:layout_weight="50"/>
+                android:layout_weight="60"/>
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:id="@+id/paired_sensor_local_port_text_view"
                 android:text="@string/local_port_example"
-                android:layout_weight="50"/>
+                android:layout_weight="40"/>
 
         </LinearLayout>
 
     </LinearLayout>
 
     <RelativeLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="33">
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_weight="25">
 
 
         <ImageButton
@@ -90,19 +103,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/remove_pairing"
+            android:layout_centerVertical="true"
             android:background="@color/ap_white"
-            android:layout_above="@+id/ping_connected_pair"
-            android:layout_marginBottom="5dp"
-            android:layout_centerHorizontal="true" />
+            />
 
         <Button
             android:id="@+id/ping_connected_pair"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ping"
-            android:layout_marginTop="5dp"
             android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_toRightOf="@+id/remove_pairing_image"
+            android:layout_alignParentEnd="true"/>
 
     </RelativeLayout>
 

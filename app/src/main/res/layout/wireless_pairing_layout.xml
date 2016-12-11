@@ -3,15 +3,34 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <android.support.v7.widget.RecyclerView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:id="@+id/pairing_fragment_container"
+        android:orientation="vertical"
         android:layout_weight="95"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"/>
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/background_border">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/ap_black"
+            android:text="@string/connected_sensors"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:layout_marginLeft="5dp"
+            />
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="95"
+            android:id="@+id/pairing_fragment_container"
+            />
+
+    </LinearLayout>
+
 
     <RelativeLayout
         android:layout_width="match_parent"
