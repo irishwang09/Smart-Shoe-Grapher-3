@@ -129,8 +129,8 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         mAdapter.addDataSet(dataToAdd);
     }
 
-    private void removeUDPSensorFromConnectedList(int position){
-        mAdapter.removeDataSet(position);
+    private void removeUDPSensorFromConnectedList(String hostname){
+        mAdapter.removeDataSet(hostname);
     }
 
     private class PairingHolder extends RecyclerView.ViewHolder {
@@ -171,10 +171,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         private View.OnClickListener removeButtonListener = new View.OnClickListener(){
 
             public void onClick(View v){
-                //TODO: how to know which sensor is being removed?
-                //Have a list of UUID's than compare the current being removed to the list of UUI in
-                // order to find position
-                removeUDPSensorFromConnectedList(0);
+                removeUDPSensorFromConnectedList(remoteHost.getText().toString()); //Remove the sensor in list by IDing the hostname
             }
 
         };
@@ -221,9 +218,17 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             notifyItemInserted(getItemCount()-1); //Tell layout manager we have an update
         }
 
-        public void removeDataSet(int position){
-            mdataSet.remove(position);
-            notifyItemRemoved(position); //Tell layout manager we have an update
+        public void removeDataSet(String hostname){
+            int position = 1000;
+            int index = 0;
+            for(ArrayList sensorData: mdataSet){
+                if(sensorData.get(0).equals(hostname)) position = index;
+                index++;
+            }
+            if(position != 1000) {
+                mdataSet.remove(position);
+                notifyItemRemoved(position); //Tell layout manager we have an update
+            }
         }
 
     }
