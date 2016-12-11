@@ -50,12 +50,14 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     private PairingListAdapter mAdapter;
     private ImageButton addSensor;
     private InputUserSettingsPopupFragment settingsFragment;
+    private ArrayList<String> connectedHostnames;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.wireless_pairing_layout);
+        connectedHostnames = new ArrayList<>();
 
 //        mDbHelper = new UDPDataBaseHelper(getApplicationContext());
 //        db = mDbHelper.getWritableDatabase();
@@ -120,10 +122,24 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     @Override //Passes Data from the UdpClient Fragment to main activity
     public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         //Send the Data to the DataBase
-        //TODO: Check if data is already in the list
-        //addUDPSettingsToDataBase(verifiedHostname, verifiedLocalPort, verifiedRemotePort); //TODO: How can I tell if this is working?
-        //Add the verifiedSensor to the list of Connected Sensors
-        addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort, verifiedRemotePort);
+        //Check if data is already in the list
+        //TODO: Don't let local port be reused
+        if(!connectedHostnames.contains(verifiedHostname)) {
+            //addUDPSettingsToDataBase(verifiedHostname, verifiedLocalPort, verifiedRemotePort); //TODO: How can I tell if this is working?
+            //Add the verifiedSensor to the list of Connected Sensors
+            addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort, verifiedRemotePort);
+            connectedHostnames.add(verifiedHostname);
+            //TODO: Add past sensors to list of connectedSenors
+            Log.d("MATT!", "Passed Data/Connected");
+        }
+        else{
+            Context context = getBaseContext();
+            CharSequence text = "Already Connected";
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            Log.d("MATT!", "Already Connected");
+        }
     }
 
 
@@ -143,6 +159,12 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
 
     private void removeUDPSensorFromConnectedList(String hostname){
         mAdapter.removeDataSet(hostname);
+        int index = 0;
+        for(String host: connectedHostnames){
+            if(host.equals(hostname)) break;
+            index++;
+        }
+        connectedHostnames.remove(index); //Remove the requested hostname from the connectedSensorList
     }
 
     private class PairingHolder extends RecyclerView.ViewHolder {
