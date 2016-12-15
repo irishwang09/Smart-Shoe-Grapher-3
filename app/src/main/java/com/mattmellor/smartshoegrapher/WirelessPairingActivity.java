@@ -41,6 +41,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     private SQLiteDatabase db;
     private PairingListAdapter mAdapter;
     private ArrayList<String> connected_host_names;
+    private ArrayList<String> used_local_ports;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.wireless_pairing_layout);
         connected_host_names = new ArrayList<>();
+        used_local_ports = new ArrayList<>();
 
         //Recycler Pairing List (Scrollable List)
         //Used to dynamically add the pairedSensor views to Recycler List
@@ -67,10 +69,12 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             Log.d("MATT!", "Reading old sensors in onCreate");
             for(ArrayList<String> sensorData: pastSensors){
                 String verifiedHostname = sensorData.get(0);
-                int verifiedLocalPort = Integer.parseInt(sensorData.get(1));
+                String verfLocalPort = sensorData.get(1);
+                int verifiedLocalPort = Integer.parseInt(verfLocalPort);
                 int verifiedRemotePort = Integer.parseInt(sensorData.get(2));
                 addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort,verifiedRemotePort);
                 connected_host_names.add(verifiedHostname);
+                used_local_ports.add(verfLocalPort);
             }
         }
 
@@ -136,11 +140,12 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         //Send the Data to the DataBase
         //Check if data is already in the list
-        //TODO: Don't let local port be reused
+        //Repeated Local Ports not allowed in the InputUserSettingsPopupFragment
         if(!connected_host_names.contains(verifiedHostname)) {
             //Add the verifiedSensor to the list of Connected Sensors
             addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort, verifiedRemotePort);
             connected_host_names.add(verifiedHostname);
+            used_local_ports.add(""+verifiedLocalPort);
             //Add sensorToDataBase
             addUDPSettingsToDataBase(verifiedHostname,""+verifiedLocalPort, ""+verifiedRemotePort);
             Log.d("MATT!", "Passed Data/Connected");
@@ -155,6 +160,13 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         }
     }
 
+    @Override
+    public boolean isLocalPortUsed(String localPort){
+        for(String usedLocalPort: used_local_ports){
+            if(usedLocalPort.equals(localPort))return true;
+        }
+        return false;
+    }
 
     @Override
     protected void onResume(){
@@ -184,6 +196,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             index++;
         }
         connected_host_names.remove(index); //Remove the requested hostname from the connectedSensorList
+        used_local_ports.remove(index);
     }
 
     private class PairingHolder extends RecyclerView.ViewHolder {
@@ -255,8 +268,8 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         public void onBindViewHolder(PairingHolder ph, int position){
             //Called whenever the SO binds the view with the data...in otherwords the
             //data is shown in the UI
-            ph.remotePort.setText(mdataSet.get(position).get(1));
-            ph.localPort.setText(mdataSet.get(position).get(2));
+            ph.remotePort.setText(mdataSet.get(position).get(2));
+            ph.localPort.setText(mdataSet.get(position).get(1));
             ph.remoteHost.setText(mdataSet.get(position).get(0));
         }
 

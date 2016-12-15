@@ -44,7 +44,6 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
 
     private OnDataPass dataPassHandle;
     private Handler activityHandler;
-    private Context context;
 
     public InputUserSettingsPopupFragment(){
         //Blank on purpose
@@ -124,7 +123,7 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
                 unverifiedLocalPort = localPortEditText.getText().toString();
                 boolean validParameters = true;
 
-                if(portValid(unverifiedLocalPort)){
+                if(portValid(unverifiedLocalPort) && !localPortAlreadyUsed(unverifiedLocalPort)){
                     localPort = convertStringToInt(unverifiedLocalPort);
                     Log.d("MATT!", "Local Port Valid");
                 }
@@ -132,6 +131,13 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
                     validParameters = false;
                     localPortEditText.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.vibrate));
                     Log.d("MATT!", "Local Port invalid");
+                    if(localPortAlreadyUsed(unverifiedLocalPort)){
+                        Context context = getActivity();
+                        CharSequence text = "Local Port Already Used";
+                        int duration = Toast.LENGTH_SHORT;
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                    }
                 }
 
                 if(portValid(unverifiedRemotePort)){
@@ -143,14 +149,12 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
                     remotePortEditText.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.vibrate));
                     validParameters = false;
                 }
-
                 if(hostnameValid(unverifiedHostname)){
                     hostname = unverifiedHostname;
                 }
                 else{
                     hostnameEditText.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.vibrate));
                 }
-
                 if(validParameters) {
                     dataIsVerified = true;
                     applyPressed = true;
@@ -215,6 +219,7 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
      */
     public interface OnDataPass{
         void onDataPassUdpSettings(String hostname,int localPort, int remotePort);
+        boolean isLocalPortUsed(String localPort);
     }
 
     /**
@@ -225,13 +230,16 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
         dataPassHandle.onDataPassUdpSettings(hostname,localPort,remotePort);
     }
 
-
     /**
      *
      * @param handler of the WirelessPairingActivity
      */
     public void setActivityHandler(Handler handler){
         this.activityHandler = handler;
+    }
+
+    public boolean localPortAlreadyUsed(String unverifiedLocalPort){
+        return dataPassHandle.isLocalPortUsed(unverifiedLocalPort);
     }
 
     //-------------Helper Functions-------------
