@@ -1,16 +1,13 @@
 package com.mattmellor.smartshoegrapher;
 
-import android.app.Activity;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,13 +21,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Handler;
 
 import Fragments.InputUserSettingsPopupFragment;
-import Fragments.UdpSettingsFragment;
 import UserDataDataBase.UDPDataBaseHelper;
 import UserDataDataBase.UDPDatabaseContract;
 
@@ -44,31 +38,28 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
 
     //Fields
     //DataBase Access
-    private UDPDataBaseHelper mDbHelper;
     private SQLiteDatabase db;
-    private RecyclerView recycPairingList;
     private PairingListAdapter mAdapter;
-    private ImageButton addSensor;
-    private InputUserSettingsPopupFragment settingsFragment;
-    private ArrayList<String> connectedHostnames;
+    private ArrayList<String> connected_host_names;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.wireless_pairing_layout);
-        connectedHostnames = new ArrayList<>();
+        connected_host_names = new ArrayList<>();
 
         //Recycler Pairing List (Scrollable List)
         //Used to dynamically add the pairedSensor views to Recycler List
-        recycPairingList = (RecyclerView) findViewById(R.id.pairing_fragment_container);
+
+        RecyclerView recycPairingList = (RecyclerView) findViewById(R.id.pairing_fragment_container);
         recycPairingList.setHasFixedSize(true);
         recycPairingList.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new PairingListAdapter(new ArrayList<ArrayList<String>>());
         recycPairingList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
 
         //Get a Database
-        mDbHelper = new UDPDataBaseHelper(getApplicationContext());
+        UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
         db = mDbHelper.getWritableDatabase(); //Creates a new database if one doesn't exist
         ArrayList<ArrayList<String>> pastSensors = readUDPSettingsFromDataBase();
         //If there are sensors already in the database...add them to the recyclerList
@@ -79,13 +70,13 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
                 int verifiedLocalPort = Integer.parseInt(sensorData.get(1));
                 int verifiedRemotePort = Integer.parseInt(sensorData.get(2));
                 addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort,verifiedRemotePort);
-                connectedHostnames.add(verifiedHostname);
+                connected_host_names.add(verifiedHostname);
             }
         }
 
         //Top Level Code to get a new Sensor from the user
         //This is button wiring for add new Sensor
-        addSensor = (ImageButton) findViewById(R.id.add_sensor_pairing);
+        ImageButton addSensor = (ImageButton) findViewById(R.id.add_sensor_pairing);
         addSensor.setOnClickListener(addSensorListener);
 
     }
@@ -98,21 +89,23 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         public void handleMessage(Message msg) {
             //Gets the task from the incoming Message object
             String aResponse = msg.getData().getString("message");
-            if (aResponse.equals("success")) {
-                Context context = getBaseContext();
-                CharSequence text = "Server Active: Reply Received";
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-                Log.d("MATT!", "Succesful Ping");
-            }
-            else {
-                Context context = getBaseContext();
-                CharSequence text = "No Reply";
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-                Log.d("MATT!", "Unsucessful Ping");
+            if (aResponse != null) {
+                if (aResponse.equals("success")) {
+                    Context context = getBaseContext();
+                    CharSequence text = "Server Active: Reply Received";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                    Log.d("MATT!", "Succesful Ping");
+                }
+                else {
+                    Context context = getBaseContext();
+                    CharSequence text = "No Reply";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                    Log.d("MATT!", "Unsucessful Ping");
+                }
             }
         }
     };
@@ -124,7 +117,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             //Bring up the UDPSettingsFragment to allow user input of new
             //sensors
             FragmentManager fm = getSupportFragmentManager();
-            settingsFragment = InputUserSettingsPopupFragment.newInstance();
+            InputUserSettingsPopupFragment settingsFragment = InputUserSettingsPopupFragment.newInstance();
             settingsFragment.setActivityHandler(mHandler);
             settingsFragment.show(fm, "MATT!");
         }
@@ -144,10 +137,10 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         //Send the Data to the DataBase
         //Check if data is already in the list
         //TODO: Don't let local port be reused
-        if(!connectedHostnames.contains(verifiedHostname)) {
+        if(!connected_host_names.contains(verifiedHostname)) {
             //Add the verifiedSensor to the list of Connected Sensors
             addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort, verifiedRemotePort);
-            connectedHostnames.add(verifiedHostname);
+            connected_host_names.add(verifiedHostname);
             //Add sensorToDataBase
             addUDPSettingsToDataBase(verifiedHostname,""+verifiedLocalPort, ""+verifiedRemotePort);
             Log.d("MATT!", "Passed Data/Connected");
@@ -186,11 +179,11 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     private void removeUDPSensorFromConnectedList(String hostname){
         mAdapter.removeDataSet(hostname);
         int index = 0;
-        for(String host: connectedHostnames){
+        for(String host: connected_host_names){
             if(host.equals(hostname)) break;
             index++;
         }
-        connectedHostnames.remove(index); //Remove the requested hostname from the connectedSensorList
+        connected_host_names.remove(index); //Remove the requested hostname from the connectedSensorList
     }
 
     private class PairingHolder extends RecyclerView.ViewHolder {
@@ -201,7 +194,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         private ImageButton removeButton;
         private Button pingButton;
 
-        public PairingHolder (View itemView){  //This must be called at least once per item...
+        private PairingHolder (View itemView){  //This must be called at least once per item...
             super(itemView);
             remotePort = (TextView) itemView.findViewById(R.id.paired_sensor_remote_port_text_view);
             localPort = (TextView) itemView.findViewById(R.id.paired_sensor_local_port_text_view);
@@ -243,7 +236,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         //Each entry is an array of ['hostname', 'localport', 'remoteport']
         private ArrayList<ArrayList<String>> mdataSet;
 
-        public PairingListAdapter(ArrayList<ArrayList<String>> dataSet){
+        private PairingListAdapter(ArrayList<ArrayList<String>> dataSet){
             //Empty on purpose
             mdataSet = dataSet;
         }
@@ -254,8 +247,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             //This is called whenever a new instance of ViewHolder is created
             LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
             View v = layoutInflater.inflate(R.layout.paired_sensor_fragment,parent,false);
-            PairingHolder pairingholder = new PairingHolder(v);
-            return pairingholder;
+            return new PairingHolder(v);
         }
 
         // Replace the contents of a view (invoked by layout manager)
@@ -273,12 +265,12 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             return mdataSet.size();
         }
 
-        public void addDataSet(ArrayList<String> dataToAdd){
+        private void addDataSet(ArrayList<String> dataToAdd){
             mdataSet.add(dataToAdd);
             notifyItemInserted(getItemCount()-1); //Tell layout manager we have an update
         }
 
-        public void removeDataSet(String hostname){
+        private void removeDataSet(String hostname){
             int position = 1000;
             int index = 0;
             for(ArrayList sensorData: mdataSet){
@@ -302,7 +294,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         row_value.put(UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_IP_HOST, IPAddress);
         row_value.put(UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_LOCAL_PORT, localPort);
         row_value.put(UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_REMOTE_PORT, remotePort);
-        long newRowId = db.insert(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, null, row_value);
+        db.insert(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, null, row_value);
         Log.d("MATT!", "Added UDPSensor to DATABASE");
     }
 
@@ -335,11 +327,4 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         db.delete(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, selection, selectionArgs);
         Log.d("MATT!", "Deleted Sensor from DataBase");
     }
-
-    private void updateHostnameValue(String hostname){
-        //TODO: Search for hostname, delete old row, get new row
-    }
-
-
-
 }
