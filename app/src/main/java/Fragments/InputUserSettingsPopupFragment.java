@@ -173,6 +173,13 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
                     passDataToActivity();
                     Log.d("MATT!", "Sent Data to WirelessPairingActivity");
                 }
+                else{
+                    Context context = getActivity();
+                    CharSequence text = "Apply Settings";
+                    int duration = Toast.LENGTH_SHORT;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                }
             }
         });
 
