@@ -59,18 +59,29 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         setContentView(R.layout.wireless_pairing_layout);
         connectedHostnames = new ArrayList<>();
 
-//        mDbHelper = new UDPDataBaseHelper(getApplicationContext());
-//        db = mDbHelper.getWritableDatabase();
         //Recycler Pairing List (Scrollable List)
         //Used to dynamically add the pairedSensor views to Recycler List
-        //TODO: Make sure that this is correct
         recycPairingList = (RecyclerView) findViewById(R.id.pairing_fragment_container);
         recycPairingList.setHasFixedSize(true);
         recycPairingList.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new PairingListAdapter(new ArrayList<ArrayList<String>>());
         recycPairingList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
 
-        //TODO: Check if old sensors exist add them to an old connected sensors list
+        //Get a Database
+        mDbHelper = new UDPDataBaseHelper(getApplicationContext());
+        db = mDbHelper.getWritableDatabase(); //Creates a new database if one doesn't exist
+        ArrayList<ArrayList<String>> pastSensors = readUDPSettingsFromDataBase();
+        //If there are sensors already in the database...add them to the recyclerList
+        if(pastSensors != null){
+            Log.d("MATT!", "Reading old sensors in onCreate");
+            for(ArrayList<String> sensorData: pastSensors){
+                String verifiedHostname = sensorData.get(0);
+                int verifiedLocalPort = Integer.parseInt(sensorData.get(1));
+                int verifiedRemotePort = Integer.parseInt(sensorData.get(2));
+                addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort,verifiedRemotePort);
+                connectedHostnames.add(verifiedHostname);
+            }
+        }
 
         //Top Level Code to get a new Sensor from the user
         //This is button wiring for add new Sensor
@@ -119,17 +130,26 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         }
     };
 
+    /**
+     *
+     * @param verifiedHostname hostname of Sensor to add to DB & create a Dynamic View
+     * @param verifiedLocalPort LocalPort of Machine to use
+     * @param verifiedRemotePort Remote Port of Machine to use
+     *
+     *  Method to add data to UDPSensor DataBase and to create a dynamic view for in recyclerView list
+     *  This method gets data from the UDPSensor Popup
+     */
     @Override //Passes Data from the UdpClient Fragment to main activity
     public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         //Send the Data to the DataBase
         //Check if data is already in the list
         //TODO: Don't let local port be reused
         if(!connectedHostnames.contains(verifiedHostname)) {
-            //addUDPSettingsToDataBase(verifiedHostname, verifiedLocalPort, verifiedRemotePort); //TODO: How can I tell if this is working?
             //Add the verifiedSensor to the list of Connected Sensors
             addUDPSensorToConnectedList(verifiedHostname, verifiedLocalPort, verifiedRemotePort);
             connectedHostnames.add(verifiedHostname);
-            //TODO: Add past sensors to list of connectedSenors
+            //Add sensorToDataBase
+            addUDPSettingsToDataBase(verifiedHostname,""+verifiedLocalPort, ""+verifiedRemotePort);
             Log.d("MATT!", "Passed Data/Connected");
         }
         else{
@@ -140,6 +160,12 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             toast.show();
             Log.d("MATT!", "Already Connected");
         }
+    }
+
+
+    @Override
+    protected void onResume(){
+        super.onResume();
     }
 
 
@@ -203,7 +229,9 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         private View.OnClickListener removeButtonListener = new View.OnClickListener(){
 
             public void onClick(View v){
-                removeUDPSensorFromConnectedList(remoteHost.getText().toString()); //Remove the sensor in list by IDing the hostname
+                String host = remoteHost.getText().toString();
+                removeUDPSensorFromConnectedList(host); //Remove the sensor in list by IDing the hostname
+                deleteSingleUDPDataSetting(host); //Remove sensor from database
             }
 
         };
@@ -267,53 +295,50 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
 
 
     //----------DataBase Manipulation Methods---------
-//
-//    public void addUDPSettingsToDataBase(String IPAddress, Integer localPort, Integer remotePort){
-//        //Adding a row to the database
-//        ContentValues row_value = new ContentValues();
-//        row_value.put(UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_IP_HOST, IPAddress);
-//        row_value.put(UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_LOCAL_PORT, localPort);
-//        row_value.put(UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_REMOTE_PORT, remotePort);
-//        long newRowId = db.insert(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, null, row_value);
-//    }
-//
-//    public ArrayList<ArrayList<String>> readUDPSettingsFromDataBase(){
-//        //These are the columns we are
-//        ArrayList<ArrayList<String>> data = new ArrayList<>();
-//        String[] projection_Columns_sought = {
-//                UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_IP_HOST,
-//                UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_LOCAL_PORT,
-//                UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_REMOTE_PORT
-//        };
-//        //Set the query cursor to get the whole table -> thus all of the nulls
-//        Cursor cursor = db.query(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, null, null, null, null, null, null);
-//        cursor.moveToFirst(); //Moves the cursor to the first row
-//        int numRows = cursor.getCount();
-//        String remoteHostname;
-//        String localPort;
-//        String remotePort;
-//        for(int rowNumber = 0; rowNumber < numRows; rowNumber++){ //Loop through each row and get the column values
-//            remoteHostname = cursor.getString(0);
-//            localPort = cursor.getString(1);
-//            remotePort = cursor.getString(2);
-//            ArrayList<String> sensorSettings = new ArrayList<String>(Arrays.asList(remoteHostname, localPort, remotePort));
-//            data.add(sensorSettings);
-//            cursor.moveToNext(); //Move to
-//        }
-//        cursor.close();
-//        return data;
-//    }
-//
-//    public void deleteSingleUDPDataSetting(String hostname){
-//        String selection = UDPDatabaseContract.UdpDataEntry. COLUMN_NAME_IP_HOST + " LIKE ?";
-//        String[] selectionArgs = {hostname}; //Matches the hostname string
-//        //Deletes all rows with columns that have values that equal the variable hostname
-//        db.delete(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, selection, selectionArgs);
-//    }
-//
-//    public void updateHostnameValue(String hostname){
-//        //TODO: Search for hostname, delete old row, get new row
-//    }
+
+    private void addUDPSettingsToDataBase(String IPAddress, String localPort, String remotePort){
+        //Adding a row to the database
+        ContentValues row_value = new ContentValues();
+        row_value.put(UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_IP_HOST, IPAddress);
+        row_value.put(UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_LOCAL_PORT, localPort);
+        row_value.put(UDPDatabaseContract.UdpDataEntry.COLUMN_NAME_REMOTE_PORT, remotePort);
+        long newRowId = db.insert(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, null, row_value);
+        Log.d("MATT!", "Added UDPSensor to DATABASE");
+    }
+
+    private ArrayList<ArrayList<String>> readUDPSettingsFromDataBase(){
+        //These are the columns we are
+        ArrayList<ArrayList<String>> data = new ArrayList<>();
+        //Set the query cursor to get the whole table -> thus all of the nulls
+        Cursor cursor = db.query(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, null, null, null, null, null, null);
+        cursor.moveToFirst(); //Moves the cursor to the first row
+        int numRows = cursor.getCount();
+        String remoteHostname;
+        String localPort;
+        String remotePort;
+        for(int rowNumber = 0; rowNumber < numRows; rowNumber++){ //Loop through each row and get the column values
+            remoteHostname = cursor.getString(0);
+            localPort = cursor.getString(1);
+            remotePort = cursor.getString(2);
+            ArrayList<String> sensorSettings = new ArrayList<>(Arrays.asList(remoteHostname, localPort, remotePort));
+            data.add(sensorSettings);
+            cursor.moveToNext(); //Move to
+        }
+        cursor.close();
+        return data;
+    }
+
+    private void deleteSingleUDPDataSetting(String hostname){
+        String selection = UDPDatabaseContract.UdpDataEntry. COLUMN_NAME_IP_HOST + " LIKE ?";
+        String[] selectionArgs = {hostname}; //Matches the hostname string
+        //Deletes all rows with columns that have values that equal the variable hostname
+        db.delete(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, selection, selectionArgs);
+        Log.d("MATT!", "Deleted Sensor from DataBase");
+    }
+
+    private void updateHostnameValue(String hostname){
+        //TODO: Search for hostname, delete old row, get new row
+    }
 
 
 

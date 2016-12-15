@@ -19,7 +19,7 @@ public final class UDPDatabaseContract {
     *  representing remote host, local port, and remote port*/
     public static class UdpDataEntry implements BaseColumns{
         public static final String TABLE_NAME = "UserUDPSensors";
-        public static final String COLUMN_NAME_IP_HOST = "IP/HOSTNAME";
+        public static final String COLUMN_NAME_IP_HOST = "IP_HOSTNAME";
         public static final String COLUMN_NAME_LOCAL_PORT = "LOCAL_PORT";
         public static final String COLUMN_NAME_REMOTE_PORT = "REMOTE_PORT";
 
