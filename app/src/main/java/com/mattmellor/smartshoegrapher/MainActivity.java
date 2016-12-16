@@ -1,19 +1,13 @@
 package com.mattmellor.smartshoegrapher;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v4.app.FragmentActivity;
 
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,8 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -43,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
     private UdpSettingsFragment settingsFragment;
     private GraphFragment graphFragment;
     private SettingsCardAdapter mAdapter;
-    private int whichSensor = 0;
+    private boolean currentlyGraphing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +47,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         //Create a Scrolling list
         RecyclerView recyclerSettingsCardsList = (RecyclerView) findViewById(R.id.recycler_view_settings_cards_list);
         recyclerSettingsCardsList.setHasFixedSize(true);
-        //Tell which LayoutManager to use by knowing which orientation the phone is in
-        LinearLayoutManager layoutManager;
-        layoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerSettingsCardsList.setLayoutManager(layoutManager);
         ArrayList<String> settingCardTitles = new ArrayList<>(Arrays.asList("Start Stop", "Sensor Pairing", "Graph Settings"));
         mAdapter = new MainActivity.SettingsCardAdapter(settingCardTitles);
@@ -130,39 +120,6 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         graphFragment.stopGraphing();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.udp_settings_button) {
-            FragmentManager fm = getSupportFragmentManager();
-            settingsFragment = UdpSettingsFragment.newInstance();
-            settingsFragment.setActivityHandler(this.mHandler);
-            settingsFragment.show(fm, "MATT!");
-            return true;
-        }
-
-        else if (id == R.id.stop_graphing_button){
-            stopGraphing();
-        }
-
-        else if (id == R.id.start_graphing_button){
-            startGraphing();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     //-------------Code for RecyclerView-----------
 
     private class SettingsCardAdapter extends RecyclerView.Adapter<SettingCardHolder>{
@@ -218,14 +175,28 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
             }
         };
 
+        private View.OnClickListener startStopButtonListener = new View.OnClickListener(){
+
+            public void onClick(View v){
+                if(currentlyGraphing){
+                    stopGraphing();  //TODO: This needs to be improved
+                    currentlyGraphing = false;
+                }
+                else{
+                    startGraphing();
+                    currentlyGraphing = true;
+                }
+            }
+        };
+
         private void setOnClickListenerHolder(String cardTitle){
             if(cardTitle.equals("Sensor Pairing")){
                 item_view.setOnClickListener(startSensorPairingListener);
             }
             else if(cardTitle.equals("Start Stop")){
-                //TODO: set the onclick Listener here
+                item_view.setOnClickListener(startStopButtonListener);
             }
-            else{
+            else{  //Equals the button for starting the Graph Settings Button
                 //TODO: Set the onClick Listener here
             }
         }
