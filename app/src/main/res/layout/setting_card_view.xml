@@ -4,7 +4,7 @@
     android:id="@+id/setting_card"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="10dp"
+    android:layout_marginTop="15dp"
     android:layout_marginBottom="15dp"
     android:layout_marginRight="20dp"
     android:layout_marginLeft="20dp"
