@@ -1,5 +1,6 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
     private UdpSettingsFragment settingsFragment;
     private GraphFragment graphFragment;
     private SettingsCardAdapter mAdapter;
+    private int whichSensor = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,16 +57,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         recyclerSettingsCardsList.setHasFixedSize(true);
         //Tell which LayoutManager to use by knowing which orientation the phone is in
         LinearLayoutManager layoutManager;
-        GridLayoutManager gridLayoutManager;
-        boolean isLandscapeOrientation = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
         layoutManager = new LinearLayoutManager(this);
-//        if(isLandscapeOrientation){
-//            layoutManager = new LinearLayoutManager(this);
-//        }
-//        else{
-//            //This is for portraitView
-//            layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-//        }
         recyclerSettingsCardsList.setLayoutManager(layoutManager);
         ArrayList<String> settingCardTitles = new ArrayList<>(Arrays.asList("Start Stop", "Sensor Pairing", "Graph Settings"));
         mAdapter = new MainActivity.SettingsCardAdapter(settingCardTitles);
@@ -194,31 +187,49 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         public void onBindViewHolder(MainActivity.SettingCardHolder ph, int position){
             //Called whenever the SO binds the view with the data...in otherwords the
             //data is shown in the UI
+            String title = mdataSet.get(position);
             ph.cardTitle.setText(mdataSet.get(position));
+            ph.setOnClickListenerHolder(title);
         }
 
         @Override
         public int getItemCount(){
             return mdataSet.size();
         }
-
-//        private void addCard(String cardText){
-//            mdataSet.add(cardText);
-//            notifyItemInserted(getItemCount()-1); //Tell layout manager we have an update
-//        }
-
     }
 
 
     private class SettingCardHolder extends RecyclerView.ViewHolder{
 
         private TextView cardTitle;
+        private View item_view;
 
         private SettingCardHolder (View itemView){  //This must be called at least once per item...
             super(itemView);
+            item_view = itemView;
             cardTitle = (TextView) itemView.findViewById(R.id.setting_card_title);
-            //itemView.setOnClickListener();
         }
+
+        private View.OnClickListener startSensorPairingListener = new View.OnClickListener(){
+
+            public void onClick(View v){
+                Intent intent = new Intent(getApplicationContext(), WirelessPairingActivity.class);
+                startActivity(intent);
+            }
+        };
+
+        private void setOnClickListenerHolder(String cardTitle){
+            if(cardTitle.equals("Sensor Pairing")){
+                item_view.setOnClickListener(startSensorPairingListener);
+            }
+            else if(cardTitle.equals("Start Stop")){
+                //TODO: set the onclick Listener here
+            }
+            else{
+                //TODO: Set the onClick Listener here
+            }
+        }
+
     }
 
 
