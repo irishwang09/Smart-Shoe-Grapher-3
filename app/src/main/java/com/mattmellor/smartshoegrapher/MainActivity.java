@@ -1,6 +1,7 @@
 package com.mattmellor.smartshoegrapher;
 
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,9 +11,22 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import Fragments.GraphFragment;
 import Fragments.UdpSettingsFragment;
@@ -27,15 +41,34 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
 
     private UdpSettingsFragment settingsFragment;
     private GraphFragment graphFragment;
-
+    private SettingsCardAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SciChartBuilder.init(this); //This is important for GraphFragment...
         super.onCreate(savedInstanceState);
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
+
+        //Create a Scrolling list
+        RecyclerView recyclerSettingsCardsList = (RecyclerView) findViewById(R.id.recycler_view_settings_cards_list);
+        recyclerSettingsCardsList.setHasFixedSize(true);
+        //Tell which LayoutManager to use by knowing which orientation the phone is in
+        LinearLayoutManager layoutManager;
+        GridLayoutManager gridLayoutManager;
+        boolean isLandscapeOrientation = (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
+        layoutManager = new LinearLayoutManager(this);
+//        if(isLandscapeOrientation){
+//            layoutManager = new LinearLayoutManager(this);
+//        }
+//        else{
+//            //This is for portraitView
+//            layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+//        }
+        recyclerSettingsCardsList.setLayoutManager(layoutManager);
+        ArrayList<String> settingCardTitles = new ArrayList<>(Arrays.asList("Start Stop", "Sensor Pairing", "Graph Settings"));
+        mAdapter = new MainActivity.SettingsCardAdapter(settingCardTitles);
+        recyclerSettingsCardsList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
     }
 
 
@@ -135,6 +168,57 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
             startGraphing();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //-------------Code for RecyclerView-----------
+
+    private class SettingsCardAdapter extends RecyclerView.Adapter<SettingCardHolder>{
+        //dataSet will just contain 3 entries: Start/Stop, Sensor Pairing, Graph Settings
+        private ArrayList<String> mdataSet;
+
+        private SettingsCardAdapter(ArrayList<String> dataSet){
+            mdataSet = dataSet;
+        }
+
+        //Create new views
+        @Override
+        public MainActivity.SettingCardHolder onCreateViewHolder(ViewGroup parent, int viewType){
+            //This is called whenever a new instance of ViewHolder is created
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            View v = layoutInflater.inflate(R.layout.setting_card_view,parent,false);
+            return new MainActivity.SettingCardHolder(v);
+        }
+
+        // Replace the contents of a view (invoked by layout manager)
+        @Override
+        public void onBindViewHolder(MainActivity.SettingCardHolder ph, int position){
+            //Called whenever the SO binds the view with the data...in otherwords the
+            //data is shown in the UI
+            ph.cardTitle.setText(mdataSet.get(position));
+        }
+
+        @Override
+        public int getItemCount(){
+            return mdataSet.size();
+        }
+
+//        private void addCard(String cardText){
+//            mdataSet.add(cardText);
+//            notifyItemInserted(getItemCount()-1); //Tell layout manager we have an update
+//        }
+
+    }
+
+
+    private class SettingCardHolder extends RecyclerView.ViewHolder{
+
+        private TextView cardTitle;
+
+        private SettingCardHolder (View itemView){  //This must be called at least once per item...
+            super(itemView);
+            cardTitle = (TextView) itemView.findViewById(R.id.setting_card_title);
+            //itemView.setOnClickListener();
+        }
     }
 
 

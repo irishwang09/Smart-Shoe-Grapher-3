@@ -24,5 +24,7 @@
     <string name="done_button">Done</string>
     <string name="connected_sensors">Connected Sensors</string>
     <string name="home_button">Home</string>
+    <string name="take_to_sensor_pairing_button">Sensor Pairing</string>
+    <string name="take_to_graph_settings_button">Graph Settings</string>
 
 </resources>

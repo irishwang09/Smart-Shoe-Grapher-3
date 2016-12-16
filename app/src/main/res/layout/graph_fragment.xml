@@ -3,6 +3,9 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    android:elevation="8dp"
+    android:background="@color/ap_white"
     android:id="@+id/graph">
 
     <com.scichart.charting.visuals.SciChartSurface
