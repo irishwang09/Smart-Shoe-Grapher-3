@@ -6,14 +6,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -32,7 +29,6 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
     private int remotePort;
     private int localPort;
 
-    private UdpSettingsFragment settingsFragment;
     private GraphFragment graphFragment;
     private SettingsCardAdapter mAdapter;
     private boolean currentlyGraphing = false;
@@ -53,28 +49,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         mAdapter = new MainActivity.SettingsCardAdapter(settingCardTitles);
         recyclerSettingsCardsList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
     }
-
-
-    /**
-     * Handler to receive messages from different threads
-     */
-    private Handler mHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-            //Gets the task from the incoming Message object
-            String aResponse = msg.getData().getString("message");
-            if (aResponse.equals("success")) {
-                settingsFragment.reportPingResult(true);
-                Log.d("MATT!", "Succesful Ping");
-            }
-            else {
-                settingsFragment.reportPingResult(false);
-                Log.d("MATT!", "Unsucessful Ping");
-            }
-        }
-    };
-
-
+    
     @Override //Passes Data from the UdpClient Fragment to main activity
     public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         this.hostname = verifiedHostname;
@@ -189,6 +164,14 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
             }
         };
 
+        private View.OnClickListener graphSettingsButtonListener = new View.OnClickListener(){
+
+            public void onClick(View v){
+                //TODO: Implement this
+            }
+        };
+
+
         private void setOnClickListenerHolder(String cardTitle){
             if(cardTitle.equals("Sensor Pairing")){
                 item_view.setOnClickListener(startSensorPairingListener);
@@ -197,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
                 item_view.setOnClickListener(startStopButtonListener);
             }
             else{  //Equals the button for starting the Graph Settings Button
-                //TODO: Set the onClick Listener here
+                item_view.setOnClickListener(graphSettingsButtonListener);
             }
         }
 
