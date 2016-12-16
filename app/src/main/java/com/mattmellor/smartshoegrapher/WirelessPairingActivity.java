@@ -139,7 +139,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
      *  Method to add data to UDPSensor DataBase and to create a dynamic view for in recyclerView list
      *  This method gets data from the UDPSensor Popup
      */
-    @Override //Passes Data from the UdpClient Fragment to main activity
+    @Override
     public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         //Send the Data to the DataBase
         //Check if data is already in the list
@@ -175,7 +175,6 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     protected void onResume(){
         super.onResume();
     }
-
 
     @Override
     protected void onDestroy(){
