@@ -32,13 +32,15 @@ import SciChartUserClasses.SciChartBuilder;
  * Created by Matthew on 8/15/2016.
  * Fragment to hold a single graph and its underlying UDP Data Collection
  * Real Time Graphing is implemented in this class
+ * TODO: This class needs to be changed to handle 24 sensors instead of 6
+ * Which will be quite difficult
  */
 
 public class GraphFragment extends Fragment {
 
     //UDP Settings
-    private UdpClient client;
-    private String hostname;
+    private UdpClient client;  //This is the client that gives up all the the data
+    private String hostname;  //hostname specifying the
     private int remotePort;
     private int localPort;
 
@@ -91,7 +93,6 @@ public class GraphFragment extends Fragment {
             @Override
             public void run() {
                 final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,xBound).build();
-
                 final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,yBound).build();
 
                 //These are wrappers for the series we added the data to...It contains the formatting
@@ -109,9 +110,9 @@ public class GraphFragment extends Fragment {
         });
 
         dataSource = new GraphDataSource(); //Run the data receiving & handling on a separate thread
-        dataSource.start();
+        dataSource.start(); //Starts the thread running/open to receive data
 
-        return frag;
+        return frag; //have to return fragment at the end of onCreateView
     }
 
     //-------------Get Data, Manipulate Data & Notify PlotUpdater-----------
@@ -255,9 +256,9 @@ public class GraphFragment extends Fragment {
             if (!listenerExists) {
                 resetGraph();
                 listenerExists = true;
-                client = new UdpClient(hostname, remotePort, localPort, 45);
+                client = new UdpClient(hostname, remotePort, localPort, 45); //Creates the client with the Updated hostname, remotePort, localPort
                 client.setStreamData(true);
-                UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //Handler has been waiting in the background for data(Since onCreateView)..It is the handler for this fragment
+                UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //Handler has been waiting in the background for data(Since onCreateView)..It is the handler in GraphDataSource
                 listener.start();
             }
         }

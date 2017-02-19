@@ -18,9 +18,10 @@ import com.mattmellor.smartshoegrapher.R;
 import com.mattmellor.smartshoegrapher.UdpClient;
 
 /**
- * Created by Matthew on 8/11/2016.
+ * Created by Matthew on 12/6/2016.
  * Holds the data about the UDP Connection and contains the wiring
  * Created as a popup to work
+ * This is the current UserInputSettings Popup Fragment it is to replace UdpSettingsFragment
  */
 
 public class InputUserSettingsPopupFragment extends DialogFragment {

@@ -89,7 +89,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     }
 
     /**
-     * Handler to receive messages from the UDPSettingsFragment Popup
+     * Handler to receive messages from the InputUserSettingsPopupFragment
      */
     private android.os.Handler mHandler = new android.os.Handler(Looper.getMainLooper()) {
         @Override

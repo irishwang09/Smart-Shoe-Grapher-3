@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import Fragments.GraphFragment;
-import Fragments.UdpSettingsFragment;
+import Fragments.UdpSettingsFragment; //UdpSettings Fragment is depreciated TODO: Change to InputUserSettingsPopupFragment
 import SciChartUserClasses.SciChartBuilder;
 
 
@@ -35,12 +35,12 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SciChartBuilder.init(this); //This is important for GraphFragment...
+        SciChartBuilder.init(this); //This is important for GraphFragment to initialize it
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main); //set the layout of the activity
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
 
-        //Create a Scrolling list
+        //Create a Scrolling list for the start stop Sensor Pairing and Graph Settings buttons
         RecyclerView recyclerSettingsCardsList = (RecyclerView) findViewById(R.id.recycler_view_settings_cards_list);
         recyclerSettingsCardsList.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
 
     @Override //Passes Data from the UdpClient Fragment to main activity
     public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
+        //TODO: This is old code that will have to be replaced.
         this.hostname = verifiedHostname;
         this.localPort = verifiedLocalPort;
         this.remotePort = verifiedRemotePort;
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
 
     //-------------Code for RecyclerView-----------
 
+    //This is used to create the underlying code for the list of buttons created in SettingsCardHolder
     private class SettingsCardAdapter extends RecyclerView.Adapter<SettingCardHolder>{
         //dataSet will just contain 3 entries: Start/Stop, Sensor Pairing, Graph Settings
         private ArrayList<String> mdataSet;
@@ -130,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         }
     }
 
-
+    //This
     private class SettingCardHolder extends RecyclerView.ViewHolder{
 
         private TextView cardTitle;
@@ -142,6 +144,9 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
             cardTitle = (TextView) itemView.findViewById(R.id.setting_card_title);
         }
 
+        //OnClick button listener will bring up the Wireless Pairing Activity to get user UDP Setting Data
+        //TODO: Need to get the UDP Sensor Data back to MainActivity
+        //which could be done by
         private View.OnClickListener startSensorPairingListener = new View.OnClickListener(){
 
             public void onClick(View v){
@@ -164,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
             }
         };
 
+        //Button listener to get data from the user on the size of the graph that they want
         private View.OnClickListener graphSettingsButtonListener = new View.OnClickListener(){
 
             public void onClick(View v){

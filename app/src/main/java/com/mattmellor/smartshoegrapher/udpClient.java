@@ -26,6 +26,7 @@ import java.net.UnknownHostException;
  *
  * Reasoning for this formatting is to avoid having the UI Main thread
  * touch the UDP threads (Avoids errors)
+ * Additionally the Android Won't Allow UDP Connection on the Main Thread
  *
  * Benefits of this approach
  *      1. Scalability
@@ -36,9 +37,6 @@ import java.net.UnknownHostException;
 
 public class UdpClient  {
 
-    //Haripriya's First commit to the project
-    //Hi HP - This is Matt
-    //hello again
 
     private DatagramSocket pingSocket;
     private DatagramSocket receiveSocket;
@@ -160,6 +158,7 @@ public class UdpClient  {
 
         public UdpDataListener(Handler handler){
             this.mhandler = handler; //This will be used to pass data to the Graph Fragment
+            //The handler specified here is the handler from the GraphDataSource inner class of GraphFragment
         }
 
         public void run(){
@@ -167,7 +166,7 @@ public class UdpClient  {
         }
 
         private void pingThenListenToServer(){
-            byte[] buf = new byte[1352]; //TODO calculate this number with a formula
+            byte[] buf = new byte[1352]; //TODO calculate this number with a formula for changability
             String received = "";
             InetAddress address;
             String mess = "Android Data Receiver";
