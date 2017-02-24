@@ -53,7 +53,7 @@ public class GraphFragment extends Fragment {
     private boolean applyBeenPressed = false;
 
     private SciChartSurface plotSurface;
-    private GraphDataSource dataSource;
+    private GraphDataSource dataSource; // has a handler to recieve data
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
