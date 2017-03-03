@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         recyclerSettingsCardsList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
     }
 
-    @Override //Passes Data from the UdpClient Fragment to main activity
+    @Override //Passes Data from main activity to graphfragment
     public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         //TODO: This is old code that will have to be replaced.
         this.hostname = verifiedHostname;

@@ -40,10 +40,10 @@ public class UdpClient  {
 
     private DatagramSocket pingSocket;
     private DatagramSocket receiveSocket;
-    private String serverAddress;
+    private String serverAddress; //Ip address/hostname
     private int remoteServerPort;
     private int localPort;
-    private int dataSetsPerPacket;
+    private int dataSetsPerPacket; // statically determined on esp side
     public DatagramPacket rcvdPacket;
     private boolean streamData = true;
 
