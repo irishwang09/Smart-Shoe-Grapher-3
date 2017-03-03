@@ -78,12 +78,13 @@ public class GraphFragment extends Fragment {
         try{
             plotSurface.setRuntimeLicenseKey(
                     "<LicenseContract>\n" +
-                            "<Customer>Trial Ext</Customer>\n" +
-                            "<OrderId />\n <LicenseCount>1</LicenseCount>\n" +
-                            " <IsTrialLicense>true</IsTrialLicense>\n" +
-                            "<SupportExpires>11/27/2016 00:00:00</SupportExpires>\n\n " +
+                            "<Customer>MIT</Customer>\n" +
+                            "<OrderId>EDUCATIONAL-USE-0016</OrderId>\n" +
+                            "<LicenseCount>5</LicenseCount>\n" +
+                            " <IsTrialLicense>false</IsTrialLicense>\n" +
+                            "<SupportExpires>05/31/2017 00:00:00</SupportExpires>\n\n " +
                             " <ProductCode>SC-ANDROID-2D-PRO</ProductCode>\n\n" +
-                            " <KeyCode>d7cf477553b6d058bd23bffb5226013a8a817eec968c665224c8d33d9dc4db50425689a229503215526c8500fe32bbc9fbc449b732e61f361d477b10d7c967f5da5c1a7e60e9843d38640764eb33d0a534580705f0427f2fa111f391cd6b6e5d8652d68144f956b8115ba61cba0b18f599a1758bbfacf810b909cb899eac7b71926a09238b765c86846ddacd23001441083221</KeyCode>\n" +
+                            " <KeyCode>57a1d37ef5811a3a3b905505a94bf08ba741a706b8768fdf434c05eb7eb2f5b58dc39039e24ff0c0e00b4385838e9ac44154fd7013b2836e7891a2281fe154a3b9915757a401e0978bc1624be61e2a53abc19a3af1f3fb11bdda0c794d1fa7bbad9acc094d884ed540cb3b841926710daa5ee7b433bb77b1d2fd317e8c499fd9db7e38973b4853351c22bc41c49cf4b5b5dc3b1c78d298313be1b071d649229f</KeyCode>\n" +
                             "</LicenseContract>" );
         }catch (Exception e){
             e.printStackTrace();
