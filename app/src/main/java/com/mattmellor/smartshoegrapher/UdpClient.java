@@ -37,7 +37,6 @@ import java.net.UnknownHostException;
 
 public class UdpClient  {
 
-
     private DatagramSocket pingSocket;
     private DatagramSocket receiveSocket;
     private String serverAddress; //Ip address/hostname

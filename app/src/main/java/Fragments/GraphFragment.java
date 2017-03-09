@@ -132,8 +132,10 @@ public class GraphFragment extends Fragment {
                         UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                 @Override
                                 public void run() {
-                                    addDataToSeries(data);
+                                    addDataToSeries(data); //Adding the data to the graph and drawing it
                                 }
+                                //TODO: Try adding UdpateSuspender somewhere else so that all 12 sensors are added at once
+                            //TODO: ^continue above s.t. addDataToSeries(data) has data that is all of the data (12 series)
                             });
                     }
                 }
