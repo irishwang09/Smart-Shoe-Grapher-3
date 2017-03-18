@@ -91,17 +91,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("MATT!", "Passed to GF Verified Remote Port : " + verifiedRemotePort);
     }
 
-    //TODO: Delete this code
-    private void applyBeenPressed() {
-        graphFragment.setApplyBeenPressed(true);
-    }
-
-    //TODO: Delete this code after changing GraphFragment
-    private void updatesBeingMadeStopGraphing() {
-        graphFragment.setApplyBeenPressed(false);
-        graphFragment.stopGraphing();
-    }
-
     //This is attached to the start/stop button in the SettingsCardAdapter
     private void startGraphing() {
         graphFragment.startGraphing();

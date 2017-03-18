@@ -50,10 +50,9 @@ public class GraphFragment extends Fragment {
     private boolean listenerExists = false;
     private int xBound = 100_000;
     private int yBound = 5000;
-    private boolean applyBeenPressed = false;
 
     private SciChartSurface plotSurface;
-    private GraphDataSource dataSource; // has a handler to recieve data
+    private GraphDataSource dataSource; // has a handler to receive data
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
@@ -255,7 +254,6 @@ public class GraphFragment extends Fragment {
      * UI thread then graphes it (not implemented)
      */
     public void startGraphing(){
-        if(applyBeenPressed) {
             if (!listenerExists) {
                 resetGraph();
                 listenerExists = true;
@@ -264,14 +262,6 @@ public class GraphFragment extends Fragment {
                 UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //Handler has been waiting in the background for data(Since onCreateView)..It is the handler in GraphDataSource
                 listener.start();
             }
-        }
-        else{
-            Context context = getActivity();
-            CharSequence text = "Apply UDP Settings";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
     }
 
     private void resetGraph(){
@@ -318,10 +308,6 @@ public class GraphFragment extends Fragment {
      */
     public void updateHostname(String hostname){
         this.hostname = hostname;
-    }
-
-    public void setApplyBeenPressed(boolean pressedOrNot){
-        applyBeenPressed = pressedOrNot;
     }
 
 
