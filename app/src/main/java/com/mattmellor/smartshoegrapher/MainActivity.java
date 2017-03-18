@@ -1,13 +1,9 @@
 package com.mattmellor.smartshoegrapher;
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,13 +18,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import Fragments.GraphFragment;
-import Fragments.UdpSettingsFragment; //UdpSettings Fragment is depreciated TODO: Change to InputUserSettingsPopupFragment
 import SciChartUserClasses.SciChartBuilder;
 import UserDataDataBase.UDPDataBaseHelper;
 import UserDataDataBase.UDPDatabaseContract;
 
 
-public class MainActivity extends AppCompatActivity implements UdpSettingsFragment.OnDataPass{
+public class MainActivity extends AppCompatActivity {
 
     private String hostname;
     private int remotePort;
@@ -38,6 +33,9 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
     private SettingsCardAdapter mAdapter;
     private boolean currentlyGraphing = false;
     private SQLiteDatabase db;
+    private ArrayList<String> hostnames;
+    private ArrayList<Integer> localPorts;
+    private ArrayList<Integer> remotePorts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +43,17 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); //set the layout of the activity
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
+        hostnames = new ArrayList<>();
+        localPorts = new ArrayList<>();
+        remotePorts = new ArrayList<>();
 
         //Read from the UserUDPSettings database if it exists
         UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
+        //Does the following need to be changed? We probably don't want to create a database if there isn't
+        //TODO:Test
         db = mDbHelper.getWritableDatabase(); //Creates a new database if one doesn't exist
         ArrayList<ArrayList<String>> pastSensors = readUDPSettingsFromDataBase();
-        //If there are sensors already in the database...add them to the recyclerList
+        //If there are sensors already in the database...
         if(pastSensors != null){
             Log.d("MATT!", "Reading old sensors in onCreate of MainActivity");
             for(ArrayList<String> sensorData: pastSensors){
@@ -58,9 +61,12 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
                 String verfLocalPort = sensorData.get(1);
                 int verifiedLocalPort = Integer.parseInt(verfLocalPort);
                 int verifiedRemotePort = Integer.parseInt(sensorData.get(2));
+                hostnames.add(verifiedHostname);
+                localPorts.add(verifiedLocalPort);
+                remotePorts.add(verifiedRemotePort);
             }
+            onDataPassUdpSettings(hostnames.get(0), localPorts.get(0), remotePorts.get(0));
         }
-
 
         //Create a Scrolling list for the start stop Sensor Pairing and Graph Settings buttons
         RecyclerView recyclerSettingsCardsList = (RecyclerView) findViewById(R.id.recycler_view_settings_cards_list);
@@ -72,44 +78,31 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         recyclerSettingsCardsList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
     }
 
-    @Override //Passes Data from main activity to graphfragment
-    public void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
-        //TODO: This is old code that will have to be replaced.
+    //Passes Data from main activity to graphfragment
+    private void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         this.hostname = verifiedHostname;
         this.localPort = verifiedLocalPort;
         this.remotePort = verifiedRemotePort;
         graphFragment.updateHostname(hostname);
         graphFragment.updateLocalPort(localPort);
         graphFragment.updateRemotePort(remotePort);
-        Log.d("MATT!", "Verified Host: " + verifiedHostname);
-        Log.d("MATT!", "Verified Local Port : " + verifiedLocalPort);
-        Log.d("MATT!", "Verified Remote Port : " + verifiedRemotePort);
+        Log.d("MATT!", "Passed to GF Verified Host: " + verifiedHostname);
+        Log.d("MATT!", "Passed to GF Verified Local Port : " + verifiedLocalPort);
+        Log.d("MATT!", "Passed to GF Verified Remote Port : " + verifiedRemotePort);
     }
 
-    @Override
-    public void onDataPassUdpReset(String defaultHostname, int defaultLocalPort, int defaultRemotePort) {
-        this.hostname = defaultHostname;
-        this.localPort = defaultLocalPort;
-        this.remotePort = defaultRemotePort;
-        graphFragment.updateHostname(hostname);
-        graphFragment.updateLocalPort(localPort);
-        graphFragment.updateRemotePort(remotePort);
-        Log.d("MATT!", "default hostname: " + defaultHostname);
-        Log.d("MATT!", "default remotePort: " + defaultRemotePort);
-        Log.d("MATT!", "default localPort: " + defaultLocalPort);
-    }
-
-    @Override
-    public void applyBeenPressed() {
+    //TODO: Delete this code
+    private void applyBeenPressed() {
         graphFragment.setApplyBeenPressed(true);
     }
 
-    @Override
-    public void updatesBeingMadeStopGraphing() {
+    //TODO: Delete this code after changing GraphFragment
+    private void updatesBeingMadeStopGraphing() {
         graphFragment.setApplyBeenPressed(false);
         graphFragment.stopGraphing();
     }
 
+    //This is attached to the start/stop button in the SettingsCardAdapter
     private void startGraphing() {
         graphFragment.startGraphing();
     }
@@ -154,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         }
     }
 
-
     private class SettingCardHolder extends RecyclerView.ViewHolder{
 
         private TextView cardTitle;
@@ -167,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         }
 
         //OnClick button listener will bring up the Wireless Pairing Activity to get user UDP Setting Data
-        //TODO: Need to get the UDP Sensor Data back to MainActivity
         //which could be done by
         private View.OnClickListener startSensorPairingListener = new View.OnClickListener(){
 
@@ -214,7 +205,6 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
 
     }
 
-
     private ArrayList<ArrayList<String>> readUDPSettingsFromDataBase(){
         //These are the columns we are
         ArrayList<ArrayList<String>> data = new ArrayList<>();
@@ -236,6 +226,5 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         cursor.close();
         return data;
     }
-
 
 }
