@@ -1,6 +1,9 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +24,8 @@ import java.util.Arrays;
 import Fragments.GraphFragment;
 import Fragments.UdpSettingsFragment; //UdpSettings Fragment is depreciated TODO: Change to InputUserSettingsPopupFragment
 import SciChartUserClasses.SciChartBuilder;
+import UserDataDataBase.UDPDataBaseHelper;
+import UserDataDataBase.UDPDatabaseContract;
 
 
 public class MainActivity extends AppCompatActivity implements UdpSettingsFragment.OnDataPass{
@@ -32,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
     private GraphFragment graphFragment;
     private SettingsCardAdapter mAdapter;
     private boolean currentlyGraphing = false;
+    private SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +45,22 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); //set the layout of the activity
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
+
+        //Read from the UserUDPSettings database if it exists
+        UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
+        db = mDbHelper.getWritableDatabase(); //Creates a new database if one doesn't exist
+        ArrayList<ArrayList<String>> pastSensors = readUDPSettingsFromDataBase();
+        //If there are sensors already in the database...add them to the recyclerList
+        if(pastSensors != null){
+            Log.d("MATT!", "Reading old sensors in onCreate of MainActivity");
+            for(ArrayList<String> sensorData: pastSensors){
+                String verifiedHostname = sensorData.get(0);
+                String verfLocalPort = sensorData.get(1);
+                int verifiedLocalPort = Integer.parseInt(verfLocalPort);
+                int verifiedRemotePort = Integer.parseInt(sensorData.get(2));
+            }
+        }
+
 
         //Create a Scrolling list for the start stop Sensor Pairing and Graph Settings buttons
         RecyclerView recyclerSettingsCardsList = (RecyclerView) findViewById(R.id.recycler_view_settings_cards_list);
@@ -132,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
         }
     }
 
-    //This
+
     private class SettingCardHolder extends RecyclerView.ViewHolder{
 
         private TextView cardTitle;
@@ -190,6 +212,29 @@ public class MainActivity extends AppCompatActivity implements UdpSettingsFragme
             }
         }
 
+    }
+
+
+    private ArrayList<ArrayList<String>> readUDPSettingsFromDataBase(){
+        //These are the columns we are
+        ArrayList<ArrayList<String>> data = new ArrayList<>();
+        //Set the query cursor to get the whole table -> thus all of the nulls
+        Cursor cursor = db.query(UDPDatabaseContract.UdpDataEntry.TABLE_NAME, null, null, null, null, null, null);
+        cursor.moveToFirst(); //Moves the cursor to the first row
+        int numRows = cursor.getCount();
+        String remoteHostname;
+        String localPort;
+        String remotePort;
+        for(int rowNumber = 0; rowNumber < numRows; rowNumber++){ //Loop through each row and get the column values
+            remoteHostname = cursor.getString(0);
+            localPort = cursor.getString(1);
+            remotePort = cursor.getString(2);
+            ArrayList<String> sensorSettings = new ArrayList<>(Arrays.asList(remoteHostname, localPort, remotePort));
+            data.add(sensorSettings);
+            cursor.moveToNext(); //Move to
+        }
+        cursor.close();
+        return data;
     }
 
 
