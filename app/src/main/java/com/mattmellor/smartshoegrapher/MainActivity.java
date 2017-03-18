@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private SettingsCardAdapter mAdapter;
     private boolean currentlyGraphing = false;
     private SQLiteDatabase db;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SciChartBuilder.init(this); //This is important for GraphFragment to initialize it
