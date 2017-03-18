@@ -33,19 +33,16 @@ public class MainActivity extends AppCompatActivity {
     private SettingsCardAdapter mAdapter;
     private boolean currentlyGraphing = false;
     private SQLiteDatabase db;
-    private ArrayList<String> hostnames;
-    private ArrayList<Integer> localPorts;
-    private ArrayList<Integer> remotePorts;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SciChartBuilder.init(this); //This is important for GraphFragment to initialize it
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); //set the layout of the activity
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
-        hostnames = new ArrayList<>();
-        localPorts = new ArrayList<>();
-        remotePorts = new ArrayList<>();
+        ArrayList<String> hostnames = new ArrayList<>();
+        ArrayList<Integer> localPorts = new ArrayList<>();
+        ArrayList<Integer> remotePorts = new ArrayList<>();
 
         //Read from the UserUDPSettings database if it exists
         UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
@@ -95,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
     private void startGraphing() {
         graphFragment.startGraphing();
     }
-
     private void stopGraphing() {
         graphFragment.stopGraphing();
     }
