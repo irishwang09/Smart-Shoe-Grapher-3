@@ -37,7 +37,6 @@ import java.net.UnknownHostException;
 
 public class UdpClient  {
 
-
     private DatagramSocket pingSocket;
     private DatagramSocket receiveSocket;
     private String serverAddress; //Ip address/hostname
@@ -187,9 +186,10 @@ public class UdpClient  {
                         threadMsg(dataToSend);
                         //Log.d("MATT!", dataToSend);
                 }
+                receiveSocket.close();
             }catch (SocketException e){
                 e.printStackTrace();
-                Log.e("MATT!", "socket exception");
+                Log.e("MATT!", "socket exception in listen");
             }catch(UnknownHostException e){
                 e.printStackTrace();
                 Log.e("MATT!", "unknown host exception");
@@ -202,7 +202,9 @@ public class UdpClient  {
             }finally {
                 if(receiveSocket != null){
                     receiveSocket.close();
+                    Log.d("MATT!", "UDP Socket Closed");
                 }
+                Log.d("MATT!", "Made it here");
             }
 
         }

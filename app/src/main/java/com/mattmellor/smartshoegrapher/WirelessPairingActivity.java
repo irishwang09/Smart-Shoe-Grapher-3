@@ -64,6 +64,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         recycPairingList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
 
         //Get a Database
+        //Goal here is to read the database if it exists
         UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
         db = mDbHelper.getWritableDatabase(); //Creates a new database if one doesn't exist
         ArrayList<ArrayList<String>> pastSensors = readUDPSettingsFromDataBase();

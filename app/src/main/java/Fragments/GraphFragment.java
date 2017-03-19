@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,12 +49,12 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
+    private boolean startAlreadyPressed = false;
     private int xBound = 100_000;
     private int yBound = 5000;
-    private boolean applyBeenPressed = false;
 
     private SciChartSurface plotSurface;
-    private GraphDataSource dataSource; // has a handler to recieve data
+    private GraphDataSource dataSource; // has a handler to receive data
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
@@ -132,8 +133,10 @@ public class GraphFragment extends Fragment {
                         UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                 @Override
                                 public void run() {
-                                    addDataToSeries(data);
+                                    addDataToSeries(data); //Adding the data to the graph and drawing it
                                 }
+                                //TODO: Try adding UdpateSuspender somewhere else so that all 12 sensors are added at once
+                            //TODO: ^continue above s.t. addDataToSeries(data) has data that is all of the data (12 series)
                             });
                     }
                 }
@@ -253,23 +256,18 @@ public class GraphFragment extends Fragment {
      * UI thread then graphes it (not implemented)
      */
     public void startGraphing(){
-        if(applyBeenPressed) {
-            if (!listenerExists) {
-                resetGraph();
-                listenerExists = true;
-                client = new UdpClient(hostname, remotePort, localPort, 45); //Creates the client with the Updated hostname, remotePort, localPort
-                client.setStreamData(true);
-                UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //Handler has been waiting in the background for data(Since onCreateView)..It is the handler in GraphDataSource
-                listener.start();
-            }
-        }
-        else{
-            Context context = getActivity();
-            CharSequence text = "Apply UDP Settings";
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        }
+          //if(!startAlreadyPressed) {
+              if (!listenerExists) {
+                  Log.d("MATT!", "Creating connection... pressed start graphing");
+                  resetGraph();
+                  listenerExists = true;
+                  client = new UdpClient(hostname, remotePort, localPort, 45); //Creates the client with the Updated hostname, remotePort, localPort
+                  client.setStreamData(true);
+                  UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //Handler has been waiting in the background for data(Since onCreateView)..It is the handler in GraphDataSource
+                  listener.start();
+              }
+              //startAlreadyPressed = true;
+          //}
     }
 
     private void resetGraph(){
@@ -288,10 +286,12 @@ public class GraphFragment extends Fragment {
      * Tell the data listener to stop listening to data
      */
     public void stopGraphing(){
+        Log.d("MATT!", "Stop Graphing In Graph Fragment");
         if (listenerExists) {
             client.setStreamData(false);
             listenerExists = false;
         }
+        //startAlreadyPressed = false;
     }
 
     /**
@@ -316,10 +316,6 @@ public class GraphFragment extends Fragment {
      */
     public void updateHostname(String hostname){
         this.hostname = hostname;
-    }
-
-    public void setApplyBeenPressed(boolean pressedOrNot){
-        applyBeenPressed = pressedOrNot;
     }
 
 
