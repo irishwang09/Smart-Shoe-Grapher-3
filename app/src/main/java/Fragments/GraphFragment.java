@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public class GraphFragment extends Fragment {
     private Handler handler;
 
     private boolean listenerExists = false;
+    private boolean startAlreadyPressed = false;
     private int xBound = 100_000;
     private int yBound = 5000;
 
@@ -254,14 +256,18 @@ public class GraphFragment extends Fragment {
      * UI thread then graphes it (not implemented)
      */
     public void startGraphing(){
-            if (!listenerExists) {
-                resetGraph();
-                listenerExists = true;
-                client = new UdpClient(hostname, remotePort, localPort, 45); //Creates the client with the Updated hostname, remotePort, localPort
-                client.setStreamData(true);
-                UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //Handler has been waiting in the background for data(Since onCreateView)..It is the handler in GraphDataSource
-                listener.start();
-            }
+          //if(!startAlreadyPressed) {
+              if (!listenerExists) {
+                  Log.d("MATT!", "Creating connection... pressed start graphing");
+                  resetGraph();
+                  listenerExists = true;
+                  client = new UdpClient(hostname, remotePort, localPort, 45); //Creates the client with the Updated hostname, remotePort, localPort
+                  client.setStreamData(true);
+                  UdpClient.UdpDataListener listener = client.new UdpDataListener(handler); //Handler has been waiting in the background for data(Since onCreateView)..It is the handler in GraphDataSource
+                  listener.start();
+              }
+              //startAlreadyPressed = true;
+          //}
     }
 
     private void resetGraph(){
@@ -280,10 +286,12 @@ public class GraphFragment extends Fragment {
      * Tell the data listener to stop listening to data
      */
     public void stopGraphing(){
+        Log.d("MATT!", "Stop Graphing In Graph Fragment");
         if (listenerExists) {
             client.setStreamData(false);
             listenerExists = false;
         }
+        //startAlreadyPressed = false;
     }
 
     /**

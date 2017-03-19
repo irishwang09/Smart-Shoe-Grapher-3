@@ -90,9 +90,11 @@ public class MainActivity extends AppCompatActivity {
 
     //This is attached to the start/stop button in the SettingsCardAdapter
     private void startGraphing() {
+        Log.d("MATT!", "Start Graphing");
         graphFragment.startGraphing();
     }
     private void stopGraphing() {
+        Log.d("MATT!", "Stop Graphing");
         graphFragment.stopGraphing();
     }
 
