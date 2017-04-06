@@ -7,6 +7,6 @@ import android.app.Fragment;
  */
 
 public class GraphSettingsPopupFragment extends Fragment {
-/*Right now blank
+//Right now blank
 }
 

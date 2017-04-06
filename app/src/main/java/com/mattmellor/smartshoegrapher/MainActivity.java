@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private GraphFragment graphFragment;
     private SettingsCardAdapter mAdapter;
+    private UDPDataBaseHelper mDbHelper;
     private boolean currentlyGraphing = false;
     private SQLiteDatabase db;
 
@@ -45,17 +46,20 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<Integer> remotePorts = new ArrayList<>();
 
         //Read from the UserUDPSettings database if it exists
-        UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
+        mDbHelper = UDPDataBaseHelper.getInstance(getApplicationContext());
         //Does the following need to be changed? We probably don't want to create a database if there isn't
         //TODO:Test
         db = mDbHelper.getWritableDatabase(); //Creates a new database if one doesn't exist
         ArrayList<ArrayList<String>> pastSensors = readUDPSettingsFromDataBase();
-        //If there are sensors already in the database...
-        if(pastSensors != null){
+//        //If there are sensors already in the database...
+        Log.d("MATT!", "Got Here Before crash?");
+        if(pastSensors != null && !pastSensors.isEmpty()){
             Log.d("MATT!", "Reading old sensors in onCreate of MainActivity");
             for(ArrayList<String> sensorData: pastSensors){
                 String verifiedHostname = sensorData.get(0);
                 String verfLocalPort = sensorData.get(1);
+                Log.d("MATT!", "It got here");
+                Log.d("MATT!", pastSensors.toString());
                 int verifiedLocalPort = Integer.parseInt(verfLocalPort);
                 int verifiedRemotePort = Integer.parseInt(sensorData.get(2));
                 hostnames.add(verifiedHostname);
@@ -73,6 +77,13 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> settingCardTitles = new ArrayList<>(Arrays.asList("Start Stop", "Sensor Pairing", "Graph Settings"));
         mAdapter = new MainActivity.SettingsCardAdapter(settingCardTitles);
         recyclerSettingsCardsList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
+    }
+
+    @Override
+    protected void onDestroy(){
+        mDbHelper.close();
+        db.close();
+        super.onDestroy();
     }
 
     //Passes Data from main activity to graphfragment

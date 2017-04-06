@@ -14,8 +14,17 @@ public class UDPDataBaseHelper extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 1;
     public static final String DATABASE_NAME = "UDPUserData.db";
+    private static UDPDataBaseHelper mInstance = null;
 
-    public UDPDataBaseHelper(Context context){
+    public static UDPDataBaseHelper getInstance(Context ctx){
+        if(mInstance == null){
+            mInstance = new UDPDataBaseHelper(ctx.getApplicationContext());
+
+        }
+        return mInstance;
+    }
+
+    private UDPDataBaseHelper(Context context){
         //The line below corresponds to
         //SQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version)
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,5 +47,12 @@ public class UDPDataBaseHelper extends SQLiteOpenHelper {
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        this.close();
+        super.finalize();
+    }
+
 
 }

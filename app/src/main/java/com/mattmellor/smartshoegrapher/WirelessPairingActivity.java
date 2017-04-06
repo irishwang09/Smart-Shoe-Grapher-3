@@ -42,6 +42,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     //Fields
     //DataBase Access
     private SQLiteDatabase db;
+    private UDPDataBaseHelper mDbHelper;
     private PairingListAdapter mAdapter;
     private ArrayList<String> connected_host_names;
     private ArrayList<String> used_local_ports;
@@ -65,11 +66,11 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
 
         //Get a Database
         //Goal here is to read the database if it exists
-        UDPDataBaseHelper mDbHelper = new UDPDataBaseHelper(getApplicationContext());
+        mDbHelper = UDPDataBaseHelper.getInstance(getApplicationContext());
         db = mDbHelper.getWritableDatabase(); //Creates a new database if one doesn't exist
         ArrayList<ArrayList<String>> pastSensors = readUDPSettingsFromDataBase();
         //If there are sensors already in the database...add them to the recyclerList
-        if(pastSensors != null){
+        if(pastSensors != null && !pastSensors.isEmpty()){
             Log.d("MATT!", "Reading old sensors in onCreate");
             for(ArrayList<String> sensorData: pastSensors){
                 String verifiedHostname = sensorData.get(0);
@@ -179,6 +180,8 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
 
     @Override
     protected void onDestroy(){
+        mDbHelper.close();
+        db.close();
         super.onDestroy();
     }
 
