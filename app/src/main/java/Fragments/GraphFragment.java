@@ -224,8 +224,8 @@ public class GraphFragment extends Fragment {
                     xCounter = 0;
                     break;
                 }
-                Log.d("MATT", dataSplit[i]); //TODO: Investigate this.. some kind of timing issue
-                num = Integer.parseInt(dataSplit[i]);
+                Log.d("MATT", dataSplit[i]); //TODO: Investigate this.. some kind of timing issue:
+                num = Integer.parseInt(dataSplit[i]); //TODO: Investigate closing thread of clients
                 switch(i){
                     case 1:
                         x1.add(xval);
