@@ -107,7 +107,7 @@ public class UdpClient  {
 
             }catch(SocketTimeoutException e){
                 //Send a message to the fragment
-                Log.d("MATT!", "TimeoutException");
+                Log.d("MATT!", "TimeoutException in ping");
                 fail = true;
             }catch (SocketException e){
                 e.printStackTrace();
@@ -115,7 +115,7 @@ public class UdpClient  {
                 fail = true;
             }catch(UnknownHostException e){
                 e.printStackTrace();
-                Log.e("MATT!", "unknown host exception");
+                Log.e("MATT!", "unknown host exception in ping test");
                 fail = true;
             }catch(IOException e) {
                 e.printStackTrace();
@@ -154,9 +154,11 @@ public class UdpClient  {
     public class UdpDataListener extends Thread {
 
         private Handler mhandler;
+        private String clientID;
 
-        public UdpDataListener(Handler handler){
+        public UdpDataListener(Handler handler, String clientID){
             this.mhandler = handler; //This will be used to pass data to the Graph Fragment
+            this.clientID = clientID;
             //The handler specified here is the handler from the GraphDataSource inner class of GraphFragment
         }
 
@@ -183,8 +185,8 @@ public class UdpClient  {
                         receiveSocket.receive(rcvdPacket);
                         received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
                         dataToSend = received.substring(0, received.length() - 2); //Get the data
-                        threadMsg(dataToSend);
-                        //Log.d("MATT!", dataToSend);
+                        threadMsg(dataToSend); //TODO: change this back
+                        //Log.d("MATT!", clientID);
                 }
                 receiveSocket.close();
             }catch (SocketException e){
@@ -192,7 +194,7 @@ public class UdpClient  {
                 Log.e("MATT!", "socket exception in listen");
             }catch(UnknownHostException e){
                 e.printStackTrace();
-                Log.e("MATT!", "unknown host exception");
+                Log.e("MATT!", "unknown host exception in listen");
             }catch(IOException e){
                 e.printStackTrace();
                 Log.e("MATT!", "IOException");
@@ -213,7 +215,8 @@ public class UdpClient  {
             if (!msg.equals(null) && !msg.equals("")) {
                 Message msgObj = mhandler.obtainMessage();
                 Bundle b = new Bundle();    //Is this the best way to do this??
-                b.putString("data", msg);
+                b.putString("data", msg); //tagging so we can distinguish data source
+                b.putString("clientID", clientID);
                 msgObj.setData(b);
                 mhandler.sendMessage(msgObj);
             }

@@ -47,26 +47,20 @@ public class MainActivity extends AppCompatActivity {
 
         //Read from the UserUDPSettings database if it exists
         mDbHelper = UDPDataBaseHelper.getInstance(getApplicationContext());
-        //Does the following need to be changed? We probably don't want to create a database if there isn't
-        //TODO:Test
         db = mDbHelper.getWritableDatabase(); //Creates a new database if one doesn't exist
         ArrayList<ArrayList<String>> pastSensors = readUDPSettingsFromDataBase();
-//        //If there are sensors already in the database...
-        Log.d("MATT!", "Got Here Before crash?");
         if(pastSensors != null && !pastSensors.isEmpty()){
             Log.d("MATT!", "Reading old sensors in onCreate of MainActivity");
             for(ArrayList<String> sensorData: pastSensors){
                 String verifiedHostname = sensorData.get(0);
                 String verfLocalPort = sensorData.get(1);
-                Log.d("MATT!", "It got here");
-                Log.d("MATT!", pastSensors.toString());
                 int verifiedLocalPort = Integer.parseInt(verfLocalPort);
                 int verifiedRemotePort = Integer.parseInt(sensorData.get(2));
                 hostnames.add(verifiedHostname);
                 localPorts.add(verifiedLocalPort);
                 remotePorts.add(verifiedRemotePort);
             }
-            onDataPassUdpSettings(hostnames.get(0), localPorts.get(0), remotePorts.get(0));
+            onDataPassUdpSettings(hostnames.get(0), localPorts.get(0), remotePorts.get(0)); //TODO: Change this... it is hardcoded
         }
 
         //Create a Scrolling list for the start stop Sensor Pairing and Graph Settings buttons
