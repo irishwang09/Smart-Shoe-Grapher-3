@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,14 +17,17 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Handler;
 
 import Fragments.GraphFragment;
+import Fragments.GraphSettingsPopupFragment;
+import Fragments.InputUserSettingsPopupFragment;
 import SciChartUserClasses.SciChartBuilder;
 import UserDataDataBase.UDPDataBaseHelper;
 import UserDataDataBase.UDPDatabaseContract;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GraphSettingsPopupFragment.OnDataPassGraphSettings{
 
     private String hostname;
     private int remotePort;
@@ -34,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private UDPDataBaseHelper mDbHelper;
     private boolean currentlyGraphing = false;
     private SQLiteDatabase db;
+    private Handler mainActivityHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +76,9 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> settingCardTitles = new ArrayList<>(Arrays.asList("Start Stop", "Sensor Pairing", "Graph Settings"));
         mAdapter = new MainActivity.SettingsCardAdapter(settingCardTitles);
         recyclerSettingsCardsList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
+
+        //TODO: Initialize the MainAcitivity Handler here
+
     }
 
     @Override
@@ -178,7 +186,11 @@ public class MainActivity extends AppCompatActivity {
         private View.OnClickListener graphSettingsButtonListener = new View.OnClickListener(){
 
             public void onClick(View v){
-                //TODO: Implement this
+                //TODO: Implement this to make graphSettings button 'Click'
+                //TODO: create the fragment
+                //FragmentManager fm = getSupportFragmentManager();
+                //GraphSettingsPopupFragment settingsFragment = GraphSettingsPopupFragment.newInstance();
+                //settingsFragment.show(fm, "HP!");
             }
         };
 
