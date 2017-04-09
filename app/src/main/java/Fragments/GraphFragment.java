@@ -18,6 +18,7 @@ import com.mattmellor.smartshoegrapher.UdpClient;
 import com.scichart.charting.model.dataSeries.IXyDataSeries;
 import com.scichart.charting.visuals.SciChartSurface;
 import com.scichart.charting.visuals.axes.NumericAxis;
+import com.scichart.charting.visuals.annotations.TextAnnotation;
 import com.scichart.charting.visuals.renderableSeries.FastLineRenderableSeries;
 import com.scichart.core.framework.UpdateSuspender;
 import com.scichart.drawing.utility.ColorUtil;
@@ -52,6 +53,9 @@ public class GraphFragment extends Fragment {
     private boolean startAlreadyPressed = false;
     private int xBound = 100_000;
     private int yBound = 5000;
+    private String title = "Sensor Values vs. Number of Samples";
+    private String xaxistitle = "Number of Samples";
+    private String yaxistitle = "Sensor Values";
 
     private SciChartSurface plotSurface;
     private GraphDataSource dataSource; // has a handler to receive data
@@ -109,7 +113,7 @@ public class GraphFragment extends Fragment {
             public void run() {
                 final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,xBound).build();
                 final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,yBound).build();
-
+                 /*String labelAnnotation = new TextAnnotation(); Still working on it*/
                 //These are wrappers for the series we added the data to...It contains the formatting
                 final FastLineRenderableSeries rs1 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor1).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
                 final FastLineRenderableSeries rs2 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor2).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xA5, 0x00)).build(); //Light Pink Color
@@ -450,6 +454,17 @@ public class GraphFragment extends Fragment {
     public void updateHostname(String hostname){
         this.hostname = hostname;
     }
+
+    /* This is to update x-axis,y-axis and title*/
+    public void updatexBound(int xBound) { this.xBound= xBound;}
+
+    public void updateyBound(int yBound) { this.yBound= yBound;}
+
+    public void updatetitle(String title) { this.title= title;}
+
+    public void updatexaxistitle(String title) { this.title= title;}
+
+    public void updateyaxistitle(String title) { this.title= title;}
 
 
 }

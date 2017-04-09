@@ -43,7 +43,7 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
     private boolean applyPressed = false;
     private boolean dataIsVerified = false;
 
-    private OnDataPass dataPassHandle;
+    private OnDataPass dataPassHandle; //
     private Handler activityHandler;
 
     public InputUserSettingsPopupFragment(){
@@ -163,6 +163,7 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
             }
         });
 
+        //closeButton is the Done Button
         closeButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -214,7 +215,7 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
     }
 
     /**
-     * Interface methods implemented by main activity to allow for communication between the activity
+     * Interface methods implemented by wireless pairing activity to allow for communication between the activity
      * and the fragment
      * We only pass verified input
      */

@@ -71,9 +71,9 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/apply_button_popup"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/apply_button_popup"
             android:layout_weight="50"
             android:text="@string/apply_button"/>
 
