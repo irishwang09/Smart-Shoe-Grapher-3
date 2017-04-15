@@ -78,6 +78,7 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
         localPortEditText = (EditText) frag.findViewById(R.id.local_port_popup);
         remotePortEditText = (EditText) frag.findViewById(R.id.remote_port_popup);
 
+
         hostnameEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

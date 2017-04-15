@@ -1,5 +1,6 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,7 +14,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +35,11 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
     private String hostname;
     private int remotePort;
     private int localPort;
+    private String graphtitle;
+    private String xaxis;
+    private String yaxis;
+    private int xscale;
+    private int yscale;
 
     private GraphFragment graphFragment;
     private SettingsCardAdapter mAdapter;
@@ -182,17 +190,6 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
             }
         };
 
-        //Button listener to get data from the user on the size of the graph that they want
-        private View.OnClickListener graphSettingsButtonListener = new View.OnClickListener(){
-
-            public void onClick(View v){
-                //TODO: Implement this to make graphSettings button 'Click'
-                //TODO: create the fragment
-                //FragmentManager fm = getSupportFragmentManager();
-                //GraphSettingsPopupFragment settingsFragment = GraphSettingsPopupFragment.newInstance();
-                //settingsFragment.show(fm, "HP!");
-            }
-        };
 
 
         private void setOnClickListenerHolder(String cardTitle){
@@ -208,6 +205,19 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
         }
 
     }
+
+    //Button listener to get data from the user on the size of the graph that they want
+    private View.OnClickListener graphSettingsButtonListener = new View.OnClickListener(){
+        @Override
+        public void onClick(View v){
+            //TODO: Implement this to make graphSettings button 'Click'
+            //TODO: create the fragment
+            FragmentManager fm = getSupportFragmentManager();
+            GraphSettingsPopupFragment settingsFragment = GraphSettingsPopupFragment.newInstance();
+            Log.d("HP!", "is this making it here");
+        }
+    };
+
 
     private ArrayList<ArrayList<String>> readUDPSettingsFromDataBase(){
         //These are the columns we are
@@ -231,4 +241,7 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
         return data;
     }
 
+    public void onDataPassGraphSettings(String graphtitle, String xaxis, String yaxis, int xscale, int yscale) {
+
+    }
 }
