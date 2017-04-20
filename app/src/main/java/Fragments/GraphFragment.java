@@ -388,7 +388,7 @@ public class GraphFragment extends Fragment {
                   Log.d("MATT!", "Creating connection... pressed start graphing");
                   resetGraph();
                   listenerExists = true;
-                  UdpClient client1 = new UdpClient("footsensor1.dynamic-dns.net", 2392,5006,45);
+                  UdpClient client1 = new UdpClient("footsensor1.dynamic-dns.net", 2391,5006,45);
                   client1.setStreamData(true);
                   UdpClient.UdpDataListener listener1 = client1.new UdpDataListener(handler, "ANDREW");
                   listener1.start();

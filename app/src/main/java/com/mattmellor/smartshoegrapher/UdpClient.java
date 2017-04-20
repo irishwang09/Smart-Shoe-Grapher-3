@@ -166,7 +166,7 @@ public class UdpClient  {
             pingThenListenToServer();
         }
 
-        private void pingThenListenToServer(){
+        private void pingThenListenToServer(){ //TODO: change this
             byte[] buf = new byte[1352]; //TODO calculate this number with a formula for changability
             String received = "";
             InetAddress address;
