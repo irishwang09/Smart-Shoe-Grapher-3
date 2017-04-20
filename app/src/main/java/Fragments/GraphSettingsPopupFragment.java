@@ -1,7 +1,7 @@
 package Fragments;
 
 import android.app.Activity;
-import android.app.DialogFragment;
+import android.support.v4.app.DialogFragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -68,14 +68,12 @@ public class GraphSettingsPopupFragment extends DialogFragment {
         xscaleEditText = (EditText) frag.findViewById(R.id.xscale_title);
         yscaleEditText = (EditText) frag.findViewById(R.id.yscale_title);
 
-
         graphtitleEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 applythisPressed = false;
             }
         });
-
 
         xaxisEditText.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
         graphFragment.startGraphing();
     }
     private void stopGraphing() {
-        Log.d("MATT!", "Stop Graphing");
+        Log.d("MATT!", "Stop Graphing"); //TODO: This needs debugging after changes for multiple pairing ESPs
         graphFragment.stopGraphing();
     }
 
@@ -214,7 +214,10 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
             //TODO: create the fragment
             FragmentManager fm = getSupportFragmentManager();
             GraphSettingsPopupFragment settingsFragment = GraphSettingsPopupFragment.newInstance();
+            settingsFragment.show(fm, "MATT!");
+            //It is probably something like settingsFragment.onAttach()
             Log.d("HP!", "is this making it here");
+            //This is where we get the graphSettings onClick()
         }
     };
 
