@@ -114,7 +114,9 @@ public class GraphFragment extends Fragment {
             @Override
             public void run() {
                 final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,xscale).build();
+                xAxis.setAxisTitle("HaripriyaX"); //TODO: This is how you can the xAxisTitle
                 final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,yscale).build();
+                yAxis.setAxisTitle("HaripriyaY"); //TODO: This is how you can change the yAxisTitle
                  /*String labelAnnotation = new TextAnnotation(); Still working on it*/
                 //These are wrappers for the series we added the data to...It contains the formatting
                 final FastLineRenderableSeries rs1 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor1).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
