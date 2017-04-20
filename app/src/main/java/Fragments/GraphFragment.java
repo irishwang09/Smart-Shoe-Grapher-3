@@ -45,17 +45,19 @@ public class GraphFragment extends Fragment {
     private String hostname;  //hostname specifying the
     private int remotePort;
     private int localPort;
+    private boolean applyPressed = false;
+
 
     //Allows Communication With Other Threads Outside GraphFragment class
     private Handler handler;
 
     private boolean listenerExists = false;
     private boolean startAlreadyPressed = false;
-    private int xBound = 100_000;
-    private int yBound = 5000;
-    private String title = "Sensor Values vs. Number of Samples";
-    private String xaxistitle = "Number of Samples";
-    private String yaxistitle = "Sensor Values";
+    private String graphtitle = "Sensor Values vs. Number of Samples";
+    private String xaxis = "Number of Samples";
+    private String yaxis = "Sample of Values";
+    private int xscale = 100000;
+    private int yscale = 5000;
 
     private SciChartSurface plotSurface;
     private GraphDataSource dataSource; // has a handler to receive data
@@ -111,8 +113,8 @@ public class GraphFragment extends Fragment {
         UpdateSuspender.using(plotSurface, new Runnable() {
             @Override
             public void run() {
-                final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,xBound).build();
-                final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,yBound).build();
+                final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,xscale).build();
+                final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,yscale).build();
                  /*String labelAnnotation = new TextAnnotation(); Still working on it*/
                 //These are wrappers for the series we added the data to...It contains the formatting
                 final FastLineRenderableSeries rs1 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor1).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
@@ -223,7 +225,7 @@ public class GraphFragment extends Fragment {
                 if(i%6==0){
                     xval++;
                 }
-                if(xval == xBound){ //If we are at xBound... break out of adding data
+                if(xval == xscale){ //If we are at xBound... break out of adding data
                     xval = 0;
                     xCounter = 0;
                     break;
@@ -306,7 +308,7 @@ public class GraphFragment extends Fragment {
                 if(i%6==0){
                     xval++;
                 }
-                if(xval == xBound){ //If we are at xBound... break out of adding data
+                if(xval == xscale){ //If we are at xBound... break out of adding data
                     xval = 0;
                     xCounter2 = 0;
                     break;
@@ -456,15 +458,15 @@ public class GraphFragment extends Fragment {
     }
 
     /* This is to update x-axis,y-axis and title*/
-    public void updatexBound(int xBound) { this.xBound= xBound;}
+    public void updatexBound(int xBound) { this.xscale= xBound;}
 
-    public void updateyBound(int yBound) { this.yBound= yBound;}
+    public void updateyBound(int yBound) { this.yscale= yBound;}
 
-    public void updatetitle(String title) { this.title= title;}
+    public void updatetitle(String title) { this.graphtitle= title;}
 
-    public void updatexaxistitle(String title) { this.title= title;}
+    public void updatexaxistitle(String title) { this.xaxis= title;}
 
-    public void updateyaxistitle(String title) { this.title= title;}
+    public void updateyaxistitle(String title) { this.yaxis= title;}
 
 
 }
