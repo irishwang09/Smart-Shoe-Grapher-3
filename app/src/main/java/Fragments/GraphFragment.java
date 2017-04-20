@@ -16,11 +16,19 @@ import android.widget.Toast;
 import com.mattmellor.smartshoegrapher.R;
 import com.mattmellor.smartshoegrapher.UdpClient;
 import com.scichart.charting.model.dataSeries.IXyDataSeries;
+import com.scichart.charting.modifiers.LegendModifier;
+import com.scichart.charting.modifiers.SourceMode;
 import com.scichart.charting.visuals.SciChartSurface;
 import com.scichart.charting.visuals.axes.NumericAxis;
 import com.scichart.charting.visuals.annotations.TextAnnotation;
 import com.scichart.charting.visuals.renderableSeries.FastLineRenderableSeries;
+import com.scichart.core.annotations.Orientation;
 import com.scichart.core.framework.UpdateSuspender;
+import com.scichart.drawing.common.BrushStyle;
+import com.scichart.drawing.common.FontStyle;
+import com.scichart.drawing.common.PenLineCap;
+import com.scichart.drawing.common.PenStyle;
+import com.scichart.drawing.common.SolidBrushStyle;
 import com.scichart.drawing.utility.ColorUtil;
 
 import java.util.ArrayList;
@@ -114,9 +122,30 @@ public class GraphFragment extends Fragment {
             @Override
             public void run() {
                 final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,xscale).build();
-                xAxis.setAxisTitle("HaripriyaX"); //TODO: This is how you can the xAxisTitle
+                xAxis.setAxisTitle(xaxis); //TODO: This is how you can the xAxisTitle
                 final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,yscale).build();
-                yAxis.setAxisTitle("HaripriyaY"); //TODO: This is how you can change the yAxisTitle
+                yAxis.setAxisTitle(yaxis); //TODO: This is how you can change the yAxisTitle
+
+                FontStyle labelStylex = new FontStyle(20, ColorUtil.Green);
+                FontStyle axisStylex = new FontStyle(50, ColorUtil.Green);
+                xAxis.setTickLabelStyle(labelStylex);
+                xAxis.setTitleStyle(axisStylex);
+
+                FontStyle labelStyley = new FontStyle(20, ColorUtil.Yellow);
+                FontStyle axisStyley = new FontStyle(50, ColorUtil.Yellow);
+                yAxis.setTickLabelStyle(labelStyley);
+                yAxis.setTitleStyle(axisStyley);
+
+                BrushStyle bandStyle = new SolidBrushStyle(0x22279B27);
+                xAxis.setAxisBandsStyle(bandStyle);
+                yAxis.setAxisBandsStyle(bandStyle);
+
+
+
+                LegendModifier legendModifier = new LegendModifier(getActivity());
+                legendModifier.setShowLegend(true);
+                legendModifier.setGetLegendDataFor(SourceMode.AllVisibleSeries);
+                legendModifier.setOrientation(Orientation.HORIZONTAL);
                  /*String labelAnnotation = new TextAnnotation(); Still working on it*/
                 //These are wrappers for the series we added the data to...It contains the formatting
                 final FastLineRenderableSeries rs1 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor1).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
