@@ -167,7 +167,8 @@ public class UdpClient  {
         }
 
         private void pingThenListenToServer(){
-            byte[] buf = new byte[1352]; //TODO calculate this number with a formula for changability
+            //byte[] buf = new byte[1352]; //TODO calculate this number with a formula for changability
+            byte[] buf = new byte[82];
             String received = "";
             InetAddress address;
             String mess = "Android Data Receiver";
@@ -179,12 +180,12 @@ public class UdpClient  {
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
                 receiveSocket.send(packet);
                 String dataToSend = "";
-
                 while (streamData) {
                         rcvdPacket = new DatagramPacket(buf, buf.length);
                         receiveSocket.receive(rcvdPacket);
                         received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
                         dataToSend = received.substring(0, received.length() - 2); //Get the data
+                        Log.d("MATT", dataToSend);
                         threadMsg(dataToSend); //TODO: change this back
                         //Log.d("MATT!", clientID);
                 }
