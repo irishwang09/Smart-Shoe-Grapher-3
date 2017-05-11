@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.GridView;
@@ -81,7 +82,8 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
         RecyclerView recyclerSettingsCardsList = (RecyclerView) findViewById(R.id.recycler_view_settings_cards_list);
         recyclerSettingsCardsList.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerSettingsCardsList.setLayoutManager(layoutManager);
+        recyclerSettingsCardsList.setLayoutManager(
+                new GridLayoutManager(recyclerSettingsCardsList.getContext(), 3, GridLayoutManager.HORIZONTAL, false));
         ArrayList<String> settingCardTitles = new ArrayList<>(Arrays.asList("Start Stop", "Sensor Pairing", "Graph Settings"));
         mAdapter = new MainActivity.SettingsCardAdapter(settingCardTitles);
         recyclerSettingsCardsList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
