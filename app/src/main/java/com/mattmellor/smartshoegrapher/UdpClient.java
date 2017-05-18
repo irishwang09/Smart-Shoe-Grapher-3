@@ -42,6 +42,7 @@ public class UdpClient  {
     private String serverAddress; //Ip address/hostname
     private int remoteServerPort;
     private int localPort;
+    private int bufferLength = 82;
     private int dataSetsPerPacket; // statically determined on esp side
     public DatagramPacket rcvdPacket;
     private boolean streamData = true;
@@ -168,7 +169,7 @@ public class UdpClient  {
 
         private void pingThenListenToServer(){
             //byte[] buf = new byte[1352]; //TODO calculate this number with a formula for changability
-            byte[] buf = new byte[82];
+            byte[] buf = new byte[bufferLength];
             String received = "";
             InetAddress address;
             String mess = "Android Data Receiver";

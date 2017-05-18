@@ -55,6 +55,7 @@ public class GraphFragment extends Fragment {
     private boolean startAlreadyPressed = false;
     private int xBound = 10_000;
     private int yBound = 5000;
+    private int validDataLength = 80;
     private String title = "Sensor Values vs. Number of Samples";
     private String xaxistitle = "Number of Samples";
     private String yaxistitle = "Sensor Values";
@@ -212,7 +213,7 @@ public class GraphFragment extends Fragment {
          * @return true if the data isn't corrupted..aka the correct length
          */
         private boolean dataValid(String data){
-            return ((data.length() == 80)); //TODO make more robust
+            return ((data.length() == validDataLength)); //TODO make more robust
         }
 
         private ArrayList<ArrayList<Integer>> spliceDataIntoPointsSets(String[] dataSplit){
