@@ -16,11 +16,19 @@ import android.widget.Toast;
 import com.mattmellor.smartshoegrapher.R;
 import com.mattmellor.smartshoegrapher.UdpClient;
 import com.scichart.charting.model.dataSeries.IXyDataSeries;
+import com.scichart.charting.modifiers.LegendModifier;
+import com.scichart.charting.modifiers.SourceMode;
 import com.scichart.charting.visuals.SciChartSurface;
 import com.scichart.charting.visuals.axes.NumericAxis;
 import com.scichart.charting.visuals.annotations.TextAnnotation;
 import com.scichart.charting.visuals.renderableSeries.FastLineRenderableSeries;
+import com.scichart.core.annotations.Orientation;
 import com.scichart.core.framework.UpdateSuspender;
+import com.scichart.drawing.common.BrushStyle;
+import com.scichart.drawing.common.FontStyle;
+import com.scichart.drawing.common.PenLineCap;
+import com.scichart.drawing.common.PenStyle;
+import com.scichart.drawing.common.SolidBrushStyle;
 import com.scichart.drawing.utility.ColorUtil;
 
 import java.util.ArrayList;
@@ -47,6 +55,8 @@ public class GraphFragment extends Fragment {
     private String hostname;  //hostname specifying the
     private int remotePort;
     private int localPort;
+    private boolean applyPressed = false;
+
 
     //Allows Communication With Other Threads Outside GraphFragment class
     private Handler handler;
@@ -56,9 +66,11 @@ public class GraphFragment extends Fragment {
     private int xBound = 10_000;
     private int yBound = 5000;
     private int validDataLength = 80;
-    private String title = "Sensor Values vs. Number of Samples";
-    private String xaxistitle = "Number of Samples";
-    private String yaxistitle = "Sensor Values";
+    private String graphtitle = "Sensor Values vs. Number of Samples";
+    private String xaxis = "Number of Samples";
+    private String yaxis = "Sensor Values";
+    private int xscale = 100000;
+    private int yscale = 5000;
 
     private SciChartSurface plotSurface;
     private GraphDataSource dataSource; // has a handler to receive data
@@ -124,8 +136,31 @@ public class GraphFragment extends Fragment {
         UpdateSuspender.using(plotSurface, new Runnable() {
             @Override
             public void run() {
-                final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,xBound).build();
-                final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,yBound).build();
+                final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,xscale).build();
+                xAxis.setAxisTitle(xaxis); //TODO: This is how you can the xAxisTitle
+                final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,yscale).build();
+                yAxis.setAxisTitle(yaxis); //TODO: This is how you can change the yAxisTitle
+
+                FontStyle labelStylex = new FontStyle(20, ColorUtil.Green);
+                FontStyle axisStylex = new FontStyle(50, ColorUtil.Green);
+                xAxis.setTickLabelStyle(labelStylex);
+                xAxis.setTitleStyle(axisStylex);
+
+                FontStyle labelStyley = new FontStyle(20, ColorUtil.Yellow);
+                FontStyle axisStyley = new FontStyle(50, ColorUtil.Yellow);
+                yAxis.setTickLabelStyle(labelStyley);
+                yAxis.setTitleStyle(axisStyley);
+
+                BrushStyle bandStyle = new SolidBrushStyle(0x22279B27);
+                xAxis.setAxisBandsStyle(bandStyle);
+                yAxis.setAxisBandsStyle(bandStyle);
+
+
+
+                LegendModifier legendModifier = new LegendModifier(getActivity());
+                legendModifier.setShowLegend(true);
+                legendModifier.setGetLegendDataFor(SourceMode.AllVisibleSeries);
+                legendModifier.setOrientation(Orientation.HORIZONTAL);
                  /*String labelAnnotation = new TextAnnotation(); Still working on it*/
                 //These are wrappers for the series we added the data to...It contains the formatting
                 final FastLineRenderableSeries rs1 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor1).withStrokeStyle(ColorUtil.argb(0xFF, 0x40, 0x83, 0xB7)).build(); //Light Blue Color
@@ -279,7 +314,7 @@ public class GraphFragment extends Fragment {
                 if(i%6==0){
                     xval++;
                 }
-                if(xval == xBound){ //If we are at xBound... break out of adding data
+                if(xval == xscale){ //If we are at xBound... break out of adding data
                     xval = 0;
                     xCounter = 0;
                     break;
@@ -422,7 +457,7 @@ public class GraphFragment extends Fragment {
                 if(i%6==0){
                     xval++;
                 }
-                if(xval == xBound){ //If we are at xBound... break out of adding data
+                if(xval == xscale){ //If we are at xBound... break out of adding data
                     xval = 0;
                     xCounter2 = 0;
                     break;
@@ -582,15 +617,15 @@ public class GraphFragment extends Fragment {
     }
 
     /* This is to update x-axis,y-axis and title*/
-    public void updatexBound(int xBound) { this.xBound= xBound;}
+    public void updatexBound(int xBound) { this.xscale= xBound;}
 
-    public void updateyBound(int yBound) { this.yBound= yBound;}
+    public void updateyBound(int yBound) { this.yscale= yBound;}
 
-    public void updatetitle(String title) { this.title= title;}
+    public void updatetitle(String title) { this.graphtitle= title;}
 
-    public void updatexaxistitle(String title) { this.title= title;}
+    public void updatexaxistitle(String title) { this.xaxis= title;}
 
-    public void updateyaxistitle(String title) { this.title= title;}
+    public void updateyaxistitle(String title) { this.yaxis= title;}
 
 
 }

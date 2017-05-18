@@ -1,5 +1,6 @@
 package com.mattmellor.smartshoegrapher;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,13 +8,17 @@ import android.os.Bundle;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.GridView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +37,12 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
     private String hostname;
     private int remotePort;
     private int localPort;
+    private String graphtitle;
+    private String xaxis;
+    private String yaxis;
+    private int xscale;
+    private int yscale;
+    private String startstop;
 
     private GraphFragment graphFragment;
     private SettingsCardAdapter mAdapter;
@@ -69,11 +80,16 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
         }
 
         //Create a Scrolling list for the start stop Sensor Pairing and Graph Settings buttons
+        if (currentlyGraphing == false)
+             startstop = "Start";
+        else
+             startstop = "Stop";
         RecyclerView recyclerSettingsCardsList = (RecyclerView) findViewById(R.id.recycler_view_settings_cards_list);
         recyclerSettingsCardsList.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerSettingsCardsList.setLayoutManager(layoutManager);
-        ArrayList<String> settingCardTitles = new ArrayList<>(Arrays.asList("Start Stop", "Sensor Pairing", "Graph Settings"));
+        recyclerSettingsCardsList.setLayoutManager(
+                new GridLayoutManager(recyclerSettingsCardsList.getContext(),3));
+        ArrayList<String> settingCardTitles = new ArrayList<>(Arrays.asList(startstop, "\tSensor\n\tPairing", "\t\tGraph\n\tSettings"));
         mAdapter = new MainActivity.SettingsCardAdapter(settingCardTitles);
         recyclerSettingsCardsList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
 
@@ -107,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
         graphFragment.startGraphing();
     }
     private void stopGraphing() {
-        Log.d("MATT!", "Stop Graphing");
+        Log.d("MATT!", "Stop Graphing"); //TODO: This needs debugging after changes for multiple pairing ESPs
         graphFragment.stopGraphing();
     }
 
@@ -182,24 +198,13 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
             }
         };
 
-        //Button listener to get data from the user on the size of the graph that they want
-        private View.OnClickListener graphSettingsButtonListener = new View.OnClickListener(){
-
-            public void onClick(View v){
-                //TODO: Implement this to make graphSettings button 'Click'
-                //TODO: create the fragment
-                //FragmentManager fm = getSupportFragmentManager();
-                //GraphSettingsPopupFragment settingsFragment = GraphSettingsPopupFragment.newInstance();
-                //settingsFragment.show(fm, "HP!");
-            }
-        };
 
 
         private void setOnClickListenerHolder(String cardTitle){
-            if(cardTitle.equals("Sensor Pairing")){
+            if(cardTitle.equals("\tSensor\n\tPairing")){
                 item_view.setOnClickListener(startSensorPairingListener);
             }
-            else if(cardTitle.equals("Start Stop")){
+            else if(cardTitle.equals("Start") || cardTitle.equals("Stop")){
                 item_view.setOnClickListener(startStopButtonListener);
             }
             else{  //Equals the button for starting the Graph Settings Button
@@ -208,6 +213,22 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
         }
 
     }
+
+    //Button listener to get data from the user on the size of the graph that they want
+    private View.OnClickListener graphSettingsButtonListener = new View.OnClickListener(){
+        @Override
+        public void onClick(View v){
+            //TODO: Implement this to make graphSettings button 'Click'
+            //TODO: create the fragment
+            FragmentManager fm = getSupportFragmentManager();
+            GraphSettingsPopupFragment settingsFragment = GraphSettingsPopupFragment.newInstance();
+            settingsFragment.show(fm, "MATT!");
+            //It is probably something like settingsFragment.onAttach()
+            Log.d("HP!", "is this making it here");
+            //This is where we get the graphSettings onClick()
+        }
+    };
+
 
     private ArrayList<ArrayList<String>> readUDPSettingsFromDataBase(){
         //These are the columns we are
@@ -231,4 +252,7 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
         return data;
     }
 
+    public void onDataPassGraphSettings(String graphtitle, String xaxis, String yaxis, int xscale, int yscale) {
+
+    }
 }
