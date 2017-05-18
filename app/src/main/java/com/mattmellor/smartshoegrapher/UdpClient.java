@@ -42,6 +42,7 @@ public class UdpClient  {
     private String serverAddress; //Ip address/hostname
     private int remoteServerPort;
     private int localPort;
+    private int bufferLength = 82;
     private int dataSetsPerPacket; // statically determined on esp side
     public DatagramPacket rcvdPacket;
     private boolean streamData = true;
@@ -166,8 +167,9 @@ public class UdpClient  {
             pingThenListenToServer();
         }
 
-        private void pingThenListenToServer(){ //TODO: change this
-            byte[] buf = new byte[1352]; //TODO calculate this number with a formula for changability
+        private void pingThenListenToServer(){
+            //byte[] buf = new byte[1352]; //TODO calculate this number with a formula for changability
+            byte[] buf = new byte[bufferLength];
             String received = "";
             InetAddress address;
             String mess = "Android Data Receiver";
@@ -179,12 +181,12 @@ public class UdpClient  {
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
                 receiveSocket.send(packet);
                 String dataToSend = "";
-
                 while (streamData) {
                         rcvdPacket = new DatagramPacket(buf, buf.length);
                         receiveSocket.receive(rcvdPacket);
                         received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
                         dataToSend = received.substring(0, received.length() - 2); //Get the data
+                        Log.d("MATT", dataToSend);
                         threadMsg(dataToSend); //TODO: change this back
                         //Log.d("MATT!", clientID);
                 }

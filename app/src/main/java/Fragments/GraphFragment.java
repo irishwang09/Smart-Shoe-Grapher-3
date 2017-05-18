@@ -49,7 +49,9 @@ import SciChartUserClasses.SciChartBuilder;
 public class GraphFragment extends Fragment {
 
     //UDP Settings
-    private UdpClient client;  //This is the client that gives up all the the data
+    private UdpClient client;//This is the client that gives up all the the data
+    private UdpClient client1;
+    private UdpClient client2;
     private String hostname;  //hostname specifying the
     private int remotePort;
     private int localPort;
@@ -61,9 +63,12 @@ public class GraphFragment extends Fragment {
 
     private boolean listenerExists = false;
     private boolean startAlreadyPressed = false;
+    private int xBound = 10_000;
+    private int yBound = 5000;
+    private int validDataLength = 80;
     private String graphtitle = "Sensor Values vs. Number of Samples";
     private String xaxis = "Number of Samples";
-    private String yaxis = "Sample of Values";
+    private String yaxis = "Sensor Values";
     private int xscale = 100000;
     private int yscale = 5000;
 
@@ -79,17 +84,27 @@ public class GraphFragment extends Fragment {
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor4 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor5 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor6 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
-
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor7 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor8 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor9 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor10 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor11 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor12 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
+    private final IXyDataSeries<Integer, Integer> dataSeriesSensor13 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
+    private final IXyDataSeries<Integer, Integer> dataSeriesSensor14 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
+    private final IXyDataSeries<Integer, Integer> dataSeriesSensor15 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
+    private final IXyDataSeries<Integer, Integer> dataSeriesSensor16 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
+
+//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor7 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
+//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor8 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
+//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor9 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
+//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor10 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
+//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor11 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
+//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor12 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
 
     private ArrayList<IXyDataSeries<Integer,Integer>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2,
             dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6, dataSeriesSensor7, dataSeriesSensor8, dataSeriesSensor9, dataSeriesSensor10,
-            dataSeriesSensor11, dataSeriesSensor12));
+            dataSeriesSensor11, dataSeriesSensor12, dataSeriesSensor13, dataSeriesSensor14, dataSeriesSensor15, dataSeriesSensor16));
 
     private int xCounter = 0;
     private int xCounter2 = 0;
@@ -160,11 +175,15 @@ public class GraphFragment extends Fragment {
                 final FastLineRenderableSeries rs10 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor10).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0xFF)).build(); //White color
                 final FastLineRenderableSeries rs11 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor11).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0x99)).build(); //Light Yellow color
                 final FastLineRenderableSeries rs12 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor12).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0x99, 0x33)).build(); //Light Orange color
+                final FastLineRenderableSeries rs13 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor13).withStrokeStyle(ColorUtil.argb(0xFF, 0xE1, 0x32, 0x19)).build(); //Orange Red Color
+                final FastLineRenderableSeries rs14 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor14).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0xFF)).build(); //White color
+                final FastLineRenderableSeries rs15 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor15).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0x99)).build(); //Light Yellow color
+                final FastLineRenderableSeries rs16 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor16).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0x99, 0x33)).build(); //Light Orange color
 
 
                 Collections.addAll(plotSurface.getXAxes(), xAxis);
                 Collections.addAll(plotSurface.getYAxes(), yAxis);
-                Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6,rs7, rs8, rs9, rs10, rs11, rs12);
+                Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6,rs7, rs8, rs9, rs10, rs11, rs12, rs13, rs14, rs15, rs16);
             }
         });
 
@@ -184,30 +203,39 @@ public class GraphFragment extends Fragment {
                 public void handleMessage(Message msg){
                     String sensorData = msg.getData().getString("data"); //Data received
                     //msg.getData().
-                    String sensorID = msg.getData().getString("clientID"); //TODO: Does this work?
+                    String sensorID = msg.getData().getString("clientID");
                     if(dataValid(sensorData)){
                         sensorData = sensorData.replaceAll("\\s", "");
                         final String[] dataSplit = sensorData.split(","); //split the data at the commas
-                        if(sensorID.equals("MATT")){
-                            firstList.add(dataSplit);
-                        }
-                        if(sensorID.equals("ANDREW")){
-                            secondList.add(dataSplit);
-                        }
-                        if(!firstList.isEmpty() && !secondList.isEmpty()){
-                            final ArrayList<ArrayList<Integer>> data = spliceDataIntoPointsSets(firstList.remove(0));
-                            final ArrayList<ArrayList<Integer>> data2 = spliceDataIntoPointsSet2(secondList.remove(0));
-                            //TODO: this needs to be updated for the multiple sensors
-
-                            UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
-                                @Override
-                                public void run() {
-                                    addDataToSeries(data,data2); //Adding the data to the graph and drawing it
-                                }
-                                //TODO: Try adding UdpateSuspender somewhere else so that all 12 sensors are added at once
-                                //TODO: ^continue above s.t. addDataToSeries(data) has data that is all of the data (12 series)
-                            });
-                        }
+                        final ArrayList<ArrayList<Integer>> data = spliceDataIntoPointsSets(dataSplit);
+//                        if(sensorID.equals("MATT")){
+//                            firstList.add(dataSplit);
+//                        }
+//                        if(sensorID.equals("ANDREW")){
+//                            secondList.add(dataSplit);
+//                        }
+//                        if(!firstList.isEmpty() && !secondList.isEmpty()){
+//                            final ArrayList<ArrayList<Integer>> data = spliceDataIntoPointsSets(firstList.remove(0));
+//                            final ArrayList<ArrayList<Integer>> data2 = spliceDataIntoPointsSet2(secondList.remove(0));
+//                            //TODO: this needs to be updated for the multiple sensors
+//
+//                            UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
+//                                @Override
+//                                public void run() {
+//                                    addDataToSeries(data,data2); //Adding the data to the graph and drawing it
+//                                }
+//                                //TODO: Try adding UdpateSuspender somewhere else so that all 12 sensors are added at once
+//                                //TODO: ^continue above s.t. addDataToSeries(data) has data that is all of the data (12 series)
+//                            });
+//                        }
+                        UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
+                            @Override
+                            public void run() {
+                                addDataToSeries(data); //Adding the data to the graph and drawing it
+                            }
+                            //TODO: Try adding UdpateSuspender somewhere else so that all 12 sensors are added at once
+                            //TODO: ^continue above s.t. addDataToSeries(data) has data that is all of the data (12 series)
+                        });
                     }
                 }
             };
@@ -220,7 +248,7 @@ public class GraphFragment extends Fragment {
          * @return true if the data isn't corrupted..aka the correct length
          */
         private boolean dataValid(String data){
-            return ((data.length() == 1350)); //TODO make more robust
+            return ((data.length() == validDataLength)); //TODO make more robust
         }
 
         private ArrayList<ArrayList<Integer>> spliceDataIntoPointsSets(String[] dataSplit){
@@ -231,12 +259,33 @@ public class GraphFragment extends Fragment {
             ArrayList<Integer> x4 = new ArrayList<>();
             ArrayList<Integer> x5 = new ArrayList<>();
             ArrayList<Integer> x6 = new ArrayList<>();
+            ArrayList<Integer> x7 = new ArrayList<>();
+            ArrayList<Integer> x8 = new ArrayList<>();
+            ArrayList<Integer> x9 = new ArrayList<>();
+            ArrayList<Integer> x10 = new ArrayList<>();
+            ArrayList<Integer> x11 = new ArrayList<>();
+            ArrayList<Integer> x12 = new ArrayList<>();
+            ArrayList<Integer> x13 = new ArrayList<>();
+            ArrayList<Integer> x14 = new ArrayList<>();
+            ArrayList<Integer> x15 = new ArrayList<>();
+            ArrayList<Integer> x16 = new ArrayList<>();
+
             ArrayList<Integer> y1 = new ArrayList<>();
             ArrayList<Integer> y2 = new ArrayList<>();
             ArrayList<Integer> y3 = new ArrayList<>();
             ArrayList<Integer> y4 = new ArrayList<>();
             ArrayList<Integer> y5 = new ArrayList<>();
             ArrayList<Integer> y6 = new ArrayList<>();
+            ArrayList<Integer> y7 = new ArrayList<>();
+            ArrayList<Integer> y8 = new ArrayList<>();
+            ArrayList<Integer> y9 = new ArrayList<>();
+            ArrayList<Integer> y10 = new ArrayList<>();
+            ArrayList<Integer> y11 = new ArrayList<>();
+            ArrayList<Integer> y12 = new ArrayList<>();
+            ArrayList<Integer> y13 = new ArrayList<>();
+            ArrayList<Integer> y14 = new ArrayList<>();
+            ArrayList<Integer> y15 = new ArrayList<>();
+            ArrayList<Integer> y16 = new ArrayList<>();
 
             int xval = xCounter;
             if(xCounter == 0){
@@ -247,6 +296,15 @@ public class GraphFragment extends Fragment {
                 dataSeriesList.get(4).clear();
                 dataSeriesList.get(5).clear();
                 dataSeriesList.get(6).clear();
+                dataSeriesList.get(7).clear();
+                dataSeriesList.get(8).clear();
+                dataSeriesList.get(9).clear();
+                dataSeriesList.get(10).clear();
+                dataSeriesList.get(11).clear();
+                dataSeriesList.get(12).clear();
+                dataSeriesList.get(13).clear();
+                dataSeriesList.get(14).clear();
+                dataSeriesList.get(15).clear();
             }
 
             int dataLength = dataSplit.length;
@@ -288,6 +346,46 @@ public class GraphFragment extends Fragment {
                         x6.add(xval);
                         y6.add(num);
                         break;
+                    case 7:
+                        x7.add(xval);
+                        y7.add(num);
+                        break;
+                    case 8:
+                        x8.add(xval);
+                        y8.add(num);
+                        break;
+                    case 9:
+                        x9.add(xval);
+                        y9.add(num);
+                        break;
+                    case 10:
+                        x10.add(xval);
+                        y10.add(num);
+                        break;
+                    case 11:
+                        x11.add(xval);
+                        y11.add(num);
+                        break;
+                    case 12:
+                        x12.add(xval);
+                        y12.add(num);
+                        break;
+                    case 13:
+                        x13.add(xval);
+                        y13.add(num);
+                        break;
+                    case 14:
+                        x14.add(xval);
+                        y14.add(num);
+                        break;
+                    case 15:
+                        x15.add(xval);
+                        y15.add(num);
+                        break;
+                    case 16:
+                        x16.add(xval);
+                        y16.add(num);
+                        break;
                 }
                 i++;
             }
@@ -304,6 +402,26 @@ public class GraphFragment extends Fragment {
             orderedData.add(y5);
             orderedData.add(x6);
             orderedData.add(y6);
+            orderedData.add(x7);
+            orderedData.add(y7);
+            orderedData.add(x8);
+            orderedData.add(y8);
+            orderedData.add(x9);
+            orderedData.add(y9);
+            orderedData.add(x10);
+            orderedData.add(y10);
+            orderedData.add(x11);
+            orderedData.add(y11);
+            orderedData.add(x12);
+            orderedData.add(y12);
+            orderedData.add(x13);
+            orderedData.add(y13);
+            orderedData.add(x14);
+            orderedData.add(y14);
+            orderedData.add(x15);
+            orderedData.add(y15);
+            orderedData.add(x16);
+            orderedData.add(y16);
             return orderedData;
         }
 
@@ -389,7 +507,7 @@ public class GraphFragment extends Fragment {
             return orderedData;
         }
 
-        private void addDataToSeries(ArrayList<ArrayList<Integer>> data, ArrayList<ArrayList<Integer>> data2){
+        private void addDataToSeries(ArrayList<ArrayList<Integer>> data){
             //Add x_1, y_1 set to IXySeries
             dataSeriesList.get(0).append(data.get(0), data.get(1));
             dataSeriesList.get(1).append(data.get(2), data.get(3));
@@ -397,12 +515,22 @@ public class GraphFragment extends Fragment {
             dataSeriesList.get(3).append(data.get(6), data.get(7));
             dataSeriesList.get(4).append(data.get(8), data.get(9));
             dataSeriesList.get(5).append(data.get(10), data.get(11));
-            dataSeriesList.get(6).append(data2.get(0), data2.get(1));
-            dataSeriesList.get(7).append(data2.get(2), data2.get(3));
-            dataSeriesList.get(8).append(data2.get(4), data2.get(5));
-            dataSeriesList.get(9).append(data2.get(6), data2.get(7));
-            dataSeriesList.get(10).append(data2.get(8), data2.get(9));
-            dataSeriesList.get(11).append(data2.get(10), data2.get(11));
+            dataSeriesList.get(6).append(data.get(12), data.get(13));
+            dataSeriesList.get(7).append(data.get(14), data.get(15));
+            dataSeriesList.get(8).append(data.get(16), data.get(17));
+            dataSeriesList.get(9).append(data.get(18), data.get(19));
+            dataSeriesList.get(10).append(data.get(20), data.get(21));
+            dataSeriesList.get(11).append(data.get(22), data.get(23));
+            dataSeriesList.get(12).append(data.get(24), data.get(25));
+            dataSeriesList.get(13).append(data.get(26), data.get(27));
+            dataSeriesList.get(14).append(data.get(28), data.get(29));
+            dataSeriesList.get(15).append(data.get(30), data.get(31));
+//            dataSeriesList.get(6).append(data2.get(0), data2.get(1));
+//            dataSeriesList.get(7).append(data2.get(2), data2.get(3));
+//            dataSeriesList.get(8).append(data2.get(4), data2.get(5));
+//            dataSeriesList.get(9).append(data2.get(6), data2.get(7));
+//            dataSeriesList.get(10).append(data2.get(8), data2.get(9));
+//            dataSeriesList.get(11).append(data2.get(10), data2.get(11));
         }
 
     }
@@ -421,15 +549,15 @@ public class GraphFragment extends Fragment {
                   Log.d("MATT!", "Creating connection... pressed start graphing");
                   resetGraph();
                   listenerExists = true;
-                  UdpClient client1 = new UdpClient("footsensor1.dynamic-dns.net", 2391,5006,45);
+                  client1 = new UdpClient("footsensor2.dynamic-dns.net", 2391,5007,1);
                   client1.setStreamData(true);
                   UdpClient.UdpDataListener listener1 = client1.new UdpDataListener(handler, "ANDREW");
                   listener1.start();
-                  Log.d("MATT!", "Trying Client 2");
-                  UdpClient client2 = new UdpClient("footsensor2.dynamic-dns.net", 2392, 5010, 45);
-                  client2.setStreamData(true);
-                  UdpClient.UdpDataListener listener2 = client2.new UdpDataListener(handler, "MATT");
-                  listener2.start();
+                  //Log.d("MATT!", "Trying Client 2");
+                  //UdpClient client2 = new UdpClient("footsensor2.dynamic-dns.net", 2392, 5010, 45);
+                  //client2.setStreamData(true);
+                  //UdpClient.UdpDataListener listener2 = client2.new UdpDataListener(handler, "MATT");
+                  //listener2.start();
 
 //                  client = new UdpClient(hostname, remotePort, localPort, 45); //Creates the client with the Updated hostname, remotePort, localPort
 //                  client.setStreamData(true);
@@ -458,7 +586,7 @@ public class GraphFragment extends Fragment {
     public void stopGraphing(){
         Log.d("MATT!", "Stop Graphing In Graph Fragment");
         if (listenerExists) {
-            client.setStreamData(false);
+            client1.setStreamData(false);
             listenerExists = false;
         }
         //startAlreadyPressed = false;
