@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.logging.Handler;
 
 import Fragments.GraphFragment;
+import Fragments.GraphFragmentLocal;
 import Fragments.GraphSettingsPopupFragment;
 import Fragments.InputUserSettingsPopupFragment;
 import SciChartUserClasses.SciChartBuilder;
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
     private String yaxis;
     private int xscale;
     private int yscale;
-    private String startstop;
+    public static volatile boolean isRunning;
 
     private GraphFragment graphFragment;
     private SettingsCardAdapter mAdapter;
@@ -51,13 +52,18 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
     private SQLiteDatabase db;
     private Handler mainActivityHandler;
 
+    public static boolean mode = true;
+    public static TextView serialWindow;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SciChartBuilder.init(this); //This is important for GraphFragment to initialize it
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); //set the layout of the activity
         graphFragment = (GraphFragment) getSupportFragmentManager().findFragmentById(R.id.graph_fragment);
-        ArrayList<String> hostnames = new ArrayList<>();
+        serialWindow = (TextView) findViewById(R.id.SerialWindow);
+        //graphFragmentLocal = (GraphFragmentLocal) getSupportFragmentManager().findFragmentById(R.id.graph_fragment_local);
+        /*ArrayList<String> hostnames = new ArrayList<>();
         ArrayList<Integer> localPorts = new ArrayList<>();
         ArrayList<Integer> remotePorts = new ArrayList<>();
 
@@ -77,19 +83,19 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
                 remotePorts.add(verifiedRemotePort);
             }
             onDataPassUdpSettings(hostnames.get(0), localPorts.get(0), remotePorts.get(0)); //TODO: Change this... it is hardcoded
-        }
+        }*/
 
         //Create a Scrolling list for the start stop Sensor Pairing and Graph Settings buttons
         if (currentlyGraphing == false)
-             startstop = "Start";
+             isRunning = true;
         else
-             startstop = "Stop";
+             isRunning = false;
         RecyclerView recyclerSettingsCardsList = (RecyclerView) findViewById(R.id.recycler_view_settings_cards_list);
         recyclerSettingsCardsList.setHasFixedSize(true);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerSettingsCardsList.setLayoutManager(
-                new GridLayoutManager(recyclerSettingsCardsList.getContext(),3));
-        ArrayList<String> settingCardTitles = new ArrayList<>(Arrays.asList(startstop, "\tSensor\n\tPairing", "\t\tGraph\n\tSettings"));
+                new GridLayoutManager(recyclerSettingsCardsList.getContext(),4));
+        ArrayList<String> settingCardTitles = new ArrayList<>(Arrays.asList("Start/Stop", "\tSensor\n\tPairing", "\t\tGraph\n\tSettings", "\tReset\n\tGraph"));
         mAdapter = new MainActivity.SettingsCardAdapter(settingCardTitles);
         recyclerSettingsCardsList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
 
@@ -103,7 +109,11 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
         db.close();
         super.onDestroy();
     }
-
+    public static void setText(String txt)
+    {
+        serialWindow.setText(txt);
+    }
+    public static String getText() { return serialWindow.getText().toString(); }
     //Passes Data from main activity to graphfragment
     private void onDataPassUdpSettings(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort) {
         this.hostname = verifiedHostname;
@@ -125,6 +135,9 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
     private void stopGraphing() {
         Log.d("MATT!", "Stop Graphing"); //TODO: This needs debugging after changes for multiple pairing ESPs
         graphFragment.stopGraphing();
+    }
+    private void resetGraph() {
+        graphFragment.resetGraph();
     }
 
     //-------------Code for RecyclerView-----------
@@ -176,44 +189,50 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
 
         //OnClick button listener will bring up the Wireless Pairing Activity to get user UDP Setting Data
         //which could be done by
-        private View.OnClickListener startSensorPairingListener = new View.OnClickListener(){
-
-            public void onClick(View v){
-                Intent intent = new Intent(getApplicationContext(), WirelessPairingActivity.class);
-                startActivity(intent);
-            }
-        };
-
-        private View.OnClickListener startStopButtonListener = new View.OnClickListener(){
-
-            public void onClick(View v){
-                if(currentlyGraphing){
-                    stopGraphing();  //TODO: This needs to be improved
-                    currentlyGraphing = false;
-                }
-                else{
-                    startGraphing();
-                    currentlyGraphing = true;
-                }
-            }
-        };
-
-
 
         private void setOnClickListenerHolder(String cardTitle){
             if(cardTitle.equals("\tSensor\n\tPairing")){
                 item_view.setOnClickListener(startSensorPairingListener);
             }
-            else if(cardTitle.equals("Start") || cardTitle.equals("Stop")){
+            else if(cardTitle.equals("Start/Stop") || cardTitle.equals("Stop")){
                 item_view.setOnClickListener(startStopButtonListener);
+            }
+            else if (cardTitle.equals("\tReset\n\tGraph")){
+                item_view.setOnClickListener(resetGraphListener);
             }
             else{  //Equals the button for starting the Graph Settings Button
                 item_view.setOnClickListener(graphSettingsButtonListener);
             }
         }
-
     }
+    private View.OnClickListener startSensorPairingListener = new View.OnClickListener(){
 
+        public void onClick(View v){
+            Intent intent = new Intent(getApplicationContext(), WirelessPairingActivity.class);
+            startActivity(intent);
+        }
+    };
+
+    private View.OnClickListener startStopButtonListener = new View.OnClickListener(){
+
+        public void onClick(View v){
+            if(currentlyGraphing)
+            {
+                stopGraphing();  //TODO: This needs to be improved
+                currentlyGraphing = false;
+            }
+            else
+            {
+                currentlyGraphing = true;
+                startGraphing();
+            }
+        }
+    };
+    private View.OnClickListener resetGraphListener = new View.OnClickListener(){
+        public void onClick(View v){
+            resetGraph();
+        }
+    };
     //Button listener to get data from the user on the size of the graph that they want
     private View.OnClickListener graphSettingsButtonListener = new View.OnClickListener(){
         @Override

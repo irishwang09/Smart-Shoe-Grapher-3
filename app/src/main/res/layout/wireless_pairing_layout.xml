@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,67 +12,100 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
-        android:layout_weight="95"
         android:layout_marginBottom="16dp"
+        android:layout_weight="36.48"
+        android:background="@drawable/background_border"
         android:elevation="8dp"
-        android:background="@drawable/background_border">
+        android:orientation="vertical"
+        android:weightSum="1">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/ap_gray"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:text="@string/connected_sensors"
+            android:textColor="@color/ap_gray"
             android:textSize="20dp"
-            android:textStyle="bold"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            />
+            android:textStyle="bold" />
+
         <View
-            android:layout_marginTop="2dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/ap_gray"
-            />
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/ap_gray" />
+
         <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="95"
             android:id="@+id/pairing_fragment_container"
-            />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.81" >
+
+        </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
-
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="15dp"
-        android:orientation="horizontal"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_weight="1.80"
         android:background="@drawable/background_border"
         android:elevation="8dp"
-        android:layout_weight="5">
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:text="@string/AddNew"
+            android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true" />
+            android:layout_marginLeft="15dp"
+            android:text="Add New Remote Pairing"
+            tools:text="Add New Remote Pairing" />
 
 
         <ImageButton
+            android:id="@+id/add_remote_sensor_pairing"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:id="@+id/add_sensor_pairing"
             android:layout_marginRight="15dp"
-            android:src="@drawable/ic_add_new_sensor"
-            android:background="@color/ap_white"/>
+            android:background="@color/ap_white"
+            android:src="@drawable/ic_add_new_sensor" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:background="@drawable/background_border"
+        android:elevation="8dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15dp"
+            android:text="Add New Local Pairing"
+            tools:text="Add New Local Pairing" />
+
+
+        <ImageButton
+            android:id="@+id/add_local_sensor_pairing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="15dp"
+            android:background="@color/ap_white"
+            android:src="@drawable/ic_add_new_sensor" />
 
 
     </RelativeLayout>

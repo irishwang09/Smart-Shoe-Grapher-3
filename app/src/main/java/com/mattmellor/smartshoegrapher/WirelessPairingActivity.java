@@ -6,11 +6,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.Uri;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -24,6 +31,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -46,6 +54,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     private PairingListAdapter mAdapter;
     private ArrayList<String> connected_host_names;
     private ArrayList<String> used_local_ports;
+    ArrayList<String> settingCardTitles = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +67,15 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         //Recycler Pairing List (Scrollable List)
         //Used to dynamically add the pairedSensor views to Recycler List
 
-        RecyclerView recycPairingList = (RecyclerView) findViewById(R.id.pairing_fragment_container);
+ /*       RecyclerView recycPairingList = (RecyclerView) findViewById(R.id.pairing_fragment_container);
         recycPairingList.setHasFixedSize(true);
         recycPairingList.setLayoutManager(new LinearLayoutManager(this));
+        recycPairingList.setLayoutManager(
+                new GridLayoutManager(recycPairingList.getContext(),2));
+        settingCardTitles = new ArrayList<>(Arrays.asList("Start/Stop", "\tSensor\n\tPairing", "\t\tGraph\n\tSettings", "\tReset\n\tGraph"));
+        mAdapter = new MainActivity.SettingsCardAdapter(settingCardTitles);
         mAdapter = new PairingListAdapter(new ArrayList<ArrayList<String>>());
-        recycPairingList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views
-
+        recycPairingList.setAdapter(mAdapter); //Adapter is what we use to manage add/remove views*/
         //Get a Database
         //Goal here is to read the database if it exists
         mDbHelper = UDPDataBaseHelper.getInstance(getApplicationContext());
@@ -85,9 +97,10 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
 
         //Top Level Code to get a new Sensor from the user
         //This is button wiring for add new Sensor
-        ImageButton addSensor = (ImageButton) findViewById(R.id.add_sensor_pairing);
-        addSensor.setOnClickListener(addSensorListener);
-
+        ImageButton addRemoteSensor = (ImageButton) findViewById(R.id.add_remote_sensor_pairing);
+        addRemoteSensor.setOnClickListener(addRemoteSensorListener);
+        ImageButton addLocalSensor = (ImageButton) findViewById(R.id.add_local_sensor_pairing);
+        addLocalSensor.setOnClickListener(addLocalSensorListener);
     }
 
     /**
@@ -120,7 +133,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
     };
 
     //Listener that brings up the UDPSettingsPopup for Sensor Adding
-    private View.OnClickListener addSensorListener = new View.OnClickListener() {
+    private View.OnClickListener addRemoteSensorListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             //Bring up the UDPSettingsFragment to allow user input of new
@@ -129,8 +142,63 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             InputUserSettingsPopupFragment settingsFragment = InputUserSettingsPopupFragment.newInstance();
             settingsFragment.setActivityHandler(mHandler);
             settingsFragment.show(fm, "MATT!");
+            MainActivity.mode = true;
         }
     };
+    private View.OnClickListener addLocalSensorListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //Bring up the UDPSettingsFragment to allow user input of new
+            //sensors
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                while (!Settings.System.canWrite(getBaseContext().getApplicationContext()))
+                {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                    intent.setData(Uri.parse("package:" + getBaseContext().getApplicationContext().getPackageName()));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivityForResult(intent, 0);
+                }
+            }
+            enableHotspot();
+            MainActivity.mode = false;
+            //TODO: check if ESP8266s are connected
+            //TODO: print IP address of ESP8266s into connected sensors card
+        }
+    };
+    private void enableHotspot() {
+        boolean result = false;
+        WifiManager wifiManager = (WifiManager)getBaseContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if(wifiManager.isWifiEnabled())
+        {
+            wifiManager.setWifiEnabled(false);
+        }
+        ConnectivityManager cman = (ConnectivityManager) getBaseContext().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        try
+        {
+            wifiManager.setWifiEnabled(false);
+            Method enableWifi = wifiManager.getClass().getMethod("setWifiApEnabled", WifiConfiguration.class, boolean.class);
+            String ssid  =   "test2";//your SSID
+            String pass  =   "12345678";// your Password
+            WifiConfiguration  myConfig =  new WifiConfiguration();
+            myConfig.SSID = ssid;
+            myConfig.preSharedKey  = pass ;
+            myConfig.status = WifiConfiguration.Status.ENABLED;
+            myConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+            myConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            myConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+            myConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+            myConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+            myConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+            myConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+            result = (Boolean) enableWifi.invoke(wifiManager, myConfig, true);
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            result = false;
+        }
+    }
 
     /**
      *
@@ -207,8 +275,6 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         }
         return super.onOptionsItemSelected(item);
     }
-
-
     //-------------RecyclerView Backend/List of Connected Sensors -----------------
     private void addUDPSensorToConnectedList(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort){
         String verifiedLocalPortString = "" + verifiedLocalPort;

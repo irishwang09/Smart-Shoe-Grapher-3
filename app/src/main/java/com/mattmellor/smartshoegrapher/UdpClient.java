@@ -3,8 +3,11 @@ package com.mattmellor.smartshoegrapher;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+
+import com.scichart.core.framework.UpdateSuspender;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -13,6 +16,9 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+
+import static com.mattmellor.smartshoegrapher.MainActivity.mode;
 
 /**
  * Created by Matt Mellor on 8/5/2016.
@@ -164,7 +170,11 @@ public class UdpClient  {
         }
 
         public void run(){
-            pingThenListenToServer();
+            while(true)
+            {
+                if (mode) pingThenListenToServer();
+                else localThread();
+            }
         }
 
         private void pingThenListenToServer(){
@@ -182,13 +192,13 @@ public class UdpClient  {
                 receiveSocket.send(packet);
                 String dataToSend = "";
                 while (streamData) {
-                        rcvdPacket = new DatagramPacket(buf, buf.length);
-                        receiveSocket.receive(rcvdPacket);
-                        received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
-                        dataToSend = received.substring(0, received.length() - 2); //Get the data
-                        Log.d("MATT", dataToSend);
-                        threadMsg(dataToSend); //TODO: change this back
-                        //Log.d("MATT!", clientID);
+                    rcvdPacket = new DatagramPacket(buf, buf.length);
+                    receiveSocket.receive(rcvdPacket);
+                    received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
+                    dataToSend = received.substring(0, received.length() - 2); //Get the data
+                    Log.d("MATT", dataToSend);
+                    threadMsg(dataToSend); //TODO: change this back
+                    //Log.d("MATT!", clientID);
                 }
                 receiveSocket.close();
             }catch (SocketException e){
@@ -210,9 +220,33 @@ public class UdpClient  {
                 }
                 Log.d("MATT!", "Made it here");
             }
+        }
+        private void localThread()
+        {
+            while (streamData)
+            {
+                int port = 8080;
+                byte[] buffer = new byte[2048];
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);;
+                DatagramSocket socket = null;
+                String recievedData;
+                try {
+                    socket = new DatagramSocket(port);
+                } catch (SocketException e) {
+                    //message.setText("EXCEPTION THROWN: could not create new DatagramSocket");
+                    Log.e("EXCEPTION THROWN", "could not create new DatagramSocket");
+                }
+                try {
+                    socket.receive(packet);
+                } catch (IOException e) {
+                    Log.e("EXCEPTION THROWN", "could not receive packet");
+                }
+                recievedData = new String(buffer, 0, packet.getLength());
+                threadMsgLocal(recievedData);
+                socket.close();
+            }
 
         }
-
         private void threadMsg(String msg) { //Send the data to the Graph Fragment
             if (!msg.equals(null) && !msg.equals("")) {
                 Message msgObj = mhandler.obtainMessage();
@@ -223,7 +257,13 @@ public class UdpClient  {
                 mhandler.sendMessage(msgObj);
             }
         }
-
+        private void threadMsgLocal(String s)
+        {
+            Message msg = Message.obtain(); // Creates an new Message instance
+            msg.obj = s; // Put the string into Message, into "obj" field.
+            msg.setTarget(mhandler); // Set the Handler
+            msg.sendToTarget(); //Send the message
+        }
     }
 
 
