@@ -8,9 +8,9 @@
     <string name="remote_hostname">Remote Hostname/IP Address</string>
     <string name="example_host">footsensor1.dynamic-dns.net</string>
     <string name="remote_port">Remote Port</string>
-    <string name="remote_port_example">2391</string>
+    <string name="remote_port_example">8080</string>
     <string name="local_port">Local Port</string>
-    <string name="local_port_example">5006</string>
+    <string name="local_port_example">5000</string>
     <string name="connected">Not Connected</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>

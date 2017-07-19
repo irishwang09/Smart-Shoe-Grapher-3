@@ -195,7 +195,7 @@ public class UdpClient  {
                     rcvdPacket = new DatagramPacket(buf, buf.length);
                     receiveSocket.receive(rcvdPacket);
                     received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
-                    dataToSend = received.substring(0, received.length() - 2); //Get the data
+                    //dataToSend = received.substring(0, received.length() - 2); //Get the data
                     Log.d("MATT", dataToSend);
                     threadMsg(dataToSend); //TODO: change this back
                     //Log.d("MATT!", clientID);

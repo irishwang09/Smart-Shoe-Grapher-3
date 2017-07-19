@@ -355,7 +355,7 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
         return super.onOptionsItemSelected(item);
     }
     //-------------RecyclerView Backend/List of Connected Sensors -----------------
-    private void addUDPSensorToConnectedList(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort){
+    public void addUDPSensorToConnectedList(String verifiedHostname, int verifiedLocalPort, int verifiedRemotePort){
         String verifiedLocalPortString = "" + verifiedLocalPort;
         String verifiedRemotePortString = "" + verifiedRemotePort;
         ArrayList<String> dataToAdd = new ArrayList<>(Arrays.asList(verifiedHostname,verifiedLocalPortString, verifiedRemotePortString));

@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.mattmellor.smartshoegrapher.R;
 import com.mattmellor.smartshoegrapher.UdpClient;
+import com.mattmellor.smartshoegrapher.WirelessPairingActivity;
 
 /**
  * Created by Matthew on 12/6/2016.
@@ -32,18 +33,18 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
     private EditText remotePortEditText;
 
     private String hostname = "footsensor1.dynamic-dns.net";
-    private int localPort = 5006;
-    private int remotePort = 2391;
+    private int localPort = 5000;
+    private int remotePort = 8080;
     private String unverifiedHostname;
     private String unverifiedRemotePort;
     private String unverifiedLocalPort;
-    private final String defaultHostname = "footsensor1.dynamic-dns.net";
-    private final int defaultRemotePort = 2391;
-    private final int defaultLocalPort = 5006;
+    private final String defaultHostname = "footsensor2.dynamic-dns.net";
+    private final int defaultRemotePort = 8080;
+    private final int defaultLocalPort = 5000;
     private boolean applyPressed = false;
     private boolean dataIsVerified = false;
 
-    private OnDataPass dataPassHandle; //
+    private DataPassHandler dataPassHandle;
     private Handler activityHandler;
 
     public InputUserSettingsPopupFragment(){
@@ -60,7 +61,7 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
         Activity a;
         if(context instanceof Activity){
             a = (Activity) context;
-            dataPassHandle = (OnDataPass) a;
+            dataPassHandle = (DataPassHandler) a;
         }
     }
 
@@ -220,9 +221,19 @@ public class InputUserSettingsPopupFragment extends DialogFragment {
      * and the fragment
      * We only pass verified input
      */
-    public interface OnDataPass{
-        void onDataPassUdpSettings(String hostname,int localPort, int remotePort);
-        boolean isLocalPortUsed(String localPort);
+    private class DataPassHandler{
+        public DataPassHandler()
+        {
+        }
+        private void onDataPassUdpSettings(String hostname,int localPort, int remotePort)
+        {
+            WirelessPairingActivity activity = (WirelessPairingActivity) getActivity();
+            activity.addUDPSensorToConnectedList(hostname,localPort,remotePort);
+        }
+        private boolean isLocalPortUsed(int port)
+        {
+
+        }
     }
 
     /**
