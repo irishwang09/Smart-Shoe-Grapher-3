@@ -49,6 +49,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.function.DoubleToLongFunction;
 
 import SciChartUserClasses.SciChartBuilder;
 
@@ -108,7 +109,7 @@ public class GraphFragment extends Fragment {
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor14 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor15 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor16 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
-
+    private NumericAxis xAxis = null;
 //    private final IXyDataSeries<Integer, Integer> dataSeriesSensor7 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
 //    private final IXyDataSeries<Integer, Integer> dataSeriesSensor8 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
 //    private final IXyDataSeries<Integer, Integer> dataSeriesSensor9 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
@@ -151,7 +152,7 @@ public class GraphFragment extends Fragment {
         UpdateSuspender.using(plotSurface, new Runnable() {
             @Override
             public void run() {
-                final NumericAxis xAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,xscale).withAutoRangeMode(AutoRange.Always).build();
+                xAxis = sciChartBuilder.newNumericAxis().withAutoRangeMode(AutoRange.Never).build();
                 xAxis.setAxisTitle(xaxis); //TODO: This is how you can the xAxisTitle
                 final NumericAxis yAxis = sciChartBuilder.newNumericAxis().withVisibleRange(0,yscale).withAutoRangeMode(AutoRange.Always).build();
                 yAxis.setAxisTitle(yaxis); //TODO: This is how you can change the yAxisTitle
@@ -264,21 +265,8 @@ public class GraphFragment extends Fragment {
                                         addDataToSeriesLocal(orderedData); //Adding the data to the graph and drawing it
                                     }
                                 });
-                                /*ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-                                ScheduledFuture<?> schedule = scheduledExecutorService.scheduleWithFixedDelay(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (!MainActivity.isRunning) {
-                                            return;
-                                        }
-                                        UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
-                                            @Override
-                                            public void run() {
-                                                addDataToSeriesLocal(orderedData); //Adding the data to the graph and drawing it
-                                            }
-                                        });
-                                    }
-                                }, 0, 100, TimeUnit.MILLISECONDS);*/
+                                xAxis.animateVisibleRangeTo(new DoubleRange((double) xCounter-3000, (double) xCounter), (long) 500);
+
                             }
                         }
                     }

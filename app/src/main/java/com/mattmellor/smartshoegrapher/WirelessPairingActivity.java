@@ -1,6 +1,7 @@
 package com.mattmellor.smartshoegrapher;
 
 
+import android.app.ActionBar;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -28,9 +29,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -161,10 +167,83 @@ public class WirelessPairingActivity extends AppCompatActivity implements InputU
             }
             enableHotspot();
             MainActivity.mode = false;
-            //TODO: check if ESP8266s are connected
-            //TODO: print IP address of ESP8266s into connected sensors card
+            TableLayout connectedSensorsLayout = (TableLayout) findViewById(R.id.csTableLayout);
+            ArrayList<String> sensorCardTitles = getClientList();
+            /*TextView sensorLeftID = (TextView) findViewById(R.id.sensorLeftID);
+            sensorLeftID.setText(sensorCardTitles.get(0));*/
+            for (String ipAdd : sensorCardTitles)
+            {
+                TextView textView = new TextView(getBaseContext().getApplicationContext());
+                textView.setText(ipAdd);
+                textView.setTextColor(0xff000000);
+                TableRow newRow = new TableRow(getBaseContext().getApplicationContext());
+                newRow.addView(textView);
+                TableLayout.LayoutParams layout = new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT);
+                connectedSensorsLayout.addView(newRow, layout);
+            }
         }
     };
+    private class SensorCardAdapter extends RecyclerView.Adapter<SensorCardHolder>{
+        //dataSet will just contain 4 entries: Start/Stop, Sensor Pairing, Graph Settings, Reset Graph
+        private ArrayList<String> mdataSet;
+
+        private SensorCardAdapter(ArrayList<String> dataSet){
+            mdataSet = dataSet;
+        }
+
+        //Create new views
+        @Override
+        public WirelessPairingActivity.SensorCardHolder onCreateViewHolder(ViewGroup parent, int viewType){
+            //This is called whenever a new instance of ViewHolder is created
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            View v = layoutInflater.inflate(R.layout.setting_card_view,parent,false);
+            return new WirelessPairingActivity.SensorCardHolder(v);
+        }
+
+        // Replace the contents of a view (invoked by layout manager)
+        @Override
+        public void onBindViewHolder(WirelessPairingActivity.SensorCardHolder ph, int position){
+            //Called whenever the SO binds the view with the data...in otherwords the
+            //data is shown in the UI
+            String title = mdataSet.get(position);
+            ph.ipAdd.setText(mdataSet.get(position));
+        }
+
+        @Override
+        public int getItemCount(){
+            return mdataSet.size();
+        }
+    }
+    private class SensorCardHolder extends RecyclerView.ViewHolder{
+
+        private TextView ipAdd;
+        private View item_view;
+
+        private SensorCardHolder (View itemView) {  //This must be called at least once per item...
+            super(itemView);
+            item_view = itemView;
+            ipAdd = (TextView) itemView.findViewById(R.id.sensor_card_title);
+        }
+    }
+    private ArrayList<String> getClientList() {
+        ArrayList<String> clientList = new ArrayList<>();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader("/proc/net/arp"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] clientInfo = line.split(" +");
+                String mac = clientInfo[3];
+                if (mac.matches("..:..:..:..:..:..")) { // To make sure its not the title
+                    clientList.add(clientInfo[0]);
+                }
+            }
+        } catch (java.io.IOException aE) {
+            aE.printStackTrace();
+            return null;
+        }
+        return clientList;
+    }
     private void enableHotspot() {
         boolean result = false;
         WifiManager wifiManager = (WifiManager)getBaseContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);

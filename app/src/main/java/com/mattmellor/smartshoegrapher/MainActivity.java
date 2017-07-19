@@ -20,6 +20,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.scichart.data.model.DoubleRange;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Handler;
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
 
     public static boolean mode = true;
     public static TextView serialWindow;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements GraphSettingsPopu
 
     @Override
     protected void onDestroy(){
-        mDbHelper.close();
+        //mDbHelper.close();
         db.close();
         super.onDestroy();
     }

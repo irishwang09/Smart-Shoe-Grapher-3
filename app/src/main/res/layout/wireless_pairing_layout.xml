@@ -9,43 +9,39 @@
     android:paddingTop="16dp"
     android:clipToPadding="false">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/textView6"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="16dp"
-        android:layout_weight="36.48"
-        android:background="@drawable/background_border"
-        android:elevation="8dp"
-        android:orientation="vertical"
-        android:weightSum="1">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:text="@string/connected_sensors"
+        android:textColor="@color/ap_gray"
+        android:textSize="20dp"
+        android:textStyle="bold" />
 
-        <TextView
+    <TableLayout
+        android:id="@+id/csTableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="358dp"
+        android:layout_weight="0.83">
+
+        <TableRow
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:text="@string/connected_sensors"
-            android:textColor="@color/ap_gray"
-            android:textSize="20dp"
-            android:textStyle="bold" />
+            android:layout_height="match_parent" />
 
-        <View
+        <TableRow
             android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="2dp"
-            android:background="@color/ap_gray" />
+            android:layout_height="match_parent" />
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/pairing_fragment_container"
+        <TableRow
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.81" >
+            android:layout_height="match_parent" />
 
-        </android.support.v7.widget.RecyclerView>
-
-    </LinearLayout>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </TableLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
