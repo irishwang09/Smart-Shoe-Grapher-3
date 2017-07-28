@@ -211,7 +211,7 @@ public class GraphFragment extends Fragment {
        //Get the data from the UDP Data Class when its available
                 handler = new Handler() {
                     public void handleMessage(Message msg) {
-                        if (MainActivity.mode && MainActivity.isRunning) {
+                        if (false) { //TODO: CHANGE THIS
                             String sensorData = msg.getData().getString("data"); //Data received
                             //msg.getData().
                             if (dataValidRemote(sensorData)) {
@@ -236,7 +236,7 @@ public class GraphFragment extends Fragment {
                                 int xval = xCounter + 1;
                                 StringBuilder sb = new StringBuilder();
                                 //below is for graphing every datapoint
-                                /*for (int i = 0; i < dataSplit.length; i += 5) {
+                                for (int i = 0; i < dataSplit.length; i += 5) {
                                     orderedData.add(xval);
                                     orderedData.add(Integer.parseInt(dataSplit[i]));
                                     orderedData.add(xval);
@@ -246,16 +246,16 @@ public class GraphFragment extends Fragment {
                                     orderedData.add(xval);
                                     orderedData.add(Integer.parseInt(dataSplit[i + 3]));
                                     xval++;
-                                }*/
+                                }
                                 //below is for graphing every fourth datapoint
-                                orderedData.add(xval);
+                                /*orderedData.add(xval);
                                 orderedData.add(Integer.parseInt(dataSplit[0]));
                                 orderedData.add(xval);
                                 orderedData.add(Integer.parseInt(dataSplit[1]));
                                 orderedData.add(xval);
                                 orderedData.add(Integer.parseInt(dataSplit[2]));
                                 orderedData.add(xval);
-                                orderedData.add(Integer.parseInt(dataSplit[3]));
+                                orderedData.add(Integer.parseInt(dataSplit[3]));*/
                                 xval++;
                                 xCounter = xval;
                                 UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
@@ -534,7 +534,7 @@ public class GraphFragment extends Fragment {
             Log.d("MATT!", "Creating connection... pressed start graphing");
             //resetGraph();
             listenerExists = true;
-            client1 = new UdpClient("footsensor2.dynamic-dns.net", 2391,5007,1);
+            client1 = new UdpClient("www.smartshoegrapher.dynamic-dns.net",5013,5013,45); //2391,5007,1 //TODO: CHANGE THIS TO TAKE IN DATA!!!
             client1.setStreamData(true);
             UdpClient.UdpDataListener listener1 = client1.new UdpDataListener(handler, "ANDREW");
             listener1.start();

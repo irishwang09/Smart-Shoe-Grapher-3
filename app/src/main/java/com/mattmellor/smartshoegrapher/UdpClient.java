@@ -43,7 +43,6 @@ import static com.mattmellor.smartshoegrapher.MainActivity.mode;
 
 public class UdpClient  {
 
-    private DatagramSocket pingSocket;
     private DatagramSocket receiveSocket;
     private String serverAddress; //Ip address/hostname
     private int remoteServerPort;
@@ -87,31 +86,34 @@ public class UdpClient  {
         }
 
         private void acknowledgeServer() {
+            DatagramSocket pingSocket = null;
+            DatagramSocket rplySocket = null;
             String mess = "Ping";
             InetAddress address;
             DatagramPacket packet;
             DatagramPacket rPacket;
             byte[] buf = new byte[8];
             boolean fail = false;
-            int port = localPort + 1;
-            if (localPort == 65535) port = localPort -1;
-
+            int port = 5013;
             try {
                 pingSocket = new DatagramSocket(port);
-                address = InetAddress.getByName(serverAddress);
-                packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
+                pingSocket.setReuseAddress(true);
+                address = InetAddress.getByName("smartshoegrapher.dynamic-dns.net");
+                //address = InetAddress.getByName("18.111.32.1");
+                packet = new DatagramPacket(mess.getBytes(), mess.length(), address, port);
                 pingSocket.send(packet);
                 Log.d("MATT!", "About to wait to receive packet");
-                pingSocket.setSoTimeout(1000); //2 second wait tile
                 rPacket = new DatagramPacket(buf, buf.length);
-                pingSocket.receive(rPacket);
+                rplySocket = new DatagramSocket(5003);
+                rplySocket.setSoTimeout(3000);
+                rplySocket.receive(rPacket);
+                //pingSocket.setSoTimeout(3000);
+                //pingSocket.receive(rPacket);
                 String received = new String(rPacket.getData(), 0, rPacket.getLength());
-
                 if (received.length() > 0){
                     Log.d("MATT!", "Successful Response from server");
                     threadMsg("success");
                 }
-
             }catch(SocketTimeoutException e){
                 //Send a message to the fragment
                 Log.d("MATT!", "TimeoutException in ping");
@@ -139,6 +141,9 @@ public class UdpClient  {
                 if(pingSocket != null){
                     pingSocket.close();
                 }
+                if (rplySocket != null){
+                    rplySocket.close();
+                }
             }
         }
 
@@ -158,6 +163,38 @@ public class UdpClient  {
      * Class for listening to Udp remote server for a long time
      * as a separate thread
      */
+    public class RplyListener extends Thread {
+        DatagramSocket rplySocket = null;
+        byte[] buffer = new byte[16];
+        DatagramPacket rplyPacket = new DatagramPacket(buffer, buffer.length);
+
+        public RplyListener()
+        {
+        }
+
+        public void run()
+        {
+            while (true)
+            {
+                try {
+                    rplySocket = new DatagramSocket(5004);
+                } catch (SocketException e) {
+                    Log.e("IRIS", "could not create new DatagramSocket");
+                }
+                try {
+                    rplySocket.receive(rplyPacket);
+                } catch (IOException e) {
+                    Log.e("IRIS", "could not receive packet");
+                }
+                String rply = new String(buffer, 0, rplyPacket.getLength());
+                Log.e("Recieved", rply);
+                if (rply.length() > 0){
+                    Log.d("MATT!", "Successful Response from server");
+                    //threadMsg("success");
+                }
+            }
+        }
+    }
     public class UdpDataListener extends Thread {
 
         private Handler mhandler;
@@ -170,11 +207,44 @@ public class UdpClient  {
         }
 
         public void run(){
-            while(true)
+
+            if (mode)
             {
-                if (mode) pingThenListenToServer();
-                else localThread();
+                DatagramSocket senderSocket = null;
+                DatagramSocket listenerSocket = null;
+                try {
+                    String mess = "Android Data Receiver";
+                    senderSocket = new DatagramSocket(localPort);
+                    InetAddress address = InetAddress.getByName("smartshoegrapher.dynamic-dns.net");
+                    DatagramPacket packet = new DatagramPacket(mess.getBytes(), mess.length(), address, localPort);
+                    senderSocket.send(packet);
+                    senderSocket.close();
+                }
+                catch (Exception e)
+                {
+                    Log.e("IRIS", "exception thrown");
+                }
+                while(true) {
+                    byte[] buffer = new byte[2048];
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                    try {
+                        listenerSocket = new DatagramSocket(5003);
+                    } catch (SocketException e) {
+                        e.printStackTrace();
+                    }
+                    String recievedData;
+                    try {
+                        listenerSocket.receive(packet);
+                    } catch (IOException e) {
+                        Log.e("EXCEPTION THROWN", "could not receive packet");
+                    }
+                    recievedData = new String(buffer, 0, packet.getLength());
+                    threadMsgLocal(recievedData);
+                    listenerSocket.close();
+                }
+
             }
+            else while (true) localThread();
         }
 
         private void pingThenListenToServer(){
@@ -183,25 +253,48 @@ public class UdpClient  {
             String received = "";
             InetAddress address;
             String mess = "Android Data Receiver";
-            DatagramPacket packet;
+            //DatagramPacket packet;
             try{
                 //Ping the server to tell server IP Address of Android phone
-                receiveSocket = new DatagramSocket(localPort);
+
+                /*receiveSocket = new DatagramSocket(localPort);
                 address = InetAddress.getByName(serverAddress);
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
-                receiveSocket.send(packet);
-                String dataToSend = "";
+                receiveSocket.send(packet);*/
+
                 while (streamData) {
-                    rcvdPacket = new DatagramPacket(buf, buf.length);
+                    /*rcvdPacket = new DatagramPacket(buf, buf.length);
                     receiveSocket.receive(rcvdPacket);
                     received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
                     //dataToSend = received.substring(0, received.length() - 2); //Get the data
-                    Log.d("MATT", dataToSend);
-                    threadMsg(dataToSend); //TODO: change this back
-                    //Log.d("MATT!", clientID);
+                    Log.d("MATT", received);
+                    if (!received.equals("IP port changed"))
+                    {
+                        threadMsg(received);
+                    }
+                     //TODO: change this back
+                    //Log.d("MATT!", clientID);*/
+                    byte[] buffer = new byte[2048];
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);;
+                    DatagramSocket socket = null;
+                    String recievedData;
+                    try {
+                        socket = new DatagramSocket(localPort);
+                    } catch (SocketException e) {
+                        //message.setText("EXCEPTION THROWN: could not create new DatagramSocket");
+                        Log.e("EXCEPTION THROWN", "could not create new DatagramSocket");
+                    }
+                    try {
+                        socket.receive(packet);
+                    } catch (IOException e) {
+                        Log.e("EXCEPTION THROWN", "could not receive packet");
+                    }
+                    recievedData = new String(buffer, 0, packet.getLength());
+                    threadMsgLocal(recievedData);
+                    socket.close();
                 }
                 receiveSocket.close();
-            }catch (SocketException e){
+/*            }catch (SocketException e){
                 e.printStackTrace();
                 Log.e("MATT!", "socket exception in listen");
             }catch(UnknownHostException e){
@@ -209,7 +302,7 @@ public class UdpClient  {
                 Log.e("MATT!", "unknown host exception in listen");
             }catch(IOException e){
                 e.printStackTrace();
-                Log.e("MATT!", "IOException");
+                Log.e("MATT!", "IOException");*/
             }catch(Exception e){
                 Log.e("MATT!", "General exception");
                 e.printStackTrace();
@@ -225,7 +318,7 @@ public class UdpClient  {
         {
             while (streamData)
             {
-                int port = 8080;
+                int port = 5003;
                 byte[] buffer = new byte[2048];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);;
                 DatagramSocket socket = null;
@@ -247,22 +340,19 @@ public class UdpClient  {
             }
 
         }
-        private void threadMsg(String msg) { //Send the data to the Graph Fragment
-            if (!msg.equals(null) && !msg.equals("")) {
-                Message msgObj = mhandler.obtainMessage();
-                Bundle b = new Bundle();    //Is this the best way to do this??
-                b.putString("data", msg); //tagging so we can distinguish data source
-                b.putString("clientID", clientID);
-                msgObj.setData(b);
-                mhandler.sendMessage(msgObj);
-            }
-        }
         private void threadMsgLocal(String s)
         {
             Message msg = Message.obtain(); // Creates an new Message instance
             msg.obj = s; // Put the string into Message, into "obj" field.
             msg.setTarget(mhandler); // Set the Handler
-            msg.sendToTarget(); //Send the message
+            try
+            {
+                msg.sendToTarget();
+            }
+            catch (Exception e)
+            {
+                Log.e("IRIS!", "exception thrown");
+            }
         }
     }
 
