@@ -520,7 +520,7 @@ public class GraphFragment extends Fragment {
             Log.d("MATT!", "Creating connection... pressed start graphing");
             //resetGraph();
             listenerExists = true;
-            client1 = new UdpClient("smartshoegrapher1.hopto.org",5013,5013,45); //2391,5007,1 //TODO: CHANGE THIS TO TAKE IN DATA!!!
+            client1 = new UdpClient("smartshoegrapher.dynamic-dns.net",5013,5013,45); //2391,5007,1 //TODO: CHANGE THIS TO TAKE IN DATA FROM INPUTUDPSETTINGS!!!
             client1.setStreamData(true);
             UdpClient.UdpDataListener listener1 = client1.new UdpDataListener(handler, "ANDREW");
             listener1.start();
