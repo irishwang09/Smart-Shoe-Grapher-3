@@ -78,9 +78,6 @@ public class UdpClient  {
             this.handler = handler;
         }
 
-        /**
-         * value to be called by the thread
-         */
         public void run(){
             acknowledgeServer();
         }
@@ -96,22 +93,23 @@ public class UdpClient  {
             boolean fail = false;
             int port = 5013;
             try {
+                //create a new socket to send "Ping" to port 5013 in IP address as defined by DDNS
                 pingSocket = new DatagramSocket(port);
                 pingSocket.setReuseAddress(true);
-                address = InetAddress.getByName("smartshoegrapher.dynamic-dns.net");
+                address = InetAddress.getByName(serverAddress);
                 //address = InetAddress.getByName("18.111.32.1");
                 packet = new DatagramPacket(mess.getBytes(), mess.length(), address, port);
                 pingSocket.send(packet);
                 Log.d("MATT!", "About to wait to receive packet");
                 rPacket = new DatagramPacket(buf, buf.length);
+                //listens for "rply" on port 5003
                 rplySocket = new DatagramSocket(5003);
                 rplySocket.setSoTimeout(3000);
                 rplySocket.receive(rPacket);
-                //pingSocket.setSoTimeout(3000);
-                //pingSocket.receive(rPacket);
                 String received = new String(rPacket.getData(), 0, rPacket.getLength());
                 if (received.length() > 0){
                     Log.d("MATT!", "Successful Response from server");
+                    //notify a handler that the ping was a success. Handler will open a Toast indicating as such
                     threadMsg("success");
                 }
             }catch(SocketTimeoutException e){
@@ -158,43 +156,6 @@ public class UdpClient  {
         }
     }
 
-
-    /**
-     * Class for listening to Udp remote server for a long time
-     * as a separate thread
-     */
-    public class RplyListener extends Thread {
-        DatagramSocket rplySocket = null;
-        byte[] buffer = new byte[16];
-        DatagramPacket rplyPacket = new DatagramPacket(buffer, buffer.length);
-
-        public RplyListener()
-        {
-        }
-
-        public void run()
-        {
-            while (true)
-            {
-                try {
-                    rplySocket = new DatagramSocket(5004);
-                } catch (SocketException e) {
-                    Log.e("IRIS", "could not create new DatagramSocket");
-                }
-                try {
-                    rplySocket.receive(rplyPacket);
-                } catch (IOException e) {
-                    Log.e("IRIS", "could not receive packet");
-                }
-                String rply = new String(buffer, 0, rplyPacket.getLength());
-                Log.e("Recieved", rply);
-                if (rply.length() > 0){
-                    Log.d("MATT!", "Successful Response from server");
-                    //threadMsg("success");
-                }
-            }
-        }
-    }
     public class UdpDataListener extends Thread {
 
         private Handler mhandler;
@@ -207,8 +168,7 @@ public class UdpClient  {
         }
 
         public void run(){
-
-            if (mode)
+            if (mode) //if using WAN method (mode = true means WAN)
             {
                 DatagramSocket senderSocket = null;
                 DatagramSocket listenerSocket = null;
@@ -244,80 +204,15 @@ public class UdpClient  {
                 }
 
             }
+            //if running LAN mode
             else while (true) localThread();
         }
 
-        private void pingThenListenToServer(){
-            //byte[] buf = new byte[1352]; //TODO calculate this number with a formula for changability
-            byte[] buf = new byte[bufferLength];
-            String received = "";
-            InetAddress address;
-            String mess = "Android Data Receiver";
-            //DatagramPacket packet;
-            try{
-                //Ping the server to tell server IP Address of Android phone
-
-                /*receiveSocket = new DatagramSocket(localPort);
-                address = InetAddress.getByName(serverAddress);
-                packet = new DatagramPacket(mess.getBytes(), mess.length(), address, remoteServerPort);
-                receiveSocket.send(packet);*/
-
-                while (streamData) {
-                    /*rcvdPacket = new DatagramPacket(buf, buf.length);
-                    receiveSocket.receive(rcvdPacket);
-                    received = new String(rcvdPacket.getData(), 0, rcvdPacket.getLength());
-                    //dataToSend = received.substring(0, received.length() - 2); //Get the data
-                    Log.d("MATT", received);
-                    if (!received.equals("IP port changed"))
-                    {
-                        threadMsg(received);
-                    }
-                     //TODO: change this back
-                    //Log.d("MATT!", clientID);*/
-                    byte[] buffer = new byte[2048];
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);;
-                    DatagramSocket socket = null;
-                    String recievedData;
-                    try {
-                        socket = new DatagramSocket(localPort);
-                    } catch (SocketException e) {
-                        //message.setText("EXCEPTION THROWN: could not create new DatagramSocket");
-                        Log.e("EXCEPTION THROWN", "could not create new DatagramSocket");
-                    }
-                    try {
-                        socket.receive(packet);
-                    } catch (IOException e) {
-                        Log.e("EXCEPTION THROWN", "could not receive packet");
-                    }
-                    recievedData = new String(buffer, 0, packet.getLength());
-                    threadMsgLocal(recievedData);
-                    socket.close();
-                }
-                receiveSocket.close();
-/*            }catch (SocketException e){
-                e.printStackTrace();
-                Log.e("MATT!", "socket exception in listen");
-            }catch(UnknownHostException e){
-                e.printStackTrace();
-                Log.e("MATT!", "unknown host exception in listen");
-            }catch(IOException e){
-                e.printStackTrace();
-                Log.e("MATT!", "IOException");*/
-            }catch(Exception e){
-                Log.e("MATT!", "General exception");
-                e.printStackTrace();
-            }finally {
-                if(receiveSocket != null){
-                    receiveSocket.close();
-                    Log.d("MATT!", "UDP Socket Closed");
-                }
-                Log.d("MATT!", "Made it here");
-            }
-        }
         private void localThread()
         {
             while (streamData)
             {
+                //keeps listening for long strings of data coming into port 5003
                 int port = 5003;
                 byte[] buffer = new byte[2048];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);;
@@ -335,6 +230,7 @@ public class UdpClient  {
                     Log.e("EXCEPTION THROWN", "could not receive packet");
                 }
                 recievedData = new String(buffer, 0, packet.getLength());
+                //sends long string of data to a handler (see GraphFragment to see how its handled)
                 threadMsgLocal(recievedData);
                 socket.close();
             }

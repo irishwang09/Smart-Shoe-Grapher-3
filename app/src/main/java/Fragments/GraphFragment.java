@@ -40,6 +40,7 @@ import com.scichart.drawing.utility.ColorUtil;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +52,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
 import SciChartUserClasses.SciChartBuilder;
+
+import static com.mattmellor.smartshoegrapher.MainActivity.mode;
 
 
 /**
@@ -91,7 +94,7 @@ public class GraphFragment extends Fragment {
     protected final SciChartBuilder sciChartBuilder = SciChartBuilder.instance();
 
    // private ArrayList<>
-
+    //creates the 16 graphing lines
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor1 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor2 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor3 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
@@ -109,12 +112,6 @@ public class GraphFragment extends Fragment {
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor15 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private final IXyDataSeries<Integer, Integer> dataSeriesSensor16 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
     private NumericAxis xAxis = null;
-//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor7 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
-//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor8 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
-//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor9 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
-//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor10 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
-//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor11 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
-//    private final IXyDataSeries<Integer, Integer> dataSeriesSensor12 = sciChartBuilder.newXyDataSeries(Integer.class, Integer.class).build();
 
     private ArrayList<IXyDataSeries<Integer,Integer>> dataSeriesList = new ArrayList<>(Arrays.asList(dataSeriesSensor1,dataSeriesSensor2,
             dataSeriesSensor3, dataSeriesSensor4, dataSeriesSensor5, dataSeriesSensor6, dataSeriesSensor7, dataSeriesSensor8, dataSeriesSensor9, dataSeriesSensor10,
@@ -193,7 +190,7 @@ public class GraphFragment extends Fragment {
                 final FastLineRenderableSeries rs15 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor15).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0xFF, 0x99)).build(); //Light Yellow color
                 final FastLineRenderableSeries rs16 = sciChartBuilder.newLineSeries().withDataSeries(dataSeriesSensor16).withStrokeStyle(ColorUtil.argb(0xFF, 0xFF, 0x99, 0x33)).build(); //Light Orange color
 
-
+                //Adds all lines to the graph
                 Collections.addAll(plotSurface.getXAxes(), xAxis);
                 Collections.addAll(plotSurface.getYAxes(), yAxis);
                 Collections.addAll(plotSurface.getRenderableSeries(), rs1, rs2, rs3, rs4, rs5, rs6, rs7, rs8, rs9, rs10, rs11, rs12, rs13, rs14, rs15, rs16);
@@ -201,6 +198,7 @@ public class GraphFragment extends Fragment {
         });
 
         dataSource = new GraphDataSource(); //Run the data receiving & handling on a separate thread]
+        //starts listening for data being received by a handler
         dataSource.start();
     }
     //-------------Get Data, Manipulate Data & Notify PlotUpdater-----------
@@ -211,31 +209,19 @@ public class GraphFragment extends Fragment {
        //Get the data from the UDP Data Class when its available
                 handler = new Handler() {
                     public void handleMessage(Message msg) {
-                        if (false) { //TODO: CHANGE THIS
-                            String sensorData = msg.getData().getString("data"); //Data received
-                            //msg.getData().
-                            if (dataValidRemote(sensorData)) {
-                                sensorData = sensorData.replaceAll("\\s", "");
-                                final String[] dataSplit = sensorData.split(","); //split the data at the commas
-                                final ArrayList<ArrayList<Integer>> data = spliceDataIntoPointsSets(dataSplit);
-                                UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
-                                    @Override
-                                    public void run() {
-                                        addDataToSeriesRemote(data); //Adding the data to the graph and drawing it
-                                    }
-                                    //TODO: Try adding UdpateSuspender somewhere else so that all 12 sensors are added at once
-                                    //TODO: ^continue above s.t. addDataToSeries(data) has data that is all of the data (12 series)
-                                });
-                            }
-                        } else if (MainActivity.isRunning){
+                        if (MainActivity.isRunning){
+                            //data is receieved in a very long string of numbers
                             String recievedData = (String) msg.obj;
+                            //split data every fourth int and populate a String[] with it
                             String[] dataSplit = splitStringEvery(recievedData, 4);
+                            //check for errors by comparing the checksum with data
                             boolean valid = dataValidLocal(dataSplit);
                             if (valid) {
                                 final ArrayList<Integer> orderedData = new ArrayList<>();
                                 int xval = xCounter + 1;
-                                StringBuilder sb = new StringBuilder();
-                                //below is for graphing every datapoint
+                                //populates Arraylist<Int> with data from dataSplit, separated by the
+                                //x value that they correspond with. This is format is important for
+                                //SciChart
                                 for (int i = 0; i < dataSplit.length; i += 5) {
                                     orderedData.add(xval);
                                     orderedData.add(Integer.parseInt(dataSplit[i]));
@@ -534,12 +520,13 @@ public class GraphFragment extends Fragment {
             Log.d("MATT!", "Creating connection... pressed start graphing");
             //resetGraph();
             listenerExists = true;
-            client1 = new UdpClient("www.smartshoegrapher.dynamic-dns.net",5013,5013,45); //2391,5007,1 //TODO: CHANGE THIS TO TAKE IN DATA!!!
+            client1 = new UdpClient("smartshoegrapher1.hopto.org",5013,5013,45); //2391,5007,1 //TODO: CHANGE THIS TO TAKE IN DATA!!!
             client1.setStreamData(true);
             UdpClient.UdpDataListener listener1 = client1.new UdpDataListener(handler, "ANDREW");
             listener1.start();
         }
     }
+
     public void resetGraph(){
         xCounter = 0;
         UpdateSuspender.using(plotSurface, new Runnable() {
