@@ -175,7 +175,7 @@ public class UdpClient  {
                 try {
                     String mess = "Android Data Receiver";
                     senderSocket = new DatagramSocket(localPort);
-                    InetAddress address = InetAddress.getByName("smartshoegrapher.dynamic-dns.net");
+                    InetAddress address = InetAddress.getByName("smartshoegrapher.duckdns.org");
                     DatagramPacket packet = new DatagramPacket(mess.getBytes(), mess.length(), address, localPort);
                     senderSocket.send(packet);
                     senderSocket.close();

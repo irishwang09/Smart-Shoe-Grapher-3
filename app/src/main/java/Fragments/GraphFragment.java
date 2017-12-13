@@ -129,13 +129,13 @@ public class GraphFragment extends Fragment {
         try{
             plotSurface.setRuntimeLicenseKey(
                 "<LicenseContract>\n" +
-                "<Customer>MIT</Customer>\n" +
-                "<OrderId>EDUCATIONAL-USE-0016</OrderId>\n" +
-                "<LicenseCount>5</LicenseCount>\n" +
-                " <IsTrialLicense>false</IsTrialLicense>\n" +
-                "<SupportExpires>05/31/2017 00:00:00</SupportExpires>\n\n " +
-                " <ProductCode>SC-ANDROID-2D-PRO</ProductCode>\n\n" +
-                " <KeyCode>57a1d37ef5811a3a3b905505a94bf08ba741a706b8768fdf434c05eb7eb2f5b58dc39039e24ff0c0e00b4385838e9ac44154fd7013b2836e7891a2281fe154a3b9915757a401e0978bc1624be61e2a53abc19a3af1f3fb11bdda0c794d1fa7bbad9acc094d884ed540cb3b841926710daa5ee7b433bb77b1d2fd317e8c499fd9db7e38973b4853351c22bc41c49cf4b5b5dc3b1c78d298313be1b071d649229f</KeyCode>\n" +
+                "  <Customer>MIT</Customer>\n" +
+                "  <OrderId>EDUCATIONAL-USE-0016</OrderId>\n" +
+                "  <LicenseCount>5</LicenseCount>\n" +
+                "  <IsTrialLicense>false</IsTrialLicense>\n" +
+                "  <SupportExpires>05/31/2017 00:00:00</SupportExpires>\n" +
+                "  <ProductCode>SC-ANDROID-2D-PRO</ProductCode>\n" +
+                "  <KeyCode>57a1d37ef5811a3a3b905505a94bf08ba741a706b8768fdf434c05eb7eb2f5b58dc39039e24ff0c0e00b4385838e9ac44154fd7013b2836e7891a2281fe154a3b9915757a401e0978bc1624be61e2a53abc19a3af1f3fb11bdda0c794d1fa7bbad9acc094d884ed540cb3b841926710daa5ee7b433bb77b1d2fd317e8c499fd9db7e38973b4853351c22bc41c49cf4b5b5dc3b1c78d298313be1b071d649229f</KeyCode>\n" +
                 "</LicenseContract>" );
         } catch (Exception e){
             e.printStackTrace();
@@ -212,6 +212,7 @@ public class GraphFragment extends Fragment {
                         if (MainActivity.isRunning){
                             //data is receieved in a very long string of numbers
                             String recievedData = (String) msg.obj;
+                            Log.e("Recieved", recievedData);
                             //split data every fourth int and populate a String[] with it
                             String[] dataSplit = splitStringEvery(recievedData, 4);
                             //check for errors by comparing the checksum with data
@@ -234,15 +235,15 @@ public class GraphFragment extends Fragment {
                                     xval++;
                                 }
                                 //below is for graphing every fourth datapoint
-                                /*orderedData.add(xval);
-                                orderedData.add(Integer.parseInt(dataSplit[0]));
-                                orderedData.add(xval);
-                                orderedData.add(Integer.parseInt(dataSplit[1]));
-                                orderedData.add(xval);
-                                orderedData.add(Integer.parseInt(dataSplit[2]));
-                                orderedData.add(xval);
-                                orderedData.add(Integer.parseInt(dataSplit[3]));*/
-                                xval++;
+//                                orderedData.add(xval);
+//                                orderedData.add(Integer.parseInt(dataSplit[0]));
+//                                orderedData.add(xval);
+//                                orderedData.add(Integer.parseInt(dataSplit[1]));
+//                                orderedData.add(xval);
+//                                orderedData.add(Integer.parseInt(dataSplit[2]));
+//                                orderedData.add(xval);
+//                                orderedData.add(Integer.parseInt(dataSplit[3]));
+//                                xval++;
                                 xCounter = xval;
                                 UpdateSuspender.using(plotSurface, new Runnable() {    //This updater graphs the values
                                     @Override
