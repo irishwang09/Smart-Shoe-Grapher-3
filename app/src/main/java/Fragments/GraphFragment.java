@@ -133,9 +133,9 @@ public class GraphFragment extends Fragment {
                 "  <OrderId>EDUCATIONAL-USE-0016</OrderId>\n" +
                 "  <LicenseCount>5</LicenseCount>\n" +
                 "  <IsTrialLicense>false</IsTrialLicense>\n" +
-                "  <SupportExpires>05/31/2017 00:00:00</SupportExpires>\n" +
+                "  <SupportExpires>05/31/2018 00:00:00</SupportExpires>\n" +
                 "  <ProductCode>SC-ANDROID-2D-PRO</ProductCode>\n" +
-                "  <KeyCode>57a1d37ef5811a3a3b905505a94bf08ba741a706b8768fdf434c05eb7eb2f5b58dc39039e24ff0c0e00b4385838e9ac44154fd7013b2836e7891a2281fe154a3b9915757a401e0978bc1624be61e2a53abc19a3af1f3fb11bdda0c794d1fa7bbad9acc094d884ed540cb3b841926710daa5ee7b433bb77b1d2fd317e8c499fd9db7e38973b4853351c22bc41c49cf4b5b5dc3b1c78d298313be1b071d649229f</KeyCode>\n" +
+                "  <KeyCode>c4c218aedbc943bc92ca472617662fce48538754b400fb375c9308694a6d12b0e14e1f35bdef8e0bde1a127ed24bc3b8a50a3771de03a5f178814f5fd03e0bfe5aaeec4021b536d6a949ac29d44a851e79ec187db0ce65f7ee368346cba3d311cb0037a26d5b68bbd983163ca631b64086008410045174604896cc5fb4dcd521451311513c11c02f76ecb08d35a2069c53ba10c0ce404b5e16d6506acbf74bb0</KeyCode>\n" +
                 "</LicenseContract>" );
         } catch (Exception e){
             e.printStackTrace();
